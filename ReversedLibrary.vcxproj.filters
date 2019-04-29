@@ -1,0 +1,708 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;hm;inl;inc;ipp;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Header Files\BitSets">
+      <UniqueIdentifier>{d8e74dc5-6949-4733-8972-4c9a0a620fbc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\CollisionDetection">
+      <UniqueIdentifier>{f7198fed-4c06-4fb0-b0fc-3cf5cccbd5d2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Components">
+      <UniqueIdentifier>{2853b26f-9475-426a-a0d6-200bfb6d26c2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Containers">
+      <UniqueIdentifier>{d970794b-c541-4791-a1ae-1a48bcef6b59}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Files">
+      <UniqueIdentifier>{63546dd0-3cd6-497c-bfb2-c122a80d1601}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Functions">
+      <UniqueIdentifier>{7aa77de0-0c5f-44d1-970d-42a0e4ed7fd2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Fonts">
+      <UniqueIdentifier>{7b7ced87-3642-4cd8-94c5-06ad2fa82381}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Internet">
+      <UniqueIdentifier>{1d410afc-2ab8-462f-b1ab-5f2e6f433c45}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Math">
+      <UniqueIdentifier>{ddb69211-3783-4db1-9b5d-6074ab854e21}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\MemoryManagement">
+      <UniqueIdentifier>{2a08b90d-d7e7-4d6d-b461-a9984b9d0053}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Messages">
+      <UniqueIdentifier>{b041de50-0898-45c3-bccb-3be1766d57b0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\SmartPointers">
+      <UniqueIdentifier>{fa46624b-dc79-4c09-9715-b71948422626}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Strings">
+      <UniqueIdentifier>{dfe79b30-e181-43f0-830d-bc9702e57d30}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Threads">
+      <UniqueIdentifier>{7f2b0724-29ba-4937-b66c-5ba2d33a6489}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Containers\Algorithms">
+      <UniqueIdentifier>{20225bdc-bf5a-478b-8b7d-fec6263ed050}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Containers\Arrays">
+      <UniqueIdentifier>{e9a1ee67-b17f-408f-86f7-deeec2538601}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Containers\HashMaps">
+      <UniqueIdentifier>{31454081-0ecb-4d4e-b71f-b59817357a8e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\CollisionDetection\Shapes">
+      <UniqueIdentifier>{488d3bc4-656d-409b-921b-56b722bf1123}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Inc\ExplicitCopy.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\Reassert.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\Redefs.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\Relib.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\RelibInitializer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\Reutils.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\Singleton.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\TemplateUtils.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\VarArgsUtils.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\Action.h">
+      <Filter>Header Files\Functions</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\ActionImpl.h">
+      <Filter>Header Files\Functions</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\ActionOwner.h">
+      <Filter>Header Files\Functions</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\ActionUtils.h">
+      <Filter>Header Files\Functions</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\AllocationStrategy.h">
+      <Filter>Header Files\MemoryManagement</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\Allocator.h">
+      <Filter>Header Files\MemoryManagement</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\AngledRectShape.h">
+      <Filter>Header Files\CollisionDetection\Shapes</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\AARect.h">
+      <Filter>Header Files\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\AARectShape.h">
+      <Filter>Header Files\CollisionDetection\Shapes</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\Archive.h">
+      <Filter>Header Files\Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\Arena.h">
+      <Filter>Header Files\MemoryManagement</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\Array.h">
+      <Filter>Header Files\Containers\Arrays</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\ArrayBuffer.h">
+      <Filter>Header Files\Containers\Arrays</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\ArrayData.h">
+      <Filter>Header Files\Containers\Arrays</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\Atomic.h">
+      <Filter>Header Files\Threads</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\BaseBlockAllocator.h">
+      <Filter>Header Files\MemoryManagement</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\BaseStackAllocator.h">
+      <Filter>Header Files\MemoryManagement</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\BaseString.h">
+      <Filter>Header Files\Strings</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\BaseStringPart.h">
+      <Filter>Header Files\Strings</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\BaseStringView.h">
+      <Filter>Header Files\Strings</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\BitmapShape.h">
+      <Filter>Header Files\CollisionDetection\Shapes</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\BitSet.h">
+      <Filter>Header Files\BitSets</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\BitSetIteration.h">
+      <Filter>Header Files\BitSets</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\CircleShape.h">
+      <Filter>Header Files\CollisionDetection\Shapes</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\CommonStringOperations.h">
+      <Filter>Header Files\Strings</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\Color.h">
+      <Filter>Header Files\Containers</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\Comparators.h">
+      <Filter>Header Files\Containers\Algorithms</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\ComplexShape.h">
+      <Filter>Header Files\CollisionDetection\Shapes</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\Component.h">
+      <Filter>Header Files\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\ComponentClasses.h">
+      <Filter>Header Files\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\ComponentEnumerators.h">
+      <Filter>Header Files\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\ComponentGroup.h">
+      <Filter>Header Files\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\ComponentUtils.h">
+      <Filter>Header Files\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\CompressedPair.h">
+      <Filter>Header Files\Containers</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\ConditionVariable.h">
+      <Filter>Header Files\Threads</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\ConvexShapeCollisionDetector.h">
+      <Filter>Header Files\CollisionDetection</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\CriticalSection.h">
+      <Filter>Header Files\Threads</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\CurlException.h">
+      <Filter>Header Files\Internet</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\CurlInitializer.h">
+      <Filter>Header Files\Internet</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\DynamicAllocators.h">
+      <Filter>Header Files\MemoryManagement</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\DynamicBitset.h">
+      <Filter>Header Files\BitSets</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\DynamicFile.h">
+      <Filter>Header Files\Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\Easing.h">
+      <Filter>Header Files\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\Entity.h">
+      <Filter>Header Files\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\EntityComponentSystem.h">
+      <Filter>Header Files\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\EntityContainer.h">
+      <Filter>Header Files\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\EntityGroup.h">
+      <Filter>Header Files\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\EntityGroupOwner.h">
+      <Filter>Header Files\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\EntityGroupRange.h">
+      <Filter>Header Files\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\EntityInitializer.h">
+      <Filter>Header Files\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\EntityRange.h">
+      <Filter>Header Files\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\EntityRef.h">
+      <Filter>Header Files\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\EnumDictionary.h">
+      <Filter>Header Files\Containers</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\EventSystem.h">
+      <Filter>Header Files\Messages</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\Errors.h">
+      <Filter>Header Files\Messages</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\EventUtils.h">
+      <Filter>Header Files\Messages</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\FileCollection.h">
+      <Filter>Header Files\Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\FileOperations.h">
+      <Filter>Header Files\Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\FileMapping.h">
+      <Filter>Header Files\Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\FileOwners.h">
+      <Filter>Header Files\Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\FileSystem.h">
+      <Filter>Header Files\Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\FileViews.h">
+      <Filter>Header Files\Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\Font.h">
+      <Filter>Header Files\Fonts</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\FontSize.h">
+      <Filter>Header Files\Fonts</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\FreeTypeException.h">
+      <Filter>Header Files\Fonts</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\GeneralBlockAllocator.h">
+      <Filter>Header Files\MemoryManagement</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\Glyph.h">
+      <Filter>Header Files\Fonts</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\GrowStrategy.h">
+      <Filter>Header Files\Containers\Arrays</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\ExternalObject.h">
+      <Filter>Header Files\SmartPointers</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\HashTable.h">
+      <Filter>Header Files\Containers\HashMaps</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\HashTableBase.h">
+      <Filter>Header Files\Containers\HashMaps</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\HashUtils.h">
+      <Filter>Header Files\Containers\HashMaps</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\Hitbox.h">
+      <Filter>Header Files\CollisionDetection</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\IniFile.h">
+      <Filter>Header Files\Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\IniSetting.h">
+      <Filter>Header Files\Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\InlineComponent.h">
+      <Filter>Header Files\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\InlineEntity.h">
+      <Filter>Header Files\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\InlineEntityStorage.h">
+      <Filter>Header Files\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\InlineStackAllocator.h">
+      <Filter>Header Files\MemoryManagement</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\InternetFile.h">
+      <Filter>Header Files\Internet</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\Interval.h">
+      <Filter>Header Files\Containers</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\Invoke.h">
+      <Filter>Header Files\Functions</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\JsonDocument.h">
+      <Filter>Header Files\Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\JsonValues.h">
+      <Filter>Header Files\Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\KernelEvent.h">
+      <Filter>Header Files\Threads</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\LibraryAllocators.h">
+      <Filter>Header Files\MemoryManagement</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\Link.h">
+      <Filter>Header Files\Containers\Algorithms</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\LockFreeStorage.h">
+      <Filter>Header Files\Threads</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\Map.h">
+      <Filter>Header Files\Containers\HashMaps</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\MapUtils.h">
+      <Filter>Header Files\Containers\HashMaps</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\MathUtils.h">
+      <Filter>Header Files\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\Matrix.h">
+      <Filter>Header Files\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\MemoryOwner.h">
+      <Filter>Header Files\MemoryManagement</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\MemoryUtils.h">
+      <Filter>Header Files\MemoryManagement</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\Message.h">
+      <Filter>Header Files\Messages</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\MessageLog.h">
+      <Filter>Header Files\Messages</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\MessageLogImpls.h">
+      <Filter>Header Files\Messages</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\MessageSystem.h">
+      <Filter>Header Files\Messages</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\MessageUtils.h">
+      <Filter>Header Files\Messages</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\MutableActionOwner.h">
+      <Filter>Header Files\Functions</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\Mutex.h">
+      <Filter>Header Files\Threads</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\NamedInlineComponent.h">
+      <Filter>Header Files\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\NoiseGenerator.h">
+      <Filter>Header Files\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\NullShape.h">
+      <Filter>Header Files\CollisionDetection\Shapes</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\ObjectCreation.h">
+      <Filter>Header Files\SmartPointers</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\ObjectCreationUtils.h">
+      <Filter>Header Files\SmartPointers</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\ObjectPool.h">
+      <Filter>Header Files\Containers</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\Optional.h">
+      <Filter>Header Files\Containers</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\PagedBitSet.h">
+      <Filter>Header Files\BitSets</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\Pair.h">
+      <Filter>Header Files\Containers</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\PersistentStorage.h">
+      <Filter>Header Files\Containers</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\PointShape.h">
+      <Filter>Header Files\CollisionDetection\Shapes</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\PolygonShape.h">
+      <Filter>Header Files\CollisionDetection\Shapes</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\Ptr.h">
+      <Filter>Header Files\SmartPointers</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\PtrCastUtils.h">
+      <Filter>Header Files\SmartPointers</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\PtrOwner.h">
+      <Filter>Header Files\SmartPointers</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\Quaternion.h">
+      <Filter>Header Files\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\RandomGenerator.h">
+      <Filter>Header Files\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\RawBuffer.h">
+      <Filter>Header Files\Containers</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\RawStringBuffer.h">
+      <Filter>Header Files\Strings</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\ReadWriteLock.h">
+      <Filter>Header Files\Threads</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\ReferenceWrappers.h">
+      <Filter>Header Files\Containers</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\RegistryKey.h">
+      <Filter>Header Files\Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\Remath.h">
+      <Filter>Header Files\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\Relimits.h">
+      <Filter>Header Files\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\ReProcess.h">
+      <Filter>Header Files\Threads</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\Serializable.h">
+      <Filter>Header Files\SmartPointers</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\ReSearch.h">
+      <Filter>Header Files\Containers\Algorithms</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\StackArray.h">
+      <Filter>Header Files\Containers\Arrays</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\SafeCounters.h">
+      <Filter>Header Files\SmartPointers</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\Shape.h">
+      <Filter>Header Files\CollisionDetection\Shapes</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\Sort.h">
+      <Filter>Header Files\Containers\Algorithms</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\StaticArray.h">
+      <Filter>Header Files\Containers\Arrays</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\StackAllocator.h">
+      <Filter>Header Files\MemoryManagement</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\Tuple.h">
+      <Filter>Header Files\Containers</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\Thread.h">
+      <Filter>Header Files\Threads</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\ZipConverter.h">
+      <Filter>Header Files\Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\XmlDocument.h">
+      <Filter>Header Files\Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\XmlElement.h">
+      <Filter>Header Files\Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\Vector.h">
+      <Filter>Header Files\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\UnicodeUtils.h">
+      <Filter>Header Files\Strings</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\UnicodeSet.h">
+      <Filter>Header Files\Strings</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\TypelessActionOwner.h">
+      <Filter>Header Files\Functions</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\Transformations.h">
+      <Filter>Header Files\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\ValueAnimator.h">
+      <Filter>Header Files\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\StringData.h">
+      <Filter>Header Files\Strings</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\StrConversions.h">
+      <Filter>Header Files\Strings</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\StringAllocator.h">
+      <Filter>Header Files\Strings</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\StringOperations.h">
+      <Filter>Header Files\Strings</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\SplitEnumerators.h">
+      <Filter>Header Files\Strings</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\SpinLock.h">
+      <Filter>Header Files\Threads</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\Systems.h">
+      <Filter>Header Files\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\TempFile.h">
+      <Filter>Header Files\Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\StaticAllocators.h">
+      <Filter>Header Files\MemoryManagement</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\SystemOwner.h">
+      <Filter>Header Files\Components</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Src\ActionOwner.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Archive.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\CurlInitializer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\DynamicAllocators.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Entity.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\EntityComponentSystem.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\EntityContainer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\EntityGroup.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\EntityInitializer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Errors.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\EventSystem.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\FileCollection.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\FileMapping.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\FileOperations.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\FileSystem.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Font.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\FontSize.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\FreeTypeException.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\GlobalData.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Glyph.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\HashUtils.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\IniFile.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\InternetFile.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\JsonDocument.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\JsonValues.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\LibraryAllocators.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\MemoryUtils.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Message.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\MessageLog.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\MessageLogImpls.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\MessageSystem.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\MessageUtils.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\ObjectCreationUtils.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Reassert.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\RegistryKey.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\RelibInitializer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\ReProcess.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Reutils.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\StaticAllocators.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\StringAllocator.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\StringOperations.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\TempFile.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\UnicodeUtils.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\XmlDocument.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\XmlElement.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\ZipConverter.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Ext\Src\RapidXml\rapidxml.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>

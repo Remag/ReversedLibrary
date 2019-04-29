@@ -1,0 +1,370 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <VCProjectVersion>16.0</VCProjectVersion>
+    <ProjectGuid>{0AC68019-724D-48BD-A828-BA93A217BA33}</ProjectGuid>
+    <RootNamespace>ReversedLibrary</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v142</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v142</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v142</PlatformToolset>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v142</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="Shared">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <TargetExt>.dll</TargetExt>
+    <OutDir>$(SolutionDir)Bin\$(Configuration)\</OutDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <TargetExt>.dll</TargetExt>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <SDLCheck>true</SDLCheck>
+      <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>.\Inc;.\Src;.\Ext\Inc;.\Ext\Inc\FreeType</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>_WINDLL;REBUILD;REBUILD_DYNAMIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <AdditionalLibraryDirectories>.\Ext\Lib\$(Configuration);</AdditionalLibraryDirectories>
+    </Link>
+    <PostBuildEvent>
+      <Command>xcopy "$(SolutionDir)Ext\Bin\$(Configuration)\*.dll" "$(TargetDir)" /D /K /Y</Command>
+    </PostBuildEvent>
+    <PostBuildEvent>
+      <Message>Copying dll files...</Message>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <SDLCheck>true</SDLCheck>
+      <ConformanceMode>true</ConformanceMode>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level4</WarningLevel>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>
+      </SDLCheck>
+      <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>.\Inc;.\Src;.\Ext\Inc;.\Ext\Inc\FreeType</AdditionalIncludeDirectories>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
+      <OmitFramePointers>true</OmitFramePointers>
+      <PreprocessorDefinitions>_WINDLL;REBUILD;REBUILD_DYNAMIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <StringPooling>true</StringPooling>
+      <BufferSecurityCheck>false</BufferSecurityCheck>
+      <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
+      <FloatingPointModel>Fast</FloatingPointModel>
+      <FloatingPointExceptions>false</FloatingPointExceptions>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <AdditionalLibraryDirectories>.\Ext\Lib\$(Configuration);</AdditionalLibraryDirectories>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <ConformanceMode>true</ConformanceMode>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClInclude Include="Inc\AARect.h" />
+    <ClInclude Include="Inc\AARectShape.h" />
+    <ClInclude Include="Inc\Action.h" />
+    <ClInclude Include="Inc\ActionImpl.h" />
+    <ClInclude Include="Inc\ActionOwner.h" />
+    <ClInclude Include="Inc\ActionUtils.h" />
+    <ClInclude Include="Inc\AllocationStrategy.h" />
+    <ClInclude Include="Inc\Allocator.h" />
+    <ClInclude Include="Inc\AngledRectShape.h" />
+    <ClInclude Include="Inc\Archive.h" />
+    <ClInclude Include="Inc\Arena.h" />
+    <ClInclude Include="Inc\Array.h" />
+    <ClInclude Include="Inc\ArrayBuffer.h" />
+    <ClInclude Include="Inc\ArrayData.h" />
+    <ClInclude Include="Inc\Atomic.h" />
+    <ClInclude Include="Inc\BaseBlockAllocator.h" />
+    <ClInclude Include="Inc\BaseStackAllocator.h" />
+    <ClInclude Include="Inc\BaseString.h" />
+    <ClInclude Include="Inc\BaseStringPart.h" />
+    <ClInclude Include="Inc\BaseStringView.h" />
+    <ClInclude Include="Inc\BitmapShape.h" />
+    <ClInclude Include="Inc\BitSet.h" />
+    <ClInclude Include="Inc\BitSetIteration.h" />
+    <ClInclude Include="Inc\CircleShape.h" />
+    <ClInclude Include="Inc\Color.h" />
+    <ClInclude Include="Inc\CommonStringOperations.h" />
+    <ClInclude Include="Inc\Comparators.h" />
+    <ClInclude Include="Inc\ComplexShape.h" />
+    <ClInclude Include="Inc\Component.h" />
+    <ClInclude Include="Inc\ComponentClasses.h" />
+    <ClInclude Include="Inc\ComponentEnumerators.h" />
+    <ClInclude Include="Inc\ComponentGroup.h" />
+    <ClInclude Include="Inc\ComponentUtils.h" />
+    <ClInclude Include="Inc\CompressedPair.h" />
+    <ClInclude Include="Inc\ConditionVariable.h" />
+    <ClInclude Include="Inc\ConvexShapeCollisionDetector.h" />
+    <ClInclude Include="Inc\CriticalSection.h" />
+    <ClInclude Include="Inc\CurlException.h" />
+    <ClInclude Include="Inc\CurlInitializer.h" />
+    <ClInclude Include="Inc\DynamicAllocators.h" />
+    <ClInclude Include="Inc\DynamicBitset.h" />
+    <ClInclude Include="Inc\DynamicFile.h" />
+    <ClInclude Include="Inc\Easing.h" />
+    <ClInclude Include="Inc\Entity.h" />
+    <ClInclude Include="Inc\EntityComponentSystem.h" />
+    <ClInclude Include="Inc\EntityContainer.h" />
+    <ClInclude Include="Inc\EntityGroup.h" />
+    <ClInclude Include="Inc\EntityGroupOwner.h" />
+    <ClInclude Include="Inc\EntityGroupRange.h" />
+    <ClInclude Include="Inc\EntityInitializer.h" />
+    <ClInclude Include="Inc\EntityRange.h" />
+    <ClInclude Include="Inc\EntityRef.h" />
+    <ClInclude Include="Inc\EnumDictionary.h" />
+    <ClInclude Include="Inc\Errors.h" />
+    <ClInclude Include="Inc\EventSystem.h" />
+    <ClInclude Include="Inc\EventUtils.h" />
+    <ClInclude Include="Inc\ExplicitCopy.h" />
+    <ClInclude Include="Inc\ExternalObject.h" />
+    <ClInclude Include="Inc\FileCollection.h" />
+    <ClInclude Include="Inc\FileMapping.h" />
+    <ClInclude Include="Inc\FileOperations.h" />
+    <ClInclude Include="Inc\FileOwners.h" />
+    <ClInclude Include="Inc\FileSystem.h" />
+    <ClInclude Include="Inc\FileViews.h" />
+    <ClInclude Include="Inc\Font.h" />
+    <ClInclude Include="Inc\FontSize.h" />
+    <ClInclude Include="Inc\FreeTypeException.h" />
+    <ClInclude Include="Inc\GeneralBlockAllocator.h" />
+    <ClInclude Include="Inc\Glyph.h" />
+    <ClInclude Include="Inc\GrowStrategy.h" />
+    <ClInclude Include="Inc\HashTable.h" />
+    <ClInclude Include="Inc\HashTableBase.h" />
+    <ClInclude Include="Inc\HashUtils.h" />
+    <ClInclude Include="Inc\Hitbox.h" />
+    <ClInclude Include="Inc\IniFile.h" />
+    <ClInclude Include="Inc\IniSetting.h" />
+    <ClInclude Include="Inc\InlineComponent.h" />
+    <ClInclude Include="Inc\InlineEntity.h" />
+    <ClInclude Include="Inc\InlineEntityStorage.h" />
+    <ClInclude Include="Inc\InlineStackAllocator.h" />
+    <ClInclude Include="Inc\InternetFile.h" />
+    <ClInclude Include="Inc\Interval.h" />
+    <ClInclude Include="Inc\Invoke.h" />
+    <ClInclude Include="Inc\JsonDocument.h" />
+    <ClInclude Include="Inc\JsonValues.h" />
+    <ClInclude Include="Inc\KernelEvent.h" />
+    <ClInclude Include="Inc\LibraryAllocators.h" />
+    <ClInclude Include="Inc\Link.h" />
+    <ClInclude Include="Inc\LockFreeStorage.h" />
+    <ClInclude Include="Inc\Map.h" />
+    <ClInclude Include="Inc\MapUtils.h" />
+    <ClInclude Include="Inc\MathUtils.h" />
+    <ClInclude Include="Inc\Matrix.h" />
+    <ClInclude Include="Inc\MemoryOwner.h" />
+    <ClInclude Include="Inc\MemoryUtils.h" />
+    <ClInclude Include="Inc\Message.h" />
+    <ClInclude Include="Inc\MessageLog.h" />
+    <ClInclude Include="Inc\MessageLogImpls.h" />
+    <ClInclude Include="Inc\MessageSystem.h" />
+    <ClInclude Include="Inc\MessageUtils.h" />
+    <ClInclude Include="Inc\MutableActionOwner.h" />
+    <ClInclude Include="Inc\Mutex.h" />
+    <ClInclude Include="Inc\NamedInlineComponent.h" />
+    <ClInclude Include="Inc\NoiseGenerator.h" />
+    <ClInclude Include="Inc\NullShape.h" />
+    <ClInclude Include="Inc\ObjectCreation.h" />
+    <ClInclude Include="Inc\ObjectCreationUtils.h" />
+    <ClInclude Include="Inc\ObjectPool.h" />
+    <ClInclude Include="Inc\Optional.h" />
+    <ClInclude Include="Inc\PagedBitSet.h" />
+    <ClInclude Include="Inc\Pair.h" />
+    <ClInclude Include="Inc\PersistentStorage.h" />
+    <ClInclude Include="Inc\PointShape.h" />
+    <ClInclude Include="Inc\PolygonShape.h" />
+    <ClInclude Include="Inc\Ptr.h" />
+    <ClInclude Include="Inc\PtrCastUtils.h" />
+    <ClInclude Include="Inc\PtrOwner.h" />
+    <ClInclude Include="Inc\Quaternion.h" />
+    <ClInclude Include="Inc\RandomGenerator.h" />
+    <ClInclude Include="Inc\RawBuffer.h" />
+    <ClInclude Include="Inc\RawStringBuffer.h" />
+    <ClInclude Include="Inc\ReadWriteLock.h" />
+    <ClInclude Include="Inc\Reassert.h" />
+    <ClInclude Include="Inc\Redefs.h" />
+    <ClInclude Include="Inc\ReferenceWrappers.h" />
+    <ClInclude Include="Inc\RegistryKey.h" />
+    <ClInclude Include="Inc\Relib.h" />
+    <ClInclude Include="Inc\RelibInitializer.h" />
+    <ClInclude Include="Inc\Relimits.h" />
+    <ClInclude Include="Inc\Remath.h" />
+    <ClInclude Include="Inc\ReProcess.h" />
+    <ClInclude Include="Inc\ReSearch.h" />
+    <ClInclude Include="Inc\Reutils.h" />
+    <ClInclude Include="Inc\SafeCounters.h" />
+    <ClInclude Include="Inc\Serializable.h" />
+    <ClInclude Include="Inc\Shape.h" />
+    <ClInclude Include="Inc\Singleton.h" />
+    <ClInclude Include="Inc\Sort.h" />
+    <ClInclude Include="Inc\SpinLock.h" />
+    <ClInclude Include="Inc\SplitEnumerators.h" />
+    <ClInclude Include="Inc\StackAllocator.h" />
+    <ClInclude Include="Inc\StackArray.h" />
+    <ClInclude Include="Inc\StaticAllocators.h" />
+    <ClInclude Include="Inc\StaticArray.h" />
+    <ClInclude Include="Inc\StrConversions.h" />
+    <ClInclude Include="Inc\StringAllocator.h" />
+    <ClInclude Include="Inc\StringData.h" />
+    <ClInclude Include="Inc\StringOperations.h" />
+    <ClInclude Include="Inc\SystemOwner.h" />
+    <ClInclude Include="Inc\Systems.h" />
+    <ClInclude Include="Inc\TempFile.h" />
+    <ClInclude Include="Inc\TemplateUtils.h" />
+    <ClInclude Include="Inc\Thread.h" />
+    <ClInclude Include="Inc\Transformations.h" />
+    <ClInclude Include="Inc\Tuple.h" />
+    <ClInclude Include="Inc\TypelessActionOwner.h" />
+    <ClInclude Include="Inc\UnicodeSet.h" />
+    <ClInclude Include="Inc\UnicodeUtils.h" />
+    <ClInclude Include="Inc\ValueAnimator.h" />
+    <ClInclude Include="Inc\VarArgsUtils.h" />
+    <ClInclude Include="Inc\Vector.h" />
+    <ClInclude Include="Inc\XmlDocument.h" />
+    <ClInclude Include="Inc\XmlElement.h" />
+    <ClInclude Include="Inc\ZipConverter.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Ext\Src\RapidXml\rapidxml.cpp" />
+    <ClCompile Include="Src\ActionOwner.cpp" />
+    <ClCompile Include="Src\Archive.cpp" />
+    <ClCompile Include="Src\CurlInitializer.cpp" />
+    <ClCompile Include="Src\DynamicAllocators.cpp" />
+    <ClCompile Include="Src\Entity.cpp" />
+    <ClCompile Include="Src\EntityComponentSystem.cpp" />
+    <ClCompile Include="Src\EntityContainer.cpp" />
+    <ClCompile Include="Src\EntityGroup.cpp" />
+    <ClCompile Include="Src\EntityInitializer.cpp" />
+    <ClCompile Include="Src\Errors.cpp" />
+    <ClCompile Include="Src\EventSystem.cpp" />
+    <ClCompile Include="Src\FileCollection.cpp" />
+    <ClCompile Include="Src\FileMapping.cpp" />
+    <ClCompile Include="Src\FileOperations.cpp" />
+    <ClCompile Include="Src\FileSystem.cpp" />
+    <ClCompile Include="Src\Font.cpp" />
+    <ClCompile Include="Src\FontSize.cpp" />
+    <ClCompile Include="Src\FreeTypeException.cpp" />
+    <ClCompile Include="Src\GlobalData.cpp" />
+    <ClCompile Include="Src\Glyph.cpp" />
+    <ClCompile Include="Src\HashUtils.cpp" />
+    <ClCompile Include="Src\IniFile.cpp" />
+    <ClCompile Include="Src\InternetFile.cpp" />
+    <ClCompile Include="Src\JsonDocument.cpp" />
+    <ClCompile Include="Src\JsonValues.cpp" />
+    <ClCompile Include="Src\LibraryAllocators.cpp" />
+    <ClCompile Include="Src\MemoryUtils.cpp" />
+    <ClCompile Include="Src\Message.cpp" />
+    <ClCompile Include="Src\MessageLog.cpp" />
+    <ClCompile Include="Src\MessageLogImpls.cpp" />
+    <ClCompile Include="Src\MessageSystem.cpp" />
+    <ClCompile Include="Src\MessageUtils.cpp" />
+    <ClCompile Include="Src\ObjectCreationUtils.cpp" />
+    <ClCompile Include="Src\Reassert.cpp" />
+    <ClCompile Include="Src\RegistryKey.cpp" />
+    <ClCompile Include="Src\RelibInitializer.cpp" />
+    <ClCompile Include="Src\ReProcess.cpp" />
+    <ClCompile Include="Src\Reutils.cpp" />
+    <ClCompile Include="Src\StaticAllocators.cpp" />
+    <ClCompile Include="Src\StringAllocator.cpp" />
+    <ClCompile Include="Src\StringOperations.cpp" />
+    <ClCompile Include="Src\TempFile.cpp" />
+    <ClCompile Include="Src\UnicodeUtils.cpp" />
+    <ClCompile Include="Src\XmlDocument.cpp" />
+    <ClCompile Include="Src\XmlElement.cpp" />
+    <ClCompile Include="Src\ZipConverter.cpp" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>
