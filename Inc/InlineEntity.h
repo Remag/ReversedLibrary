@@ -574,7 +574,7 @@ public:
 
 	template <class T>
 	bool HasValue( const CInlineComponent<T, ComponentClass>& component ) const
-		{ return hasValue( component ); }
+		{ return this->hasValue( component ); }
 	// Get component values.
 	template <class T>
 	T GetValue( const CInlineComponent<T, ComponentClass>& component ) const

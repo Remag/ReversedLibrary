@@ -1,6 +1,7 @@
 #pragma once
 #include <Remath.h>
 #include <Matrix.h>
+#include <HashUtils.h>
 
 namespace Relib {
 
@@ -523,33 +524,6 @@ template <class VecType, int dim>
 const VecType* end( const CVector<VecType, dim>& vec )
 {
 	return vec.Ptr() + dim;
-}
-
-// Conversion to strings.
-template <class VecType, int dim, class StrType, class DelimType>
-COptional<CVector<VecType, dim>> Value( const StrType& str, const DelimType& delimiter )
-{
-	CVector<VecType, dim> result;
-	int index = 0;
-	for( auto part : str.Split( delimiter ) ) {
-		if( index >= dim ) {
-			return COptional<CVector<VecType, dim>>();
-		}
-
-		const auto indexValue = Value<VecType>( part );
-		if( !indexValue.IsValid() ) {
-			return COptional<CVector<VecType, dim>>();
-		}
-
-		result[index] = *indexValue;
-		index++;
-	}
-
-	if( index < dim - 1 ) {
-		return COptional<CVector<VecType, dim>>();
-	}
-
-	return COptional<CVector<VecType, dim>>( result );
 }
 
 //////////////////////////////////////////////////////////////////////////

@@ -907,6 +907,33 @@ typename Types::EnableIf<Types::IsSame<T, RelibInternal::CBaseStringView<StrType
 	return CreateOptional( static_cast<RelibInternal::CBaseStringView<StrType>>( str ) );
 }
 
+// Vector conversion.
+template <class VecType, int dim, class StrType, class DelimType>
+COptional<CVector<VecType, dim>> Value( const StrType& str, const DelimType& delimiter )
+{
+	CVector<VecType, dim> result;
+	int index = 0;
+	for( auto part : str.Split( delimiter ) ) {
+		if( index >= dim ) {
+			return COptional<CVector<VecType, dim>>();
+		}
+
+		const auto indexValue = Value<VecType>( part );
+		if( !indexValue.IsValid() ) {
+			return COptional<CVector<VecType, dim>>();
+		}
+
+		result[index] = *indexValue;
+		index++;
+	}
+
+	if( index < dim - 1 ) {
+		return COptional<CVector<VecType, dim>>();
+	}
+
+	return COptional<CVector<VecType, dim>>( result );
+}
+
 //////////////////////////////////////////////////////////////////////////
 
 template <class T>
