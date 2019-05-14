@@ -8,10 +8,17 @@
 
 namespace Relib {
 
-extern const CError Err_BadIniFile;
-extern const CError Err_DuplicateIniKey;
+//////////////////////////////////////////////////////////////////////////
+
+CPair<CUnicodeView> CIniSectionKeyRange::operator*() const
+{
+	const auto& data = *mapIterator;
+	return CPair<CUnicodeView>( data.Key(), values[data.Value()] );
+}
 
 //////////////////////////////////////////////////////////////////////////
+extern const CError Err_BadIniFile;
+extern const CError Err_DuplicateIniKey;
 
 int CIniKeyHashStrategy::HashKey( CUnicodePart key )
 {
@@ -106,6 +113,11 @@ void CIniFileSection::DeleteKey( CUnicodePart keyName )
 void CIniFileSection::DeleteKey( int keyId )
 {
 	valueStrings[keyId] = CUnicodeString();
+}
+
+CIniSectionKeyRange CIniFileSection::KeyValuePairs() const
+{
+	return CIniSectionKeyRange( valueNameToId, valueStrings, valueNameToId.begin() );
 }
 
 CUnicodeString CIniFileSection::GetKeyValuePairsString() const

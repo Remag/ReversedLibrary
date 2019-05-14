@@ -91,7 +91,7 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <AdditionalLibraryDirectories>.\Ext\Lib\$(Configuration);</AdditionalLibraryDirectories>
-      <ImportLibrary>.\Lib\$(Configuration)\$(TargetName).lib</ImportLibrary>
+      <ImportLibrary>$(SolutionDir)\Lib\$(Configuration)\$(TargetName).lib</ImportLibrary>
     </Link>
     <PostBuildEvent>
       <Command>xcopy "$(ProjectDir)Ext\Bin\$(Configuration)\*.dll" "$(TargetDir)" /D /K /Y</Command>
@@ -136,7 +136,7 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <AdditionalLibraryDirectories>.\Ext\Lib\$(Configuration);</AdditionalLibraryDirectories>
-      <ImportLibrary>.\Lib\$(Configuration)\$(TargetName).lib</ImportLibrary>
+      <ImportLibrary>$(SolutionDir)\Lib\$(Configuration)\$(TargetName).lib</ImportLibrary>
     </Link>
     <PostBuildEvent>
       <Command>xcopy "$(ProjectDir)Ext\Bin\$(Configuration)\*.dll" "$(TargetDir)" /D /K /Y</Command>

@@ -21,6 +21,33 @@ public:
 
 //////////////////////////////////////////////////////////////////////////
 
+// Class for range-based for loop section values iteration.
+class REAPI CIniSectionKeyRange {
+public:
+	typedef RelibInternal::CHashIndexConstIterator<CMapData<CUnicodeString, int>, RelibInternal::CMapHashStrategy<CUnicodeString, int, CIniKeyHashStrategy>, CRuntimeHeap> TMapIterator;
+
+	CIniSectionKeyRange( const CMap<CUnicodeString, int, CIniKeyHashStrategy, CRuntimeHeap>& _valueNameToIds, CArrayView<CUnicodeString> _values, TMapIterator _mapIterator ) :
+		valueNameToIds( _valueNameToIds ), values( _values ), mapIterator( _mapIterator ) {}
+
+	void operator++()
+		{ ++mapIterator; } 
+	CPair<CUnicodeView> operator*() const;
+	bool operator!=( CIniSectionKeyRange other ) const
+		{ return mapIterator != other.mapIterator; }
+
+	CIniSectionKeyRange begin() const
+		{ return CIniSectionKeyRange( valueNameToIds, values, valueNameToIds.begin() ); }
+	CIniSectionKeyRange end() const
+		{ return CIniSectionKeyRange( valueNameToIds, values, valueNameToIds.end() ); }
+
+private:
+	const CMap<CUnicodeString, int, CIniKeyHashStrategy, CRuntimeHeap>& valueNameToIds; 
+	CArrayView<CUnicodeString> values;
+	TMapIterator mapIterator;
+};
+
+//////////////////////////////////////////////////////////////////////////
+
 // Section in an .ini file. Provides access to its keys.
 class REAPI CIniFileSection {
 public:
@@ -47,6 +74,7 @@ public:
 	void DeleteKey( CUnicodePart keyName );
 	void DeleteKey( int keyId );
 
+	CIniSectionKeyRange KeyValuePairs() const;
 	// Get contents of the section in a single string.
 	CUnicodeString GetKeyValuePairsString() const;
 
