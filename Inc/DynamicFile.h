@@ -16,6 +16,13 @@ public:
 	~CDynamicFile()
 		{ close(); }
 
+	operator CFileReadView() const
+		{ return CFileReadView( getFileHandle() ); }
+	operator CFileWriteView() const
+		{ return CFileWriteView( getFileHandle() ); }
+	operator CFileReadWriteView() const
+		{ return CFileReadWriteView( getFileHandle() ); }
+
 	// Get the WinAPI file handle.
 	HANDLE Handle() const
 		{ return getFileHandle(); }
@@ -30,9 +37,6 @@ public:
 		{ return tryOpen( fileName, readWriteMode, createMode, shareMode, FILE_ATTRIBUTE_NORMAL ); }
 	bool TryOpen( CUnicodeView fileName, TFileReadWriteMode readWriteMode, TFileCreationMode createMode, TFileShareMode shareMode, DWORD attributes )
 		{ return tryOpen( fileName, readWriteMode, createMode, shareMode, attributes ); }
-	
-	CFileStatus GetStatus() const
-		{ return getStatus(); }
 
 	// Save pending changes.
 	void Flush()

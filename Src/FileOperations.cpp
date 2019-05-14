@@ -88,6 +88,18 @@ bool CFileReadWriteOperations::IsOpen() const
 	return fileHandle != INVALID_HANDLE_VALUE;
 }
 
+CFileStatus CFileReadWriteOperations::GetStatus() const
+{
+	assert( IsOpen() );
+	CFileStatus result;
+	result.FullName = GetFileName();
+	result.Attributes = FileSystem::GetAttributes( result.FullName );
+	result.Length = GetLength();
+
+	::GetFileTime( fileHandle, &result.CreationTime, nullptr, &result.ModificationTime );
+	return result;
+}
+
 void CFileReadWriteOperations::open( CUnicodeView fileName, TFileReadWriteMode readWriteMode, TFileCreationMode createMode, TFileShareMode shareMode, DWORD attributes )
 {
 	assert( !IsOpen() );
@@ -131,18 +143,6 @@ __int64 CFileReadWriteOperations::Seek( __int64 offset, TFileSeekPosition from )
 		throwException();
 	}
 	return newPos.QuadPart;
-}
-
-CFileStatus CFileReadWriteOperations::getStatus() const
-{
-	assert( IsOpen() );
-	CFileStatus result;
-	result.FullName = GetFileName();
-	result.Attributes = FileSystem::GetAttributes( result.FullName );
-	result.Length = GetLength();
-
-	::GetFileTime( fileHandle, &result.CreationTime, nullptr, &result.ModificationTime );
-	return result;
 }
 
 __int64 CFileReadWriteOperations::GetLength() const

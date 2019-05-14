@@ -70,6 +70,7 @@ public:
 	CUnicodeString GetFileName() const;
 
 	bool IsOpen() const;
+	CFileStatus GetStatus() const;
 
 	// Low level read-write methods.
 
@@ -116,8 +117,6 @@ protected:
 	bool tryOpen( CUnicodeView fileName, TFileReadWriteMode readWriteMode, TFileCreationMode createMode, TFileShareMode shareMode, DWORD attributes );
 	// Open method that returns an invalid handle on failure.
 	static HANDLE tryOpenHandle( CUnicodeView fileName, TFileReadWriteMode readWriteMode, TFileCreationMode createMode, TFileShareMode shareMode, DWORD attributes );
-	
-	CFileStatus getStatus() const;
 
 	// Save pending changes.
 	void flush();
@@ -149,6 +148,7 @@ public:
 	using CFileReadWriteOperations::GetFileName;
 	using CFileReadWriteOperations::IsEndOfFile;
 	using CFileReadWriteOperations::IsOpen;
+	using CFileReadWriteOperations::GetStatus;
 	using CFileReadWriteOperations::GetLength;
 	using CFileReadWriteOperations::GetLength32;
 	using CFileReadWriteOperations::GetPosition;
@@ -169,6 +169,7 @@ public:
 	using CFileReadWriteOperations::GetFileName;
 	using CFileReadWriteOperations::IsEndOfFile;
 	using CFileReadWriteOperations::IsOpen;
+	using CFileReadWriteOperations::GetStatus;
 	using CFileReadWriteOperations::GetLength;
 	using CFileReadWriteOperations::GetLength32;
 	using CFileReadWriteOperations::GetPosition;
