@@ -410,7 +410,7 @@ static void writeUtf16LE( CFileWriteView file, CUnicodePart text )
 
 void WriteUnicodeText( CUnicodeView fileName, CUnicodePart text, TFileTextEncoding encoding )
 {
-	CFileWriter file( fileName, FCM_OpenExisting );
+	CFileWriter file( fileName, FCM_CreateAlways );
 	WriteUnicodeText( file, text, encoding );
 }
 
