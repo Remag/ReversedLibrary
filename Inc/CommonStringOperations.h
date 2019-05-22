@@ -56,6 +56,7 @@ public:
 	static int ReverseFindOneOf( CStringData<T> data, CStringData<T> charSet, int from );
 
 	static bool HasPrefix( CBaseStringPart<T> str, CBaseStringPart<T> prefix );
+	static bool HasSuffix( CBaseStringPart<T> str, CBaseStringPart<T> suffix );
 	static CBaseString<T> Concatenate( const T* leftStr, int leftLen, CBaseString<T>&& rightStr );
 	static CBaseString<T> Concatenate( const T* leftStr, int leftLen, const T* rightStr, int rightLen );
 	static CBaseStringPart<T> TrimRight( CStringData<T> data );
@@ -168,7 +169,15 @@ int CCommonStringOperations<T>::ReverseFindOneOf( CStringData<T> data, CStringDa
 template <class T>
 bool CCommonStringOperations<T>::HasPrefix( CBaseStringPart<T> str, CBaseStringPart<T> prefix )
 {
-	return str.Length() >= prefix.Length() && str.Left( prefix.Length() ) == prefix;
+	const auto prefixLength = prefix.Length();
+	return str.Length() >= prefixLength && str.Left( prefixLength ) == prefix;
+}
+
+template <class T>
+bool CCommonStringOperations<T>::HasSuffix( CBaseStringPart<T> str, CBaseStringPart<T> suffix )
+{
+	const auto suffixLength = suffix.Length();
+	return str.Length() >= suffixLength && str.Right( suffixLength ) == suffix;
 }
 
 template <class T>

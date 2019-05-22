@@ -46,6 +46,8 @@ public:
 		{ return CompareNoCase( string ) == 0; }
 	bool HasPrefix( CBaseStringPart<T> prefix ) const
 		{ return CStringOperations<T>::HasPrefix( *this, prefix ); }
+	bool HasSuffix( CBaseStringPart<T> suffix ) const
+		{ return CStringOperations<T>::HasSuffix( *this, suffix ); }
 
 	// Get a part without spaces on the edges.
 	CBaseStringPart<T> TrimRight() const
