@@ -1,0 +1,183 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<AutoVisualizer xmlns="http://schemas.microsoft.com/vstudio/debugger/natvis/2010">
+
+<Type Name="Relib::RelibInternal::CBaseStringView&lt;wchar_t&gt;">
+    <DisplayString>{buffer, su}</DisplayString>
+	<StringView>buffer, su</StringView>
+</Type>
+
+<Type Name="Relib::RelibInternal::CBaseStringPart&lt;wchar_t&gt;">
+	<DisplayString>{buffer, su}</DisplayString>
+	<StringView>buffer, su</StringView>
+</Type>
+
+<Type Name="Relib::RelibInternal::CBaseString&lt;wchar_t&gt;">
+    <DisplayString>{buffer, su}</DisplayString>
+	<StringView>buffer, su</StringView>
+</Type>
+
+<Type Name="Relib::RelibInternal::CBaseStringView&lt;char&gt;">
+	<DisplayString>{buffer, s}</DisplayString>
+	<StringView>buffer, s</StringView>
+</Type>
+
+<Type Name="Relib::RelibInternal::CBaseStringPart&lt;char&gt;">
+	<DisplayString>{buffer, s}</DisplayString>
+	<StringView>buffer, s</StringView>
+</Type>
+
+<Type Name="Relib::RelibInternal::CBaseString&lt;char&gt;">
+	<DisplayString>{buffer, s}</DisplayString>
+	<StringView>buffer, s</StringView>
+</Type>
+
+<Type Name="Relib::COptional&lt;*&gt;">
+	<DisplayString Condition="!isValid">Invalid</DisplayString>
+	<DisplayString Condition="isValid">{($T1&amp;)(*innerTypeData)}</DisplayString>
+</Type>
+
+<Type Name="Relib::CVector&lt;*,*&gt;">
+	<DisplayString Condition="$T2==2">( {vectorData[0]}, {vectorData[1]} )</DisplayString>
+	<DisplayString Condition="$T2==3">( {vectorData[0]}, {vectorData[1]}, {vectorData[2]} )</DisplayString>
+	<DisplayString Condition="$T2==4">( {vectorData[0]}, {vectorData[1]}, {vectorData[2]}, {vectorData[3]} )</DisplayString>
+	<DisplayString Condition="$T2>4">( {vectorData[0]}, {vectorData[1]}, {vectorData[2]}, {vectorData[3]}... )</DisplayString>
+	
+	<Expand>
+		<ArrayItems Condition="$T2>4">
+			<Size>$T2</Size>
+			<ValuePointer>vectorData</ValuePointer>
+		</ArrayItems>
+	</Expand>
+</Type>
+
+<Type Name="Relib::CMatrix&lt;*,*,*,*&gt;">
+	<DisplayString>[{$T2} x {$T3}]</DisplayString>
+	
+	<Expand>
+		<Synthetic Name="[0]" Condition="$T3>0 &amp;&amp; $T4==1">
+			<DisplayString Condition="$T2==2"> {matrixData[0]}   {matrixData[$T3]}</DisplayString>
+			<DisplayString Condition="$T2==3"> {matrixData[0]}   {matrixData[$T3]}   {matrixData[2 * $T3]}</DisplayString>
+			<DisplayString Condition="$T2==4"> {matrixData[0]}   {matrixData[$T3]}   {matrixData[2 * $T3]}   {matrixData[3 * $T3]}</DisplayString>
+			<DisplayString Condition="$T2>4"> {matrixData[0]}   {matrixData[$T3]}   {matrixData[2 * $T3]}   {matrixData[3 * $T3]}...</DisplayString>
+		</Synthetic>
+		<Synthetic Name="[1]" Condition="$T3>1 &amp;&amp; $T4==1">
+			<DisplayString Condition="$T2==2"> {matrixData[1]}   {matrixData[$T3 + 1]}</DisplayString>
+			<DisplayString Condition="$T2==3"> {matrixData[1]}   {matrixData[$T3 + 1]}   {matrixData[2 * $T3 + 1]}</DisplayString>
+			<DisplayString Condition="$T2==4"> {matrixData[1]}   {matrixData[$T3 + 1]}   {matrixData[2 * $T3 + 1]}   {matrixData[3 * $T3 + 1]}</DisplayString>
+			<DisplayString Condition="$T2>4"> {matrixData[1]}   {matrixData[$T3 + 1]}   {matrixData[2 * $T3 + 1]}   {matrixData[3 * $T3 + 1]}...</DisplayString>
+		</Synthetic>	                                   
+		<Synthetic Name="[2]" Condition="$T3>2 &amp;&amp; $T4==1">           
+			<DisplayString Condition="$T2==2"> {matrixData[2]}   {matrixData[$T3 + 2]}</DisplayString>
+			<DisplayString Condition="$T2==3"> {matrixData[2]}   {matrixData[$T3 + 2]}   {matrixData[2 * $T3 + 2]}</DisplayString>
+			<DisplayString Condition="$T2==4"> {matrixData[2]}   {matrixData[$T3 + 2]}   {matrixData[2 * $T3 + 2]}   {matrixData[3 * $T3 + 2]}</DisplayString>
+			<DisplayString Condition="$T2>4"> {matrixData[2]}   {matrixData[$T3 + 2]}   {matrixData[2 * $T3 + 2]}   {matrixData[3 * $T3 + 2]}...</DisplayString>
+		</Synthetic>                                       
+		<Synthetic Name="[3]" Condition="$T3>3 &amp;&amp; $T4==1">           
+			<DisplayString Condition="$T2==2"> {matrixData[3]}   {matrixData[$T3 + 3]}</DisplayString>
+			<DisplayString Condition="$T2==3"> {matrixData[3]}   {matrixData[$T3 + 3]}   {matrixData[2 * $T3 + 3]}</DisplayString>
+			<DisplayString Condition="$T2==4"> {matrixData[3]}   {matrixData[$T3 + 3]}   {matrixData[2 * $T3 + 3]}   {matrixData[3 * $T3 + 3]}</DisplayString>
+			<DisplayString Condition="$T2>4"> {matrixData[3]}   {matrixData[$T3 + 3]}   {matrixData[2 * $T3 + 3]}   {matrixData[3 * $T3 + 3]}...</DisplayString>
+		</Synthetic>
+		
+		<Synthetic Name="[0]" Condition="$T3>0 &amp;&amp; $T4==0">
+			<DisplayString Condition="$T2==2"> {matrixData[0]}   {matrixData[1]}</DisplayString>
+			<DisplayString Condition="$T2==3"> {matrixData[0]}   {matrixData[1]}   {matrixData[2]}</DisplayString>
+			<DisplayString Condition="$T2==4"> {matrixData[0]}   {matrixData[1]}   {matrixData[2]}   {matrixData[3]}</DisplayString>
+			<DisplayString Condition="$T2>4"> {matrixData[0]}   {matrixData[1]}   {matrixData[2]}   {matrixData[3]}...</DisplayString>
+		</Synthetic>
+		<Synthetic Name="[1]" Condition="$T3>1 &amp;&amp; $T4==0">
+			<DisplayString Condition="$T2==2"> {matrixData[$T2]}   {matrixData[$T2 + 1]}</DisplayString>
+			<DisplayString Condition="$T2==3"> {matrixData[$T2]}   {matrixData[$T2 + 1]}   {matrixData[$T2 + 2]}</DisplayString>
+			<DisplayString Condition="$T2==4"> {matrixData[$T2]}   {matrixData[$T2 + 1]}   {matrixData[$T2 + 2]}   {matrixData[$T2 + 3]}</DisplayString>
+			<DisplayString Condition="$T2>4"> {matrixData[$T2]}   {matrixData[$T2 + 1]}   {matrixData[$T2 + 2]}   {matrixData[$T2 + 3]}...</DisplayString>
+		</Synthetic>	                                   
+		<Synthetic Name="[2]" Condition="$T3>2 &amp;&amp; $T4==0">           
+			<DisplayString Condition="$T2==2"> {matrixData[2 * $T2]}   {matrixData[2 * $T2 + 1]}</DisplayString>
+			<DisplayString Condition="$T2==3"> {matrixData[2 * $T2]}   {matrixData[2 * $T2 + 1]}   {matrixData[2 * $T2 + 2]}</DisplayString>
+			<DisplayString Condition="$T2==4"> {matrixData[2 * $T2]}   {matrixData[2 * $T2 + 1]}   {matrixData[2 * $T2 + 2]}   {matrixData[2 * $T2 + 3]}</DisplayString>
+			<DisplayString Condition="$T2>4"> {matrixData[2 * $T2]}   {matrixData[2 * $T2 + 1]}   {matrixData[2 * $T2 + 2]}   {matrixData[2 * $T2 + 3]}...</DisplayString>
+		</Synthetic>                                       
+		<Synthetic Name="[3]" Condition="$T3>3 &amp;&amp; $T4==0">           
+			<DisplayString Condition="$T2==2"> {matrixData[3 * $T2]}   {matrixData[3 * $T2 + 1]}</DisplayString>
+			<DisplayString Condition="$T2==3"> {matrixData[3 * $T2]}   {matrixData[3 * $T2 + 1]}   {matrixData[3 * $T2 + 2]}</DisplayString>
+			<DisplayString Condition="$T2==4"> {matrixData[3 * $T2]}   {matrixData[3 * $T2 + 1]}   {matrixData[3 * $T2 + 2]}   {matrixData[3 * $T2 + 3]}</DisplayString>
+			<DisplayString Condition="$T2>4"> {matrixData[3 * $T2]}   {matrixData[3 * $T2 + 1]}   {matrixData[3 * $T2 + 2]}   {matrixData[3 * $T2 + 3]}...</DisplayString>
+		</Synthetic>
+				
+		<Synthetic Name="[4]" Condition="$T3>4">
+			<DisplayString>...</DisplayString>
+		</Synthetic>
+	</Expand>
+</Type>
+
+<Type Name="Relib::RelibInternal::CArrayConstData&lt;*&gt;">
+	<DisplayString Condition="size==0">[{size}]</DisplayString>
+	<DisplayString Condition="size==1">[{size}] ( {buffer[0]} )</DisplayString>
+	<DisplayString Condition="size==2">[{size}] ( {buffer[0]}, {buffer[1]} )</DisplayString>
+	<DisplayString Condition="size==3">[{size}] ( {buffer[0]}, {buffer[1]}, {buffer[2]} )</DisplayString>
+	<DisplayString Condition="size==4">[{size}] ( {buffer[0]}, {buffer[1]}, {buffer[2]}, {buffer[3]} )</DisplayString>
+	<DisplayString Condition="size==5">[{size}] ( {buffer[0]}, {buffer[1]}, {buffer[2]}, {buffer[3]}, {buffer[4]} )</DisplayString>
+	<DisplayString Condition="size==6">[{size}] ( {buffer[0]}, {buffer[1]}, {buffer[2]}, {buffer[3]}, {buffer[4]}, {buffer[5]} )</DisplayString>
+	<DisplayString Condition="size==7">[{size}] ( {buffer[0]}, {buffer[1]}, {buffer[2]}, {buffer[3]}, {buffer[4]}, {buffer[5]}, {buffer[6]} )</DisplayString>
+	<DisplayString Condition="size==8">[{size}] ( {buffer[0]}, {buffer[1]}, {buffer[2]}, {buffer[3]}, {buffer[4]}, {buffer[5]}, {buffer[6]}, {buffer[7]} )</DisplayString>
+	<DisplayString Condition="size==9">[{size}] ( {buffer[0]}, {buffer[1]}, {buffer[2]}, {buffer[3]}, {buffer[4]}, {buffer[5]}, {buffer[6]}, {buffer[7]}, {buffer[8]} )</DisplayString>
+	<DisplayString Condition="size==10">[{size}] ( {buffer[0]}, {buffer[1]}, {buffer[2]}, {buffer[3]}, {buffer[4]}, {buffer[5]}, {buffer[6]}, {buffer[7]}, {buffer[8]}, {buffer[9]} )</DisplayString>
+	<DisplayString Condition="size>10">[{size}] ( {buffer[0]}, {buffer[1]}, {buffer[2]}, {buffer[3]}, {buffer[4]}, {buffer[5]}, {buffer[6]}, {buffer[7]}, {buffer[8]}, {buffer[9]}... )</DisplayString>
+	
+	<Expand>
+		<Item Name="[size]">size</Item>
+		<ArrayItems>
+			<Size>size</Size>
+			<ValuePointer>buffer</ValuePointer>
+		</ArrayItems>
+	</Expand>
+</Type>
+
+<Type Name="Relib::RelibInternal::CArrayData&lt;*&gt;">
+	<DisplayString Condition="data.size==0">[{data.size}]</DisplayString>
+	<DisplayString Condition="data.size==1">[{data.size}] ( {data.buffer[0]} )</DisplayString>
+	<DisplayString Condition="data.size==2">[{data.size}] ( {data.buffer[0]}, {data.buffer[1]} )</DisplayString>
+	<DisplayString Condition="data.size==3">[{data.size}] ( {data.buffer[0]}, {data.buffer[1]}, {data.buffer[2]} )</DisplayString>
+	<DisplayString Condition="data.size==4">[{data.size}] ( {data.buffer[0]}, {data.buffer[1]}, {data.buffer[2]}, {data.buffer[3]} )</DisplayString>
+	<DisplayString Condition="data.size==5">[{data.size}] ( {data.buffer[0]}, {data.buffer[1]}, {data.buffer[2]}, {data.buffer[3]}, {data.buffer[4]} )</DisplayString>
+	<DisplayString Condition="data.size==6">[{data.size}] ( {data.buffer[0]}, {data.buffer[1]}, {data.buffer[2]}, {data.buffer[3]}, {data.buffer[4]}, {data.buffer[5]} )</DisplayString>
+	<DisplayString Condition="data.size==7">[{data.size}] ( {data.buffer[0]}, {data.buffer[1]}, {data.buffer[2]}, {data.buffer[3]}, {data.buffer[4]}, {data.buffer[5]}, {data.buffer[6]} )</DisplayString>
+	<DisplayString Condition="data.size==8">[{data.size}] ( {data.buffer[0]}, {data.buffer[1]}, {data.buffer[2]}, {data.buffer[3]}, {data.buffer[4]}, {data.buffer[5]}, {data.buffer[6]}, {data.buffer[7]} )</DisplayString>
+	<DisplayString Condition="data.size==9">[{data.size}] ( {data.buffer[0]}, {data.buffer[1]}, {data.buffer[2]}, {data.buffer[3]}, {data.buffer[4]}, {data.buffer[5]}, {data.buffer[6]}, {data.buffer[7]}, {data.buffer[8]} )</DisplayString>
+	<DisplayString Condition="data.size==10">[{data.size}] ( {data.buffer[0]}, {data.buffer[1]}, {data.buffer[2]}, {data.buffer[3]}, {data.buffer[4]}, {data.buffer[5]}, {data.buffer[6]}, {data.buffer[7]}, {data.buffer[8]}, {data.buffer[9]} )</DisplayString>
+	<DisplayString Condition="data.size>10">[{data.size}] ( {data.buffer[0]}, {data.buffer[1]}, {data.buffer[2]}, {data.buffer[3]}, {data.buffer[4]}, {data.buffer[5]}, {data.buffer[6]}, {data.buffer[7]}, {data.buffer[8]}, {data.buffer[9]}... )</DisplayString>
+	
+	<Expand>
+		<Item Name="[size]">data.size</Item>
+		<ArrayItems>
+			<Size>data.size</Size>
+			<ValuePointer>data.buffer</ValuePointer>
+		</ArrayItems>
+	</Expand>
+</Type>
+
+<Type Name="Relib::CStaticArray&lt;*&gt;">
+	<DisplayString Condition="size==0">[{size}]</DisplayString>
+	<DisplayString Condition="size==1">[{size}] ( {buffer[0]} )</DisplayString>
+	<DisplayString Condition="size==2">[{size}] ( {buffer[0]}, {buffer[1]} )</DisplayString>
+	<DisplayString Condition="size==3">[{size}] ( {buffer[0]}, {buffer[1]}, {buffer[2]} )</DisplayString>
+	<DisplayString Condition="size==4">[{size}] ( {buffer[0]}, {buffer[1]}, {buffer[2]}, {buffer[3]} )</DisplayString>
+	<DisplayString Condition="size==5">[{size}] ( {buffer[0]}, {buffer[1]}, {buffer[2]}, {buffer[3]}, {buffer[4]} )</DisplayString>
+	<DisplayString Condition="size==6">[{size}] ( {buffer[0]}, {buffer[1]}, {buffer[2]}, {buffer[3]}, {buffer[4]}, {buffer[5]} )</DisplayString>
+	<DisplayString Condition="size==7">[{size}] ( {buffer[0]}, {buffer[1]}, {buffer[2]}, {buffer[3]}, {buffer[4]}, {buffer[5]}, {buffer[6]} )</DisplayString>
+	<DisplayString Condition="size==8">[{size}] ( {buffer[0]}, {buffer[1]}, {buffer[2]}, {buffer[3]}, {buffer[4]}, {buffer[5]}, {buffer[6]}, {buffer[7]} )</DisplayString>
+	<DisplayString Condition="size==9">[{size}] ( {buffer[0]}, {buffer[1]}, {buffer[2]}, {buffer[3]}, {buffer[4]}, {buffer[5]}, {buffer[6]}, {buffer[7]}, {buffer[8]} )</DisplayString>
+	<DisplayString Condition="size==10">[{size}] ( {buffer[0]}, {buffer[1]}, {buffer[2]}, {buffer[3]}, {buffer[4]}, {buffer[5]}, {buffer[6]}, {buffer[7]}, {buffer[8]}, {buffer[9]} )</DisplayString>
+	<DisplayString Condition="size>10">[{size}] ( {buffer[0]}, {buffer[1]}, {buffer[2]}, {buffer[3]}, {buffer[4]}, {buffer[5]}, {buffer[6]}, {buffer[7]}, {buffer[8]}, {buffer[9]}... )</DisplayString>
+	
+	<Expand>
+		<Item Name="[size]">size</Item>
+		<ArrayItems>
+			<Size>size</Size>
+			<ValuePointer>buffer</ValuePointer>
+		</ArrayItems>
+	</Expand>
+</Type>
+
+</AutoVisualizer>
