@@ -35,7 +35,7 @@ T* AddressOf( T& value )
 }
 
 // Split a single string command line into a list of command line arguments.
-CStaticArray<CUnicodePart> SplitCommandLine( CUnicodeView commandLine );
+CStaticArray<CUnicodePart> REAPI SplitCommandLine( CUnicodeView commandLine );
 
 // Library behavior when internal errors occur.
 enum TLibraryDebugMode {
