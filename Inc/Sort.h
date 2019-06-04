@@ -45,6 +45,23 @@ inline int divideArray( Type* arr, int arraySize, const LessAction& less )
 	return currentGreaterPos;
 }
 
+template <class Type>
+void internalMoveElements( Type* src, Type* dest, int count, Types::TrueType )
+{
+	::memmove( dest, src, count * sizeof( Type ) );
+}
+
+template <class Type>
+void internalMoveElements( Type* src, Type* dest, int count, Types::FalseType )
+{
+	for( int i = 0; i < count; i++ ) {
+		// Call the move constructor.
+		::new( dest + i ) Type( move( *( src + i ) ) );
+		// Destroy the original.
+		src->~Type();
+	}
+}
+
 //////////////////////////////////////////////////////////////////////////
 
 }	// namespace Internal.
@@ -70,7 +87,7 @@ void InSort( Type* arr, int elemCount, const LessAction& less )
 			}
 			// Insert the element in its place.
 			Type temp = move( arr[insertIndex] );
-			ArrayInternalMove( arr + i, arr + insertIndex, insPos - i );
+			RelibInternal::internalMoveElements( arr + i, arr + insertIndex, insPos - i, Types::HasTrivialCopyConstructor<Type>() );
 			arr[insPos - 1] = move( temp );
 		}
 	}

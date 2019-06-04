@@ -85,18 +85,18 @@ private:
 	void reallocateBuffer( int newBufferSize );
 	
 	static void internalMoveElementsLeft( Elem* src, int srcPos, int destPos, int count );
-	static void doInternalMoveElementsLeft( Elem* src, Elem* dest, int count, Types::TrueType tribiallyCopyableTag );
-	static void doInternalMoveElementsLeft( Elem* src, Elem* dest, int count, Types::FalseType tribiallyCopyableTag );
+	static void doInternalMoveElementsLeft( Elem* src, Elem* dest, int count, Types::TrueType triviallyCopyableTag );
+	static void doInternalMoveElementsLeft( Elem* src, Elem* dest, int count, Types::FalseType triviallyCopyableTag );
 
 	static void internalMoveElementsRight( Elem* src, int srcPos, int destPos, int count );
-	static void doInternalMoveElementsRight( Elem* src, Elem* dest, int count, Types::TrueType tribiallyCopyableTag );
-	static void doInternalMoveElementsRight( Elem* src, Elem* dest, int count, Types::FalseType tribiallyCopyableTag );
+	static void doInternalMoveElementsRight( Elem* src, Elem* dest, int count, Types::TrueType triviallyCopyableTag );
+	static void doInternalMoveElementsRight( Elem* src, Elem* dest, int count, Types::FalseType triviallyCopyableTag );
 
 	static void bitwiseInternalMove( Elem* src, Elem* dest, int count );
 
 	static void externalMoveElements( Elem* src, Elem* dest, int count );
-	static void doExternalMoveElements( Elem* src, Elem* dest, int count, Types::TrueType tribiallyCopyableTag );
-	static void doExternalMoveElements( Elem* src, Elem* dest, int count, Types::FalseType tribiallyCopyableTag );
+	static void doExternalMoveElements( Elem* src, Elem* dest, int count, Types::TrueType triviallyCopyableTag );
+	static void doExternalMoveElements( Elem* src, Elem* dest, int count, Types::FalseType triviallyCopyableTag );
 
 	static void invokeMoveContructor( Elem* src, Elem* dest );
 
