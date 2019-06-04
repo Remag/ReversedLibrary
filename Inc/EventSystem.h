@@ -12,6 +12,8 @@ class CEventSystem;
 template <class EventClass>
 class CEvent {
 public:
+	typedef EventClass TEventClass;
+
 	virtual ~CEvent() {}
 
 	// An event class. Only listeners of this class will be notified of the event.
@@ -82,13 +84,13 @@ public:
 	template <class EventClass>
 	int GetEventClassId() const;
 	
-	template <class EventClass, class ActionType>
-	CEventTarget AddEventTarget( EventClass eventClass, ActionType&& eventAction );
+	template <class ActionType>
+	CEventTarget AddEventTarget( ActionType&& eventAction );
 	CExternalEventTarget AddExternalEventTarget( int eventClassId, const IExternalObject* eventAction );
 
 	// Notify all the listeners.
-	template <class EventClass>
-	void Notify( const CEvent<EventClass>& e );
+	template <class Event>
+	void Notify( const Event& e );
 
 	// Event target needs access to remove the action target from the list of listeners.
 	template <class ActionType>
@@ -114,11 +116,16 @@ int CEventSystem::GetEventClassId() const
 	return RelibInternal::CEventClassInstance<EventClass>::GetEventClassId();
 }
 
-template <class EventClass, class ActionType>
-CEventTarget CEventSystem::AddEventTarget( EventClass, ActionType&& eventAction )
+template <class ActionType>
+CEventTarget CEventSystem::AddEventTarget( ActionType&& eventAction )
 {
-	const int classId = GetEventClassId<EventClass>();
-	CActionOwner<void( const CEvent<EventClass>& )> actionOwner( forward<ActionType>( eventAction ) );
+	staticAssert( ( Types::IsSame<Types::FunctionInfo<ActionType>::ReturnType, void>::Result ) );
+	staticAssert( Types::FunctionInfo<ActionType>::ArgCount == 1 );
+	using TEventArgRef = typename Types::FunctionInfo<ActionType>::template ArgTypeAt<0>;
+	using TEventArg = typename Types::PureType<TEventArgRef>::Result;
+	typedef typename TEventArg::TEventClass TArgEventClass;
+	const int classId = GetEventClassId<TArgEventClass>();
+	CActionOwner<void( const TEventArg& )> actionOwner( forward<ActionType>( eventAction ) );
 	CTypelessActionOwner typelessAction( move( actionOwner ) );
 
 	assert( classId >= 0 );
@@ -131,9 +138,11 @@ CEventTarget CEventSystem::AddEventTarget( EventClass, ActionType&& eventAction 
 	return CEventTarget( *this, move( typelessAction ), classId );
 }
 
-template <class EventClass>
-void CEventSystem::Notify( const CEvent<EventClass>& e )
+template <class Event>
+void CEventSystem::Notify( const Event& e )
 {
+	typedef typename Event::TEventClass TBaseEventClass;
+	staticAssert( ( Types::IsDerivedFrom<Event, CEvent<TBaseEventClass>>::Result ) );
 	const int classId = e.GetEventClassId();
 	if( classId >= listeners.Size() ) {
 		return;
@@ -141,7 +150,7 @@ void CEventSystem::Notify( const CEvent<EventClass>& e )
 	auto& listenerList = listeners[classId];
 	for( int i = 0; i < listenerList.Size(); i++ ) {
 		auto listener = listenerList[i];
-		const auto eventAction = static_cast<const IAction<void( const CEvent<EventClass>& )>*>( listener );
+		const auto eventAction = static_cast<const IAction<void( const Event& )>*>( listener );
 		eventAction->Invoke( e );
 	}
 }
