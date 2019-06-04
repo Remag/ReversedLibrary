@@ -24,7 +24,7 @@ struct ClassMemberInfo<ReturnType ( ClassType::* )( Args... ) const> {
 
 // General information about an entity that defines operator().
 template <class F>
-struct FunctionInfo : public ClassMemberInfo<decltype( &F::operator() )> {};
+struct FunctionInfo : public ClassMemberInfo<decltype( &Types::PureType<F>::Result::operator() )> {};
 
 template <class ReturnType, class... Args>
 struct FunctionInfo<ReturnType( Args... )> {
