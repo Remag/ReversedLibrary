@@ -24,6 +24,7 @@ private:
 // Font size object. Can be created and switched in the font class.
 class REAPI CFontSizeOwner {
 public:
+	CFontSizeOwner() = default;
 	CFontSizeOwner( CFontSizeOwner&& other );
 	CFontSizeOwner& operator=( CFontSizeOwner&& other );
 	~CFontSizeOwner();
@@ -34,10 +35,10 @@ public:
 		{ return sizeHandle; }
 
 	// Only font objects can create size objects.
-	friend class CFontEdit;
+	friend class CFontView;
 
 private:
-	FT_Size sizeHandle;
+	FT_Size sizeHandle = nullptr;
 
 	explicit CFontSizeOwner( FT_Size handle ) : sizeHandle( handle ) {}
 };

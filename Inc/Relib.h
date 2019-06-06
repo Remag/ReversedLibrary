@@ -45,6 +45,7 @@
 #include <FileMapping.h>
 #include <FileSystem.h>
 #include <Font.h>
+#include <FontSize.h>
 #include <GeneralBlockAllocator.h>
 #include <Glyph.h>
 #include <HashTable.h>

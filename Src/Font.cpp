@@ -20,90 +20,27 @@ CFontView::CFontView( const CFontOwner& owner ) :
 {
 }
 
-CGlyph CFontView::GetGlyph( int charCode ) const
+CGlyph CFontView::GetGlyph( int charCode, CFontSizeView fontSize ) const
 {
+	FT_Activate_Size( fontSize.GetHandle() );
 	checkFreeTypeError( FT_Load_Char( fontFace, charCode, FT_LOAD_DEFAULT ) );
 	return CGlyph( fontFace->glyph, charCode );
 }
 
-static const int basicAsciiBegin = 32;
-static const int basicAsciiEnd = 128;
-bool CFontView::GetGlyph( char character, CGlyph& result ) const
+CFontSizeOwner CFontView::CreateSizeObject( float pxSize ) const
 {
-	if( character < basicAsciiBegin || character >= basicAsciiEnd ) {
-		return false;
-	}
-
-	// ASCII encoded characters are the same in UTF32 encoding.
-	result = GetGlyph( numeric_cast<int>( character ) );
-	return true;
+	return CreateSizeObject( CVector2<float>( pxSize, pxSize ) );
 }
 
-bool CFontView::GetUnicodeGlyph( wchar_t charCode, CGlyph& result ) const
-{
-	int resultCode;
-	const bool canConvert = Unicode::TryConvertWideToInt( charCode, resultCode );
-	if( !canConvert ) {
-		return false;
-	} 
-	result = GetGlyph( resultCode );
-	return true;
-}
-
-bool CFontView::GetUnicodeGlyph( wchar_t hiCode, wchar_t loCode, CGlyph& result ) const
-{
-	int resultCode;
-	const bool canConvert = Unicode::TryConvertWideToInt( hiCode, loCode, resultCode );
-	if( !canConvert ) {
-		return false;
-	} 
-	result = GetGlyph( resultCode );
-	return true;
-}
-
-//////////////////////////////////////////////////////////////////////////
-
-void CFontEdit::SetPixelSize( CVector2<int> size )
-{
-	assert( IsLoaded() );
-	checkFreeTypeError( FT_Set_Pixel_Sizes( GetFtFace(), size.X(), size.Y() ) );
-}
-
-void CFontEdit::SetPixelSize( int size )
-{
-	SetPixelSize( CVector2<int>( size, size ) );
-}
-
-void CFontEdit::SetPointSize( CVector2<float> size )
-{
-	assert( IsLoaded() );
-	const auto dpi = 96;
-	checkFreeTypeError( FT_Set_Char_Size( GetFtFace(), Round( 64 * size.X() ), Round( 64 * size.Y() ), dpi, dpi ) );
-}
-
-void CFontEdit::SetPointSize( float size )
-{
-	SetPointSize( CVector2<float>( size, size ) );
-}
-
-CFontSizeOwner CFontEdit::CreateSizeObject( float ptSize )
-{
-	return CreateSizeObject( CVector2<float>( ptSize, ptSize ) );
-}
-
-CFontSizeOwner CFontEdit::CreateSizeObject( CVector2<float> ptSize )
+CFontSizeOwner CFontView::CreateSizeObject( CVector2<float> pxSize ) const
 {
 	assert( IsLoaded() );
 	FT_Size newSize;
 	FT_New_Size( GetFtFace(), &newSize );
+	CFontSizeOwner result( newSize );
 	FT_Activate_Size( newSize );
-	SetPointSize( ptSize );
-	return CFontSizeOwner( newSize );
-}
-
-void CFontEdit::ActivateSize( CFontSizeView size )
-{
-	FT_Activate_Size( size.GetHandle() );
+	checkFreeTypeError( FT_Set_Pixel_Sizes( GetFtFace(), pxSize.X(), pxSize.Y() ) );
+	return result;
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -185,29 +122,19 @@ void CFontOwner::Unload()
 	detachView();
 }
 
-void CFontOwner::SetPixelSize( CVector2<int> size )
+CFontSizeOwner CFontOwner::CreateSizeObject( float pxSize ) const
 {
-	view.SetPixelSize( size );
+	return view.CreateSizeObject( pxSize );
 }
 
-void CFontOwner::SetPixelSize( int size )
+CFontSizeOwner CFontOwner::CreateSizeObject( CVector2<float> pxSize ) const
 {
-	view.SetPixelSize( size );
+	return view.CreateSizeObject( pxSize );
 }
 
-void CFontOwner::SetPointSize( CVector2<float> size )
+CGlyph CFontOwner::GetGlyph( int charCode, CFontSizeView fontSize ) const
 {
-	view.SetPointSize( size );
-}
-
-void CFontOwner::SetPointSize( float size )
-{
-	view.SetPointSize( size );
-}
-
-CGlyph CFontOwner::GetGlyph( int charCode ) const
-{
-	return view.GetGlyph( charCode );
+	return view.GetGlyph( charCode, fontSize );
 }
 
 //////////////////////////////////////////////////////////////////////////

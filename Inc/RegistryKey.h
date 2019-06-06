@@ -26,6 +26,31 @@ enum TRegistryAccessType {
 
 //////////////////////////////////////////////////////////////////////////
 
+// Enumerator with registry key value range-based for loop support.
+class REAPI CRegistryKeyValueEnumerator {
+public:
+	CRegistryKeyValueEnumerator( HKEY handle, DWORD pos, DWORD count, DWORD maxLen ) : keyHandle( handle ), enumPosition( pos ), enumCount( count ), maxLength( maxLen ) {}
+
+	CUnicodeString operator*() const;
+	void operator++()
+		{ enumPosition++; }
+	bool operator!=( CRegistryKeyValueEnumerator other ) const
+		{ return enumPosition != other.enumPosition; }
+
+	CRegistryKeyValueEnumerator begin() const
+		{ return CRegistryKeyValueEnumerator( keyHandle, 0, enumCount, maxLength ); }
+	CRegistryKeyValueEnumerator end() const
+		{ return CRegistryKeyValueEnumerator( keyHandle, enumCount, enumCount, maxLength ); }
+
+private:
+	HKEY keyHandle;
+	DWORD enumPosition = 0;
+	DWORD enumCount = 0;
+	DWORD maxLength = 0;
+};
+
+//////////////////////////////////////////////////////////////////////////
+
 // Mechanism for writing data to the Windows registry.
 // The class owns an open key handle. The handle is freed on deletion.
 class REAPI CRegistryKey {
@@ -37,7 +62,7 @@ public:
 	~CRegistryKey();
 
 	// Enumerate all values of this key.
-	void GetValueNames( CArray<CUnicodeString>& result );
+	CRegistryKeyValueEnumerator ValueNames() const;
 
 	// Check if a given value exists.
 	bool HasValue( CUnicodeView valueName ) const;

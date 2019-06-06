@@ -130,6 +130,8 @@ namespace RelibInternal {
 	class CExplicitCopyTag;
 	class CMessageSource;
 	class CInternetFile;
+	class CRegistryKey;
+	class CRegistryKeyValueEnumerator;
 	struct CColor;
 
 	class CEntityGroup;

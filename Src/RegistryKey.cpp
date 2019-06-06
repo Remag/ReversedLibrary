@@ -8,6 +8,16 @@ namespace Relib {
 
 //////////////////////////////////////////////////////////////////////////
 
+CUnicodeString CRegistryKeyValueEnumerator::operator*() const
+{
+	CUnicodeString newName;
+	DWORD valueLen = maxLength;
+	::RegEnumValue( keyHandle, enumPosition, newName.CreateRawBuffer( maxLength ), &valueLen, nullptr, nullptr, nullptr, nullptr );
+	return newName;
+}
+
+//////////////////////////////////////////////////////////////////////////
+
 const CEnumDictionary<TRegistryRootKey, RRK_EnumCount, HKEY> rootKeys {
 	{ RRK_ClassesRoot, HKEY_CLASSES_ROOT },
 	{ RRK_CurrentUser, HKEY_CURRENT_USER },
@@ -45,19 +55,12 @@ CRegistryKey::~CRegistryKey()
 	::RegCloseKey( keyHandle );
 }
 
-void CRegistryKey::GetValueNames( CArray<CUnicodeString>& result )
+CRegistryKeyValueEnumerator CRegistryKey::ValueNames() const
 {
 	DWORD valueCount;
 	DWORD maxValueLen;
 	::RegQueryInfoKey( keyHandle, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, &valueCount, &maxValueLen, nullptr, nullptr, nullptr );
-	result.ReserveBuffer( valueCount );
-
-	for( unsigned i = 0; i < valueCount; i++ ) {
-		CUnicodeString newName;
-		DWORD valueLen = maxValueLen;
-		::RegEnumValue( keyHandle, i, newName.CreateRawBuffer( valueLen ), &valueLen, nullptr, nullptr, nullptr, nullptr );
-		result.AddWithinCapacity( move( newName ) );
-	}
+	return CRegistryKeyValueEnumerator( keyHandle, 0, valueCount, maxValueLen );
 }
 
 bool CRegistryKey::HasValue( CUnicodeView valueName ) const
