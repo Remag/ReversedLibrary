@@ -1,7 +1,5 @@
 #pragma once
 #include <Redefs.h>
-#include <EntityRef.h>
-#include <Entity.h>
 #include <Array.h>
 #include <StaticArray.h>
 #include <MemoryOwner.h>
@@ -9,6 +7,7 @@
 
 namespace Relib {
 
+struct CFullEntityData;
 class CComponentGroup;
 class CEntityRange;
 class CEntityConstRange;

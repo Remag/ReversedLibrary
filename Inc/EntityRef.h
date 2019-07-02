@@ -6,6 +6,7 @@ namespace Relib {
 
 //////////////////////////////////////////////////////////////////////////
 
+struct CFullEntityData;
 class CEntity;
 class CEntityConstRef;
 bool operator==( CEntityConstRef left, CEntityConstRef right );
