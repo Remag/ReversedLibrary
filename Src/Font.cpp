@@ -27,12 +27,12 @@ CGlyph CFontView::GetGlyph( int charCode, CFontSizeView fontSize ) const
 	return CGlyph( fontFace->glyph, charCode );
 }
 
-CFontSizeOwner CFontView::CreateSizeObject( float pxSize ) const
+CFontSizeOwner CFontView::CreateSizeObject( int pxSize ) const
 {
-	return CreateSizeObject( CVector2<float>( pxSize, pxSize ) );
+	return CreateSizeObject( CVector2<int>( pxSize, pxSize ) );
 }
 
-CFontSizeOwner CFontView::CreateSizeObject( CVector2<float> pxSize ) const
+CFontSizeOwner CFontView::CreateSizeObject( CVector2<int> pxSize ) const
 {
 	assert( IsLoaded() );
 	FT_Size newSize;
@@ -122,12 +122,12 @@ void CFontOwner::Unload()
 	detachView();
 }
 
-CFontSizeOwner CFontOwner::CreateSizeObject( float pxSize ) const
+CFontSizeOwner CFontOwner::CreateSizeObject( int pxSize ) const
 {
 	return view.CreateSizeObject( pxSize );
 }
 
-CFontSizeOwner CFontOwner::CreateSizeObject( CVector2<float> pxSize ) const
+CFontSizeOwner CFontOwner::CreateSizeObject( CVector2<int> pxSize ) const
 {
 	return view.CreateSizeObject( pxSize );
 }
