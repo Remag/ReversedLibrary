@@ -20,13 +20,6 @@ CPair<CUnicodeView> CIniSectionKeyRange::operator*() const
 extern const CError Err_BadIniFile;
 extern const CError Err_DuplicateIniKey;
 
-int CIniKeyHashStrategy::HashKey( CUnicodePart key )
-{
-	return GetCaselessUnicodeHash( key );
-}
-
-//////////////////////////////////////////////////////////////////////////
-
 static CUnicodePart deleteWhitespace( CUnicodePart str )
 {
 	return str.TrimSpaces();

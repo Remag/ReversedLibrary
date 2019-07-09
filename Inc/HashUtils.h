@@ -213,6 +213,26 @@ inline int CDefaultHash<unsigned __int64>::HashKey( const unsigned __int64& key 
 
 //////////////////////////////////////////////////////////////////////////
 
+// String hash that ignores case.
+class CCaselessStringHash {
+public:
+	static int HashKey( CStringPart key )
+		{ return GetCaselessStringHash( key ); }
+	static bool IsEqual( CStringPart leftKey, CStringPart rightKey )
+		{ return leftKey.CompareNoCase( rightKey ) == 0; }
+};
+
+// Unicode hash that ignores case.
+class CCaselessUnicodeHash {
+public:
+	static int HashKey( CUnicodePart key )
+		{ return GetCaselessUnicodeHash( key ); }
+	static bool IsEqual( CUnicodePart leftKey, CUnicodePart rightKey )
+		{ return leftKey.CompareNoCase( rightKey ) == 0; }
+};
+
+//////////////////////////////////////////////////////////////////////////
+
 // Hash strategy that uses the specified class member as the hash source.
 template <class T, class ReturnType, ReturnType T::*Member>
 class CMemberHash : public CDefaultHash<ReturnType> {

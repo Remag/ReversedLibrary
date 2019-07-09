@@ -10,23 +10,12 @@ namespace Relib {
 class CIniFileData;
 //////////////////////////////////////////////////////////////////////////
 
-// Strategy for hashing key values in an .ini file.
-// Hashing is case insensitive.
-class REAPI CIniKeyHashStrategy {
-public:
-	static int HashKey( CUnicodePart key );
-	static bool IsEqual( CUnicodePart leftKey, CUnicodePart rightKey )
-		{ return leftKey.CompareNoCase( rightKey ) == 0; }
-};
-
-//////////////////////////////////////////////////////////////////////////
-
 // Class for range-based for loop section values iteration.
 class REAPI CIniSectionKeyRange {
 public:
-	typedef RelibInternal::CHashIndexConstIterator<CMapData<CUnicodeString, int>, RelibInternal::CMapHashStrategy<CUnicodeString, int, CIniKeyHashStrategy>, CRuntimeHeap> TMapIterator;
+	typedef RelibInternal::CHashIndexConstIterator<CMapData<CUnicodeString, int>, RelibInternal::CMapHashStrategy<CUnicodeString, int, CCaselessUnicodeHash>, CRuntimeHeap> TMapIterator;
 
-	CIniSectionKeyRange( const CMap<CUnicodeString, int, CIniKeyHashStrategy, CRuntimeHeap>& _valueNameToIds, CArrayView<CUnicodeString> _values, TMapIterator _mapIterator ) :
+	CIniSectionKeyRange( const CMap<CUnicodeString, int, CCaselessUnicodeHash, CRuntimeHeap>& _valueNameToIds, CArrayView<CUnicodeString> _values, TMapIterator _mapIterator ) :
 		valueNameToIds( _valueNameToIds ), values( _values ), mapIterator( _mapIterator ) {}
 
 	void operator++()
@@ -41,7 +30,7 @@ public:
 		{ return CIniSectionKeyRange( valueNameToIds, values, valueNameToIds.end() ); }
 
 private:
-	const CMap<CUnicodeString, int, CIniKeyHashStrategy, CRuntimeHeap>& valueNameToIds; 
+	const CMap<CUnicodeString, int, CCaselessUnicodeHash, CRuntimeHeap>& valueNameToIds; 
 	CArrayView<CUnicodeString> values;
 	TMapIterator mapIterator;
 };
@@ -82,7 +71,7 @@ private:
 	// Section name.
 	CUnicodeView sectionName;
 	// Key-value pairs.
-	CMap<CUnicodeString, int, CIniKeyHashStrategy, CRuntimeHeap> valueNameToId;
+	CMap<CUnicodeString, int, CCaselessUnicodeHash, CRuntimeHeap> valueNameToId;
 	CArray<CUnicodeString> valueStrings;
 };
 
