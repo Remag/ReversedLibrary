@@ -32,7 +32,7 @@ template <class Target>
 CSingleton<Target>::CSingleton()
 {
 	staticAssert( ( Types::IsDerivedFrom<Target, CSingleton<Target>>::Result ) );
-	assert( instance == 0 );
+	assert( instance == nullptr );
 	instance = static_cast<Target*>( this );
 }
 
