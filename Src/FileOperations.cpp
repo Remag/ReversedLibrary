@@ -292,7 +292,7 @@ CString ReadText( CFileReadView file )
 
 void WriteText( CUnicodeView fileName, CStringPart text )
 {
-	CFileWriter file( fileName, FCM_OpenExisting );
+	CFileWriter file( fileName, FCM_CreateAlways );
 	WriteText( file, text );
 }
 
