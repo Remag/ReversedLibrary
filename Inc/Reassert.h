@@ -24,7 +24,7 @@ inline void ProgramBreakPoint()
 #define ProgramDebugModeBreak()
 #endif
 
-// Assert and presume.
+// Assert macro.
 #if !defined( RELIB_FINAL )
 #define assert( expr ) \
 if( !( expr ) ) { \
@@ -34,6 +34,14 @@ if( !( expr ) ) { \
 #else
 #define assert( expr ) ( ( void ) 0 )
 #endif
+
+#ifdef DEBUG
+#define debug_assert( expr ) assert( ( expr ) )
+
+#else
+#define debug_assert( expr ) ( ( void ) 0 )
+#endif
+
 
 #define staticAssert( condition ) static_assert( ( condition ), "Compile time assertion failed." )
 
