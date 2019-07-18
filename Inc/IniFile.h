@@ -140,9 +140,9 @@ public:
 
 	// Template methods that automatically perform the string-value casts with Value/UnicodeStr functions.
 	template <class ValueType>
-	ValueType GetValue( CUnicodePart sectionName, CUnicodePart keyName, ValueType defaultValue ) const;
+	ValueType GetValue( CUnicodePart sectionName, CUnicodePart keyName, const ValueType& defaultValue ) const;
 	template <class ValueType>
-	ValueType GetValue( int sectionId, int keyId, ValueType defaultValue ) const;
+	ValueType GetValue( int sectionId, int keyId, const ValueType& defaultValue ) const;
 	template <class ValueType>
 	void SetValue( CUnicodeView sectionName, CUnicodeView keyName, ValueType newValue );
 	template <class ValueType>
@@ -178,29 +178,29 @@ private:
 //////////////////////////////////////////////////////////////////////////
 
 template <class ValueType>
-ValueType CIniFile::GetValue( CUnicodePart sectionName, CUnicodePart keyName, ValueType defaultValue ) const
+ValueType CIniFile::GetValue( CUnicodePart sectionName, CUnicodePart keyName, const ValueType& defaultValue ) const
 {
 	const CUnicodeString* resultStr = LookupString( sectionName, keyName );
 	if( resultStr != nullptr ) {
-		const auto result = Value<ValueType>( *resultStr );
+		auto result = Value<ValueType>( *resultStr );
 		if( result.IsValid() ) {
-			return *result;
+			return move( *result );
 		}
 	}
-	return defaultValue;
+	return copy( defaultValue );
 }
 
 template <class ValueType>
-ValueType CIniFile::GetValue( int sectionId, int keyId, ValueType defaultValue ) const
+ValueType CIniFile::GetValue( int sectionId, int keyId, const ValueType& defaultValue ) const
 {
 	const auto resultStr = LookupString( sectionId, keyId );
 	if( resultStr != nullptr ) {
-		const auto result = Value<ValueType>( *resultStr );
+		auto result = Value<ValueType>( *resultStr );
 		if( result.IsValid() ) {
-			return *result;
+			return move( *result );
 		}
 	}
-	return defaultValue;
+	return copy( defaultValue );
 }
 
 template <class ValueType>
