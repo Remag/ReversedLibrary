@@ -40,7 +40,7 @@ CUnicodeString REAPI MergeName( CUnicodePart driveDir, CUnicodeView name, CUnico
 CUnicodeString REAPI MergeName( CUnicodeView drive, CUnicodeView dir, CUnicodeView name, CUnicodeView ext );
 // Combines a full path from the base dir and a relative path.
 CUnicodeString REAPI MergePath( CUnicodePart dir, CUnicodePart relativePath );
-// Add the extension if necessary.
+// Add the extension if necessary. Extention is provided without the leading period.
 void REAPI AddExtIfNone( CUnicodeString& name, CUnicodeView ext );
 // Replace the extension.
 void REAPI ReplaceExt( CUnicodeString& name, CUnicodeView ext );

@@ -38,12 +38,15 @@ inline bool IsSurrogate( wchar_t ch )
 
 // UTF16 to UTF32 conversion.
 bool REAPI CanConvertToUTF32( wchar_t ch );
-bool REAPI TryConvertWideToInt( wchar_t ch, int& result );
-bool REAPI TryConvertWideToInt( wchar_t hiCh, wchar_t loCh, int& result );
+bool REAPI TryConvertUtf16ToUtf32( wchar_t ch, int& result );
+bool REAPI TryConvertUtf16ToUtf32( wchar_t hiCh, wchar_t loCh, int& result );
 
 // Convert the first char of a given sequence to UTF32.
 // Return the number of symbols used for conversion or 0 in case of an invalid sequence.
-int REAPI TryConvertUtf8ToInt( const char* str, int length, int& result );
+int REAPI TryConvertUtf8ToUtf32( const char* str, int length, int& result );
+// Return the number of symbols used for conversion or 0 in case of an invalid sequence.
+// Result must have at least 4 bytes allocated.
+int REAPI TryConvertUtf32ToUtf8( int utf32, char* result );
 
 //////////////////////////////////////////////////////////////////////////
 
