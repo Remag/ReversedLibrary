@@ -1,5 +1,6 @@
 #pragma once
 #include <Array.h>
+#include <ArrayBuffer.h>
 #include <EventUtils.h>
 #include <ActionOwner.h>
 
@@ -8,18 +9,43 @@ namespace Relib {
 class CEventSystem;
 //////////////////////////////////////////////////////////////////////////
 
+// Generic event.
+class IEvent {
+public:
+	virtual ~IEvent() {}
+
+	virtual int GetClassId() const = 0;
+	virtual void DispatchListenerActions( CArrayView<const IExternalObject*> actions ) const = 0;
+};
+
+//////////////////////////////////////////////////////////////////////////
+
 // An event of the given class.
 template <class EventClass>
-class CEvent {
+class CEvent : public IEvent {
 public:
 	typedef EventClass TEventClass;
-
-	virtual ~CEvent() {}
 
 	// An event class. Only listeners of this class will be notified of the event.
 	static int GetEventClassId()
 		{ return RelibInternal::CEventClassInstance<EventClass>::GetEventClassId(); }
+
+	virtual int GetClassId() const override final
+		{ return GetEventClassId(); }
+	virtual void DispatchListenerActions( CArrayView<const IExternalObject *> actions ) const override final;
 };
+
+//////////////////////////////////////////////////////////////////////////
+
+template<class EventClass>
+void CEvent<EventClass>::DispatchListenerActions( CArrayView<const IExternalObject*> actions ) const
+{
+	for( auto actionPtr : actions ) {
+		const auto eventAction = static_cast<const IAction<void( const EventClass& )>*>( actionPtr );
+		const auto& realEvent = static_cast<const EventClass&>( *this );
+		eventAction->Invoke( realEvent );
+	}
+}
 
 //////////////////////////////////////////////////////////////////////////
 
@@ -91,6 +117,8 @@ public:
 	// Notify all the listeners.
 	template <class Event>
 	void Notify( const Event& e );
+	// Notify all the listeners using the generic event.
+	void NotifyDynamic( const IEvent& e );
 
 	// Event target needs access to remove the action target from the list of listeners.
 	template <class ActionType>
@@ -153,6 +181,15 @@ void CEventSystem::Notify( const Event& e )
 		const auto eventAction = static_cast<const IAction<void( const Event& )>*>( listener );
 		eventAction->Invoke( e );
 	}
+}
+
+inline void CEventSystem::NotifyDynamic( const IEvent& e )
+{
+	const int classId = e.GetClassId();
+	if( classId >= listeners.Size() ) {
+		return;
+	}
+	e.DispatchListenerActions( listeners[classId] );
 }
 
 //////////////////////////////////////////////////////////////////////////
