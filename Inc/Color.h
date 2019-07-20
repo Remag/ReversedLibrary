@@ -19,6 +19,8 @@ struct CColor {
 	// Color in vector form.
 	CVector4<float> GetVector() const
 		{ return CVector4<float>{ GetRed(), GetGreen(), GetBlue(), GetAlpha() }; }
+	// Color in a single integer form.
+	unsigned GetHexRgbaValue() const;
 	// Floating point color values in range [0,1].
 	float GetRed() const
 		{ return toFloat( R ); }
@@ -38,7 +40,7 @@ struct CColor {
 	void SetAlpha( float newValue )
 		{ A = toByte( newValue ); }
 
-	// Default construction. Components are uninitialized.
+	// Default construction. Creates a black color.
 	CColor() = default;
 
 	// Construct a color from a single value in RGB format.
@@ -107,6 +109,14 @@ inline CColor::CColor( float r, float g, float b, float a /*= 1.0f */ ) :
 	assert( g >= 0 && r <= 1 );
 	assert( b >= 0 && r <= 1 );
 	assert( a >= 0 && r <= 1 );
+}
+
+inline unsigned CColor::GetHexRgbaValue() const
+{
+	return ( static_cast<unsigned>( A ) << 24 ) 
+		+ ( static_cast<unsigned>( R ) << 16 ) 
+		+ ( static_cast<unsigned>( G ) << 8 ) 
+		+ ( static_cast<unsigned>( B ) ); 
 }
 
 inline float CColor::toFloat( BYTE color )

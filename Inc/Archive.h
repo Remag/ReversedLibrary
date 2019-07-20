@@ -10,6 +10,7 @@
 #include <Serializable.h>
 #include <PtrOwner.h>
 #include <TemplateUtils.h>
+#include <Color.h>
 
 namespace Relib {
 
@@ -640,7 +641,6 @@ CArchiveReader& operator>>( CArchiveReader& archive, CHashTable<Elem, HashStrate
 }
 
 //////////////////////////////////////////////////////////////////////////
-
 // Map serialization.
 
 template<class KeyType, class ValueType, class HashStrategy, class Allocator>
@@ -673,7 +673,8 @@ CArchiveReader& operator>>( CArchiveReader& left, CMap<KeyType, ValueType, HashS
 }
 
 //////////////////////////////////////////////////////////////////////////
-// Bitset serialization functions.
+// Bitset serialization.
+
 template <int bitSetSize, int pageSize, class Allocator>
 CArchiveReader& operator>>( CArchiveReader& archive, RelibInternal::CPagedStorage<bitSetSize, pageSize, Allocator>& set )
 {
@@ -704,6 +705,23 @@ CArchiveWriter& operator<<( CArchiveWriter& archive, const RelibInternal::CPaged
 		}
 	}
 	return archive;
+}
+
+//////////////////////////////////////////////////////////////////////////
+// Color serialization.
+
+inline CArchiveReader& operator>>( CArchiveReader& reader, CColor& color )
+{
+	unsigned hexValue;
+	reader >> hexValue;
+	color = CColor( hexValue );
+	return reader;
+}
+
+inline CArchiveWriter& operator<<( CArchiveWriter& writer, CColor color )
+{
+	writer << color.GetHexRgbaValue();
+	return writer;
 }
 
 //////////////////////////////////////////////////////////////////////////
