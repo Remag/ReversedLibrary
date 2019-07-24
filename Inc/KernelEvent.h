@@ -1,6 +1,8 @@
 #pragma once
 #include <BaseStringView.h>
 #include <Errors.h>
+#include <StackArray.h>
+#include <ArrayBuffer.h>
 
 namespace Relib {
 
@@ -18,10 +20,17 @@ public:
 		{ return eventHandle; }
 
 	void Signal();
-	void Wait();
+	bool Wait();
+
+	template <class... Events>
+	static int WaitAny( const Events&... events );
 
 private:
 	HANDLE eventHandle;
+
+	template <class... Events>
+	static void fillEventHandles( CArrayBuffer<HANDLE> handles, const CKernelEvent& e, const Events&... rest );
+	static void fillEventHandles( CArrayBuffer<HANDLE> handles, const CKernelEvent& e );
 
 	// Copying is prohibited.
 	CKernelEvent( CKernelEvent& ) = delete;
@@ -60,9 +69,35 @@ inline void CKernelEvent::Signal()
 	::SetEvent( eventHandle );
 }
 
-inline void CKernelEvent::Wait()
+inline bool CKernelEvent::Wait()
 {
-	::WaitForSingleObject( eventHandle, INFINITE );
+	return( ::WaitForSingleObject( eventHandle, INFINITE ) == WAIT_OBJECT_0 );
+}
+
+template<class... Events>
+int CKernelEvent::WaitAny( const Events&... events )
+{
+	static const int eventCount = sizeof...( Events );
+	staticAssert( eventCount <= MAXIMUM_WAIT_OBJECTS );
+	staticAssert( eventCount > 0 );
+	CStackArray<HANDLE, eventCount> eventHandles;
+	CKernelEvent::fillEventHandles( eventHandles, events... );
+	const auto waitResult = ::WaitForMultipleObjects( eventCount, eventHandles.Ptr(), FALSE, INFINITE );
+	checkLastError( waitResult != WAIT_FAILED );
+	const auto eventId = waitResult - WAIT_OBJECT_0;
+	return ( eventId >= 0 && eventId < eventCount ) ? eventId : NotFound;
+}
+
+template<class... Events>
+void CKernelEvent::fillEventHandles( CArrayBuffer<HANDLE> handles, const CKernelEvent& e, const Events&... rest )
+{
+	handles[0] = e.GetHandle();
+	fillEventHandles( handles.Mid( 1 ), rest... );
+}
+
+inline void CKernelEvent::fillEventHandles( CArrayBuffer<HANDLE> handles, const CKernelEvent& e )
+{
+	handles[0] = e.GetHandle();
 }
 
 //////////////////////////////////////////////////////////////////////////

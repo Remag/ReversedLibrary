@@ -4,7 +4,7 @@
 #include <CriticalSection.h>
 #include <RelibInitializer.h>
 #include <StrConversions.h>
-#include <StaticArray.h>
+#include <Array.h>
 
 #include <ft2build.h>
 #include FT_FREETYPE_H
@@ -13,7 +13,7 @@ namespace Relib {
 
 //////////////////////////////////////////////////////////////////////////
 
-static int parseSingleArgument( int pos, CUnicodeView commandLine, CStaticArray<CUnicodePart>& result )
+static int parseSingleArgument( int pos, CUnicodeView commandLine, CArray<CUnicodePart>& result )
 {
 	const auto length = commandLine.Length();
 	while( CUnicodeString::IsCharWhiteSpace( commandLine[pos] ) ) {
@@ -43,9 +43,9 @@ static int parseSingleArgument( int pos, CUnicodeView commandLine, CStaticArray<
 	return stopPos;
 }
 
-CStaticArray<CUnicodePart> SplitCommandLine( CUnicodeView commandLine )
+CArray<CUnicodePart> SplitCommandLine( CUnicodeView commandLine )
 {
-	CStaticArray<CUnicodePart> result;
+	CArray<CUnicodePart> result;
 	int pos = 0;
 	while( pos < commandLine.Length() ) {
 		const int newPos = parseSingleArgument( pos, commandLine, result );
