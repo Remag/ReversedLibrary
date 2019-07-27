@@ -70,6 +70,10 @@ protected:
 
 private:
 	TJsonValueType valueType;
+
+	// Copying is prohibited.
+	CJsonValue( CJsonValue& ) = delete;
+	void operator=( CJsonValue& ) = delete;
 };
 
 //////////////////////////////////////////////////////////////////////////
