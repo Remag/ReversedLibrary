@@ -101,6 +101,7 @@ extern const CUnicodeView HardwareFileError= L"Hardware IO error!\nFile name: %0
 extern const CUnicodeView XmlParsingError = L"XML parsing error at position %0:\n%1.";
 extern const CUnicodeView JsonParsingError = L"JSON parsing error at position %0.";
 extern const CUnicodeView GeneralFreeTypeError = L"FreeType error. Error code: %0.\nFreeType module name: %1.";
+extern const CUnicodeView GeneralCurlError = L"Curl error. Error string buffer: %0.";
 
 // Log suffices.
 extern const CUnicodeView FirstFileLogSuffix = L"_1.log";

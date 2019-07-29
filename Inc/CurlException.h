@@ -11,8 +11,7 @@ class CCurlException : public CException {
 public:
 	explicit CCurlException( CUnicodeString msg ) : errorMsg( move( msg ) ) {}
 
-	virtual CUnicodeString GetMessageText() const override final
-		{ return copy( errorMsg ); }
+	virtual CUnicodeString GetMessageText() const override final;
 
 private:
 	CUnicodeString errorMsg;

@@ -8,6 +8,7 @@
 
 namespace Relib {
 
+class CJsonValue;
 //////////////////////////////////////////////////////////////////////////
 
 // Possible JSON value type.
@@ -19,6 +20,13 @@ enum TJsonValueType {
 	JVT_Array,
 	JVT_Object,
 	JVT_EnumCount
+};
+
+//////////////////////////////////////////////////////////////////////////
+
+struct CJsonKeyValue {
+	CStringPart Key;
+	CJsonValue* Value;
 };
 
 //////////////////////////////////////////////////////////////////////////
@@ -64,6 +72,8 @@ public:
 	bool GetAsBool() const;
 	CJsonListEnumerator<CJsonValue*> GetAsArray() const;
 	CJsonValue* FindObjectValue( CStringPart key ) const;
+	CJsonListEnumerator<CJsonKeyValue> GetObjectKeyValues() const;
+
 
 protected:
 	explicit CJsonValue( TJsonValueType type ) : valueType( type ) {}
@@ -153,11 +163,6 @@ private:
 
 //////////////////////////////////////////////////////////////////////////
 
-struct CJsonKeyValue {
-	CStringPart Key;
-	CJsonValue* Value;
-};
-
 class CJsonObject : public CJsonValue {
 public:
 	explicit CJsonObject( CJsonListNode<CJsonKeyValue>* head, CJsonListNode<CJsonKeyValue>* tail, int size ) : 
@@ -230,6 +235,12 @@ inline CJsonValue* CJsonValue::FindObjectValue( CStringPart key ) const
 {
 	assert( valueType == JVT_Object );
 	return static_cast<const CJsonObject*>( this )->FindValue( key );
+}
+
+inline CJsonListEnumerator<CJsonKeyValue> CJsonValue::GetObjectKeyValues() const
+{
+	assert( valueType == JVT_Object );
+	return static_cast<const CJsonObject*>( this )->GetKeyValueList();
 }
 
 //////////////////////////////////////////////////////////////////////////

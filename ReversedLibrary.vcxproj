@@ -328,6 +328,7 @@
     <ClCompile Include="Ext\Src\RapidXml\rapidxml.cpp" />
     <ClCompile Include="Src\ActionOwner.cpp" />
     <ClCompile Include="Src\Archive.cpp" />
+    <ClCompile Include="Src\CurlException.cpp" />
     <ClCompile Include="Src\CurlInitializer.cpp" />
     <ClCompile Include="Src\DynamicAllocators.cpp" />
     <ClCompile Include="Src\Entity.cpp" />
