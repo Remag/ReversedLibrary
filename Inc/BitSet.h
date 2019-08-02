@@ -40,9 +40,10 @@ public:
 		{ storage = move( newStorage ); }
 
 	int ElementsCount() const;
-	bool IsEmpty() const;
-	bool IsFull() const;
-	void Empty();
+	bool IsFilledWithZeroes() const;
+	bool IsFilledWithOnes() const;
+	void FillWithZeroes();
+	void FillWithOnes();
 
 	bool Has( Elem element ) const;
 	bool Has( const CBaseBitSet& subset ) const;
@@ -143,7 +144,7 @@ int CBaseBitSet<BitSetStorage, Elem>::ElementsCount() const
 }
 
 template <class BitSetStorage, class Elem>
-bool CBaseBitSet<BitSetStorage, Elem>::IsEmpty() const
+bool CBaseBitSet<BitSetStorage, Elem>::IsFilledWithZeroes() const
 {
 	for( DWORD setPart : storage ) {
 		if( setPart != 0 ) {
@@ -154,7 +155,7 @@ bool CBaseBitSet<BitSetStorage, Elem>::IsEmpty() const
 }
 
 template<class BitSetStorage, class Elem>
-bool CBaseBitSet<BitSetStorage, Elem>::IsFull() const
+bool CBaseBitSet<BitSetStorage, Elem>::IsFilledWithOnes() const
 {
 	for( DWORD setPart : storage ) {
 		if( setPart != ~static_cast<DWORD>( 0 ) ) {
@@ -165,10 +166,18 @@ bool CBaseBitSet<BitSetStorage, Elem>::IsFull() const
 }
 
 template <class BitSetStorage, class Elem>
-void CBaseBitSet<BitSetStorage, Elem>::Empty()
+void CBaseBitSet<BitSetStorage, Elem>::FillWithZeroes()
 {
 	for( DWORD& setPart : storage ) {
 		setPart = 0;
+	}
+}
+
+template <class BitSetStorage, class Elem>
+void CBaseBitSet<BitSetStorage, Elem>::FillWithOnes()
+{
+	for( DWORD& setPart : storage ) {
+		setPart = ~static_cast<DWORD>( 0 );
 	}
 }
 
@@ -320,7 +329,7 @@ CBaseBitSet<BitSetStorage, Elem>& CBaseBitSet<BitSetStorage, Elem>::operator&=( 
 {
 	const int elemIndex = index( element );
 	const int newBody = storage[elemIndex] & bitMask( element );
-	Empty();
+	FillWithZeroes();
 	storage[elemIndex] = newBody;
 	return *this;
 }
@@ -372,7 +381,7 @@ CBaseBitSet<BitSetStorage, Elem>& CBaseBitSet<BitSetStorage, Elem>::operator<<=(
 	assert( shift >= 0 );
 
 	if( shift >= Size() ) {
-		Empty();
+		FillWithZeroes();
 		return *this;
 	}
 
@@ -406,7 +415,7 @@ CBaseBitSet<BitSetStorage, Elem>& CBaseBitSet<BitSetStorage, Elem>::operator>>=(
 {
 	assert( shift >= 0 );
 	if( shift >= Size() ) {
-		Empty();
+		FillWithZeroes();
 		return *this;
 	}
 

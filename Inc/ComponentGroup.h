@@ -69,7 +69,7 @@ int CComponentGroup::findComponentCount( const FirstComponent& component, const 
 inline void CComponentGroup::Empty()
 {
 	components.Empty();
-	componentIdSet.Empty();
+	componentIdSet.FillWithZeroes();
 }
 
 inline void CComponentGroup::Add( const CBaseComponent& component )
