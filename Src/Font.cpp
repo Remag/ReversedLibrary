@@ -20,7 +20,7 @@ CFontView::CFontView( const CFontOwner& owner ) :
 {
 }
 
-CGlyph CFontView::GetGlyph( int charCode, CFontSizeView fontSize ) const
+CGlyph CFontView::GetGlyph( unsigned charCode, CFontSizeView fontSize ) const
 {
 	FT_Activate_Size( fontSize.GetHandle() );
 	checkFreeTypeError( FT_Load_Char( fontFace, charCode, FT_LOAD_DEFAULT ) );
@@ -132,7 +132,7 @@ CFontSizeOwner CFontOwner::CreateSizeObject( CVector2<int> pxSize ) const
 	return view.CreateSizeObject( pxSize );
 }
 
-CGlyph CFontOwner::GetGlyph( int charCode, CFontSizeView fontSize ) const
+CGlyph CFontOwner::GetGlyph( unsigned charCode, CFontSizeView fontSize ) const
 {
 	return view.GetGlyph( charCode, fontSize );
 }

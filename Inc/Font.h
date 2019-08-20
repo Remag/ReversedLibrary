@@ -33,7 +33,7 @@ public:
 	CFontSizeOwner CreateSizeObject( CVector2<int> pxSize ) const;
 
 	// Get the glyph structure for the given character code in UTF32BE encoding.
-	CGlyph GetGlyph( int charCode, CFontSizeView fontSize ) const;
+	CGlyph GetGlyph( unsigned charCode, CFontSizeView fontSize ) const;
 
 protected:
 	// FreeType internal structure.
@@ -76,7 +76,7 @@ public:
 	CFontSizeOwner CreateSizeObject( int pxSize ) const;
 	CFontSizeOwner CreateSizeObject( CVector2<int> pxSize ) const;
 	// Get the glyph structure for the given character code in UTF32BE encoding.
-	CGlyph GetGlyph( int charCode, CFontSizeView fontSize ) const;
+	CGlyph GetGlyph( unsigned charCode, CFontSizeView fontSize ) const;
 
 	// Initialization functions need access to the FT_Library object to fill it.
 	friend class CRelibInitializer;

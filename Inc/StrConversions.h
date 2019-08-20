@@ -704,7 +704,10 @@ namespace RelibInternal {
 
 	inline CString CStrConversionFunctions<char>::ToString( unsigned value, int base )
 	{
-		return ToString( numeric_cast<int>( value ), base );
+		const int maxIntDigits = CLimits<unsigned>::MaxDigitsBase10 + 1;
+		CString result;
+		_ultoa_s( value, result.CreateRawBuffer( maxIntDigits ), maxIntDigits + 1, base );
+		return result;
 	}
 
 	inline CString CStrConversionFunctions<char>::ToString( __int64 value, int base )
@@ -893,7 +896,10 @@ namespace RelibInternal {
 
 	inline CUnicodeString CStrConversionFunctions<wchar_t>::ToString( unsigned value, int base )
 	{
-		return ToString( numeric_cast<int>( value ), base );
+		const int maxIntDigits = CLimits<unsigned>::MaxDigitsBase10 + 1;
+		CUnicodeString result;
+		::_ultow_s( value, result.CreateRawBuffer( maxIntDigits ), maxIntDigits + 1, base );
+		return result;
 	}
 
 	inline CUnicodeString CStrConversionFunctions<wchar_t>::ToString( bool value )
@@ -1009,6 +1015,11 @@ inline CString Str( int val, int base )
 	return RelibInternal::CStrConversionFunctions<char>::ToString( val, base );
 }
 
+inline CString Str( unsigned val, int base )
+{
+	return RelibInternal::CStrConversionFunctions<char>::ToString( val, base );
+}
+
 inline CString Str( __int64 val, int base )
 {
 	return RelibInternal::CStrConversionFunctions<char>::ToString( val, base );
@@ -1041,6 +1052,11 @@ inline CUnicodeString UnicodeStr( double val, int digitCount = 3 )
 }
 
 inline CUnicodeString UnicodeStr( int val, int base )
+{
+	return RelibInternal::CStrConversionFunctions<wchar_t>::ToString( val, base );
+}
+
+inline CUnicodeString UnicodeStr( unsigned val, int base )
 {
 	return RelibInternal::CStrConversionFunctions<wchar_t>::ToString( val, base );
 }

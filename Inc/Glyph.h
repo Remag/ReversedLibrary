@@ -42,7 +42,7 @@ public:
 	CGlyph& operator=( CGlyph&& other );
 
 	// Get UTF32 glyph code.
-	int GetCode() const
+	unsigned GetCode() const
 		{ return glyphCode; }
 
 	bool IsLoaded() const
@@ -57,10 +57,10 @@ public:
 
 private:
 	FT_BitmapGlyph bitmapGlyph;
-	int glyphCode;
+	unsigned glyphCode;
 
 	// Copy a glyph from a given glyph slot.
-	explicit CGlyph( FT_GlyphSlot slot, int glyphCode );
+	explicit CGlyph( FT_GlyphSlot slot, unsigned glyphCode );
 
 	void renderGlyph( FT_Glyph glyph );
 

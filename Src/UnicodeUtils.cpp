@@ -16,7 +16,7 @@ bool CanConvertToUTF32( wchar_t ch )
 	return !IsSurrogate( ch );
 }
 
-bool TryConvertUtf16ToUtf32( wchar_t ch, int& result )
+bool TryConvertUtf16ToUtf32( wchar_t ch, unsigned& result )
 {
 	staticAssert( sizeof( wchar_t ) == 2 );
 	// Part of a surrogate pair cannot be translated.
@@ -30,7 +30,7 @@ bool TryConvertUtf16ToUtf32( wchar_t ch, int& result )
 
 static const int utf16HalfShift = 10;
 static const int utf16HalfBase = 0x0010000UL;
-bool TryConvertUtf16ToUtf32( wchar_t hiCh, wchar_t loCh, int& result )
+bool TryConvertUtf16ToUtf32( wchar_t hiCh, wchar_t loCh, unsigned& result )
 {
 	staticAssert( sizeof( wchar_t ) == 2 );
 	// Only parts of a surrogate pair can be translated.
@@ -72,22 +72,22 @@ static int getUtf8ByteCount( const char firstByte, int length )
 
 
 const int utf8ContinuationInvMask = 0x3f;
-int TryConvertUtf8ToUtf32( const char* str, int length, int& result )
+int TryConvertUtf8ToUtf32( const char* str, int length, unsigned& result )
 {
 	const auto byteCount = getUtf8ByteCount( str[0], length );
 
 	switch( byteCount ) {
 		case 1:
-			result = str[0];
+			result = static_cast<unsigned char>( str[0] );
 			return 1;
 		case 2:
-			result = ( str[0] & ~utf8TwoBytesMask ) << 6 
-				| ( str[1] & utf8ContinuationInvMask );
+			result = ( static_cast<unsigned char>( str[0] ) & ~utf8TwoBytesMask ) << 6 
+				| ( static_cast<unsigned char>( str[1] ) & utf8ContinuationInvMask );
 			return 2;
 		case 3:
-			result = ( str[0] & ~utf8ThreeBytesMask ) << 12 
-				| ( str[1] & utf8ContinuationInvMask ) << 6
-				| ( str[2] & utf8ContinuationInvMask );
+			result = ( static_cast<unsigned char>( str[0] ) & ~utf8ThreeBytesMask ) << 12 
+				| ( static_cast<unsigned char>( str[1] ) & utf8ContinuationInvMask ) << 6
+				| ( static_cast<unsigned char>( str[2] ) & utf8ContinuationInvMask );
 			return 3;
 		case 4:
 			result = ( static_cast<unsigned char>( str[0] ) & ~utf8FourBytesMask ) << 18

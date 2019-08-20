@@ -17,7 +17,7 @@ CGlyph::CGlyph() :
 {
 }
 
-CGlyph::CGlyph( FT_GlyphSlot slot, int _glyphCode ) :
+CGlyph::CGlyph( FT_GlyphSlot slot, unsigned _glyphCode ) :
 	glyphCode( _glyphCode )
 {
 	FT_Glyph glyph;
