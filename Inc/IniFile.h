@@ -50,6 +50,7 @@ public:
 
 	int GetKeyId( CUnicodePart keyName ) const;
 	int GetOrCreateKeyId( CUnicodePart keyName );
+	int GetOrCreateKeyId( CUnicodePart keyName, CUnicodeString defaultValue );
 
 	// Check key presence.
 	bool HasKey( CUnicodePart keyName ) const;
@@ -116,7 +117,6 @@ public:
 
 	// Retrieve an id of the given key name for quick access.
 	int GetKeyId( int sectionId, CUnicodePart keyName ) const;
-	int GetOrCreateKeyId( int sectionId, CUnicodePart keyName );
 
 	// Conditional string lookup.
 	const CUnicodeString* LookupString( CUnicodePart sectionName, CUnicodePart keyName ) const;
@@ -140,13 +140,15 @@ public:
 
 	// Template methods that automatically perform the string-value casts with Value/UnicodeStr functions.
 	template <class ValueType>
+	int GetOrCreateKeyId( int sectionId, CUnicodePart keyName, const ValueType& defaultValue );
+	template <class ValueType>
 	ValueType GetValue( CUnicodePart sectionName, CUnicodePart keyName, const ValueType& defaultValue ) const;
 	template <class ValueType>
 	ValueType GetValue( int sectionId, int keyId, const ValueType& defaultValue ) const;
 	template <class ValueType>
-	void SetValue( CUnicodeView sectionName, CUnicodeView keyName, ValueType newValue );
+	void SetValue( CUnicodeView sectionName, CUnicodeView keyName, const ValueType& newValue );
 	template <class ValueType>
-	void SetValue( int sectionId, int keyId, ValueType newValue );
+	void SetValue( int sectionId, int keyId, const ValueType& newValue );
 	// Conditional value lookup.
 	template <class ValueType>
 	bool LookupValue( CUnicodePart sectionName, CUnicodePart keyName, ValueType& result ) const;
@@ -169,6 +171,7 @@ private:
 	const CIniFileSection* getSection( CUnicodePart name ) const
 		{ return const_cast<CIniFile*>( this )->getSection( move( name ) ); }
 	CIniFileSection& getOrCreateSection( CUnicodePart name );
+	int getOrCreateKeyId( int sectionId, CUnicodePart keyName, CUnicodeString defaultValue );
 
 	// Copying is prohibited.
 	CIniFile( CIniFile& ) = delete;
@@ -176,6 +179,12 @@ private:
 };
 
 //////////////////////////////////////////////////////////////////////////
+
+template<class ValueType>
+int CIniFile::GetOrCreateKeyId( int sectionId, CUnicodePart keyName, const ValueType& defaultValue )
+{
+	return getOrCreateKeyId( sectionId, keyName, UnicodeStr( defaultValue ) );
+}
 
 template <class ValueType>
 ValueType CIniFile::GetValue( CUnicodePart sectionName, CUnicodePart keyName, const ValueType& defaultValue ) const
@@ -204,13 +213,13 @@ ValueType CIniFile::GetValue( int sectionId, int keyId, const ValueType& default
 }
 
 template <class ValueType>
-void CIniFile::SetValue( CUnicodeView sectionName, CUnicodeView keyName, ValueType newValue )
+void CIniFile::SetValue( CUnicodeView sectionName, CUnicodeView keyName, const ValueType& newValue )
 {
 	SetString( sectionName, keyName, UnicodeStr( newValue ) );
 }
 
 template <class ValueType>
-void CIniFile::SetValue( int sectionId, int keyId, ValueType newValue )
+void CIniFile::SetValue( int sectionId, int keyId, const ValueType& newValue )
 {
 	SetString( sectionId, keyId, UnicodeStr( newValue ) );
 }

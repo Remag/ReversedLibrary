@@ -32,7 +32,7 @@ CIniSetting<FileSource, T>::CIniSetting( CUnicodePart settingName, T _defaultVal
 	defaultValue( move( _defaultValue ) )
 {
 	sectionId = fileSrc.GetOrCreateSectionId( sectionName );
-	keyId = fileSrc.GetOrCreateKeyId( sectionId, settingName );
+	keyId = fileSrc.GetOrCreateKeyId( sectionId, settingName, defaultValue );
 }
 
 template <class FileSource, class T>

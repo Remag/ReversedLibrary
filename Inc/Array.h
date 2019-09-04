@@ -47,6 +47,11 @@ public:
 	// Change an arrays size without zero initializing the elements.
 	// Only arrays of POD elements can use this method.
 	void IncreaseSizeNoInitialize( int newSize );
+	// Add a number of default constructed elements to the start.
+	void PadLeft( int padCount );
+	// Add a number of elements to the start without zero initializing them.
+	// Only arrays of POD elements can use this method.
+	void PadLeftNoInitialize( int padCount );
 
 	// Contents manipulation.
 
@@ -61,6 +66,7 @@ public:
 	// Insert using an arbitrary constructor.
 	template <class... Args>
 	Elem& InsertAt( int pos, Args&&... elemArgs );
+	// Delete a given amount of values. Value count must be at least 1.
 	void DeleteAt( int pos, int count = 1 );
 	void DeleteLast( int count = 1 );
 	// Find all array elements for which shouldSwap is true and delete them.
@@ -221,6 +227,35 @@ void CArray<Elem, Allocator, GrowStrategy>::IncreaseSizeNoInitialize( int newSiz
 }
 
 template <class Elem, class Allocator /*= CRuntimeHeap*/, class GrowStrategy /*= CDefaultGrowStrategy<8>*/>
+void CArray<Elem, Allocator, GrowStrategy>::PadLeft( int padCount )
+{
+	assert( padCount >= 0 );
+	const int size = this->Size();
+	const auto newSize = size + padCount;
+	growAt( 0, newSize );
+	auto buffer = this->Ptr();
+	for( int i = 0; i < padCount; i++ ) {
+		::new( buffer + i ) Elem{};
+	}
+	this->setSizeValue( newSize );
+}
+
+template <class Elem, class Allocator /*= CRuntimeHeap*/, class GrowStrategy /*= CDefaultGrowStrategy<8>*/>
+void CArray<Elem, Allocator, GrowStrategy>::PadLeftNoInitialize( int padCount )
+{
+	staticAssert( Types::IsPOD<Elem>::Result );
+	assert( padCount >= 0 );
+	const int size = this->Size();
+	const auto newSize = size + padCount;
+	growAt( 0, newSize );
+	auto buffer = this->Ptr();
+	for( int i = 0; i < padCount; i++ ) {
+		::new( buffer + i ) Elem;
+	}
+	this->setSizeValue( newSize );
+}
+
+template <class Elem, class Allocator /*= CRuntimeHeap*/, class GrowStrategy /*= CDefaultGrowStrategy<8>*/>
 template <class ...AddArgs>
 Elem& CArray<Elem, Allocator, GrowStrategy>::Add( AddArgs&&... args )
 {
@@ -261,7 +296,7 @@ Elem& CArray<Elem, Allocator, GrowStrategy>::InsertAt( int pos, Args&&... elemAr
 template <class Elem, class Allocator /*= CRuntimeHeap*/, class GrowStrategy /*= CDefaultGrowStrategy<8>*/>
 void CArray<Elem, Allocator, GrowStrategy>::DeleteAt( int pos, int count /*= 1 */ )
 {
-	assert( count >= 0 && count <= this->Size() );
+	assert( count > 0 && count <= this->Size() );
 	assert( pos >= 0 && pos <= this->Size() - count );
 	this->destroyElements( pos, pos + count - 1 );
 	const int newSize = this->Size() - count;

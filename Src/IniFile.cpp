@@ -57,6 +57,16 @@ int CIniFileSection::GetOrCreateKeyId( CUnicodePart keyName )
 	return resultId;
 }
 
+int CIniFileSection::GetOrCreateKeyId( CUnicodePart keyName, CUnicodeString defaultValue )
+{
+	const auto valueCount = valueStrings.Size();
+	const auto resultId = valueNameToId.GetOrCreate( deleteWhitespace( keyName ), valueCount ).Value();
+	if( resultId == valueCount ) {
+		valueStrings.Add( move( defaultValue ) );
+	}
+	return resultId;
+}
+
 bool CIniFileSection::HasKey( CUnicodePart keyName ) const
 {
 	const auto keyId = valueNameToId.Get( deleteWhitespace( keyName ) );
@@ -355,9 +365,9 @@ int CIniFile::GetKeyId( int sectionId, CUnicodePart keyName ) const
 	return sections[sectionId].GetKeyId( keyName );
 }
 
-int CIniFile::GetOrCreateKeyId( int sectionId, CUnicodePart keyName ) 
+int CIniFile::getOrCreateKeyId( int sectionId, CUnicodePart keyName, CUnicodeString defaultValue ) 
 {
-	return sections[sectionId].GetOrCreateKeyId( keyName );
+	return sections[sectionId].GetOrCreateKeyId( keyName, move( defaultValue ) );
 }
 
 const CUnicodeString* CIniFile::LookupString( CUnicodePart sectionName, CUnicodePart keyName ) const
