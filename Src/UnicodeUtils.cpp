@@ -55,7 +55,7 @@ const unsigned char utf8FourBytesMask = 0xF8;
 const unsigned char utf8TwoBytesMarker = 0xC0;
 const unsigned char utf8ThreeBytesMarker = 0xE0;
 const unsigned char utf8FourBytesMarker = 0xF0;
-static int getUtf8ByteCount( const char firstByte, int length )
+static int getUtf8ByteCount( unsigned char firstByte, int length )
 {
 	if( ( firstByte & utf8OneByteMask ) == 0 ) {
 		return 1;
@@ -74,7 +74,7 @@ static int getUtf8ByteCount( const char firstByte, int length )
 const int utf8ContinuationInvMask = 0x3f;
 int TryConvertUtf8ToUtf32( const char* str, int length, unsigned& result )
 {
-	const auto byteCount = getUtf8ByteCount( str[0], length );
+	const auto byteCount = getUtf8ByteCount( static_cast<unsigned char>( str[0] ), length );
 
 	switch( byteCount ) {
 		case 1:
