@@ -1,5 +1,6 @@
 #pragma once
 #include <Redefs.h>
+#include <CommonStringOperationsDefs.h>
 
 namespace Relib {
 
@@ -102,4 +103,7 @@ void CRawStringBuffer<StrType>::Release( int strLength )
 }	// namespace RelibInternal.
 
 }	// namespace Relib.
+
+#include <CommonStringOperationsInline.h>
+
 

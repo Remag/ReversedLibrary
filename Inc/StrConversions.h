@@ -1120,47 +1120,47 @@ inline void ConvertString( CUnicodePart val, CString& result, char defaultChar, 
 
 namespace RelibInternal {
 
-	// Common string method definitions that depend on string conversions.
-	template <class T>
-	CBaseString<T> CCommonStringOperations<T>::substParam( CBaseStringView<T> data, CBaseStringPart<T> params[], int size )
-	{
-		CBaseString<T> result;
-		const int length = data.Length();
-		const T* buffer = data.begin();
-		const T messageParamPrefix = getMessageParamPrefix();
-		result.ReserveBuffer( length );
-		int pos = 0;
-		// Start parsing.
-		while( pos < length ) {
-			// Find the parameter prefix.
-			const int prevPosition = pos;
-			pos = data.Find( messageParamPrefix, prevPosition );
-			if( pos == NotFound || pos + 1 >= length ) {
-				// No parameters were found.
-				result += data.Mid( prevPosition );
-				break;
-			}
-			result += data.Mid( prevPosition, pos - prevPosition );
-			// Try and parse the digit after the prefix.
-			// First, find the digit's length.
-			int digitPos = pos + 1;
-			for( ; digitPos < length && data.IsCharDigit( buffer[digitPos] ); digitPos++ ) {
-			}
-			// Now, parse the digit.
-			if( digitPos > pos + 1 ) {
-				const auto indexValue = Value<int>( data.Mid( pos + 1, digitPos - pos - 1 ) );
-				if( indexValue.IsValid() && 0 <= *indexValue && *indexValue < size ) {
-					// The digit can be substituted with an entry from the provided array.
-					result += params[*indexValue];
-				}
-			} else {
-				// No digits were found after the prefix.
-				result += data.Mid( pos, digitPos - pos );
-			}
-			pos = digitPos;
+// Common string method definitions that depend on string conversions.
+template <class T>
+CBaseString<T> CCommonStringOperations<T>::substParam( CBaseStringView<T> data, CBaseStringPart<T> params[], int size )
+{
+	CBaseString<T> result;
+	const int length = data.Length();
+	const T* buffer = data.begin();
+	const T messageParamPrefix = getMessageParamPrefix();
+	result.ReserveBuffer( length );
+	int pos = 0;
+	// Start parsing.
+	while( pos < length ) {
+		// Find the parameter prefix.
+		const int prevPosition = pos;
+		pos = data.Find( messageParamPrefix, prevPosition );
+		if( pos == NotFound || pos + 1 >= length ) {
+			// No parameters were found.
+			result += data.Mid( prevPosition );
+			break;
 		}
-		return result;
+		result += data.Mid( prevPosition, pos - prevPosition );
+		// Try and parse the digit after the prefix.
+		// First, find the digit's length.
+		int digitPos = pos + 1;
+		for( ; digitPos < length && data.IsCharDigit( buffer[digitPos] ); digitPos++ ) {
+		}
+		// Now, parse the digit.
+		if( digitPos > pos + 1 ) {
+			const auto indexValue = Value<int>( data.Mid( pos + 1, digitPos - pos - 1 ) );
+			if( indexValue.IsValid() && 0 <= *indexValue && *indexValue < size ) {
+				// The digit can be substituted with an entry from the provided array.
+				result += params[*indexValue];
+			}
+		} else {
+			// No digits were found after the prefix.
+			result += data.Mid( pos, digitPos - pos );
+		}
+		pos = digitPos;
 	}
+	return result;
+}
 
 }	// namespace RelibInternal
 
