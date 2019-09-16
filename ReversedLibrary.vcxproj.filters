@@ -564,6 +564,24 @@
     <ClInclude Include="Inc\Reassert.h">
       <Filter>Header Files\Messages</Filter>
     </ClInclude>
+    <ClInclude Include="Inc\GlyphInc.h">
+      <Filter>Header Files\Fonts</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\FreeTypeGlyphProvider.h">
+      <Filter>Header Files\Fonts</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\GlyphProvider.h">
+      <Filter>Header Files\Fonts</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\CommonStringOperationsInline.h">
+      <Filter>Header Files\Strings</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\CommonStringOperationsDefs.h">
+      <Filter>Header Files\Strings</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\FontListGlyphProvider.h">
+      <Filter>Header Files\Fonts</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Src\ActionOwner.cpp">
@@ -708,6 +726,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Src\CurlException.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\FreeTypeGlyphProvider.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\FontListGlyphProvider.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

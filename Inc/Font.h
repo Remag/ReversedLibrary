@@ -32,8 +32,15 @@ public:
 	CFontSizeOwner CreateSizeObject( int pxSize ) const;
 	CFontSizeOwner CreateSizeObject( CVector2<int> pxSize ) const;
 
+	// Check if a given character is present in the font.
+	bool HasGlyph( unsigned charCode ) const;
+	// Get an index of a needed glyph in the font's character map.
+	// If no glyph is mapped to a char, return 0.
+	unsigned GetGlyphIndex( unsigned charCode ) const;
 	// Get the glyph structure for the given character code in UTF32BE encoding.
 	CGlyph GetGlyph( unsigned charCode, CFontSizeView fontSize ) const;
+	// Get the glyph structure for the given glyph index.
+	CGlyph GetGlyphByIndex( unsigned glyphIndex, CFontSizeView fontSize ) const;
 
 protected:
 	// FreeType internal structure.
@@ -75,8 +82,15 @@ public:
 	// Create an object with size information.
 	CFontSizeOwner CreateSizeObject( int pxSize ) const;
 	CFontSizeOwner CreateSizeObject( CVector2<int> pxSize ) const;
+	// Check if a given character is present in the font.
+	bool HasGlyph( unsigned charCode ) const;
+	// Get an index of a needed glyph in the font's character map.
+	// If no glyph is mapped to a char, return 0.
+	unsigned GetGlyphIndex( unsigned charCode ) const;
 	// Get the glyph structure for the given character code in UTF32BE encoding.
 	CGlyph GetGlyph( unsigned charCode, CFontSizeView fontSize ) const;
+	// Get the glyph structure for the given glyph index.
+	CGlyph GetGlyphByIndex( unsigned glyphIndex, CFontSizeView fontSize ) const;
 
 	// Initialization functions need access to the FT_Library object to fill it.
 	friend class CRelibInitializer;

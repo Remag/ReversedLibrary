@@ -20,11 +20,28 @@ CFontView::CFontView( const CFontOwner& owner ) :
 {
 }
 
+bool CFontView::HasGlyph( unsigned charCode ) const
+{
+	return GetGlyphIndex( charCode ) != 0;
+}
+
+unsigned CFontView::GetGlyphIndex( unsigned charCode ) const
+{
+	return FT_Get_Char_Index( fontFace, charCode );
+}
+
 CGlyph CFontView::GetGlyph( unsigned charCode, CFontSizeView fontSize ) const
 {
 	FT_Activate_Size( fontSize.GetHandle() );
 	checkFreeTypeError( FT_Load_Char( fontFace, charCode, FT_LOAD_DEFAULT ) );
-	return CGlyph( fontFace->glyph, charCode );
+	return CGlyph( fontFace->glyph );
+}
+
+CGlyph CFontView::GetGlyphByIndex( unsigned glyphIndex, CFontSizeView fontSize ) const
+{
+	FT_Activate_Size( fontSize.GetHandle() );
+	checkFreeTypeError( FT_Load_Glyph( fontFace, glyphIndex, FT_LOAD_DEFAULT ) );
+	return CGlyph( fontFace->glyph );
 }
 
 CFontSizeOwner CFontView::CreateSizeObject( int pxSize ) const
@@ -132,9 +149,24 @@ CFontSizeOwner CFontOwner::CreateSizeObject( CVector2<int> pxSize ) const
 	return view.CreateSizeObject( pxSize );
 }
 
+bool CFontOwner::HasGlyph( unsigned charCode ) const
+{
+	return view.HasGlyph( charCode );
+}
+
+unsigned CFontOwner::GetGlyphIndex( unsigned charCode ) const
+{
+	return view.GetGlyphIndex( charCode );
+}
+
 CGlyph CFontOwner::GetGlyph( unsigned charCode, CFontSizeView fontSize ) const
 {
 	return view.GetGlyph( charCode, fontSize );
+}
+
+CGlyph CFontOwner::GetGlyphByIndex( unsigned glyphIndex, CFontSizeView fontSize ) const
+{
+	return view.GetGlyphByIndex( glyphIndex, fontSize );
 }
 
 //////////////////////////////////////////////////////////////////////////
