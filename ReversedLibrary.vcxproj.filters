@@ -70,6 +70,9 @@
     <Filter Include="Header Files\Utility">
       <UniqueIdentifier>{c877c863-72f9-4217-b94b-e052397d02c8}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Time">
+      <UniqueIdentifier>{c59e7437-1eb9-43ed-b090-95e95f719a9a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Inc\Redefs.h">
@@ -582,6 +585,9 @@
     <ClInclude Include="Inc\FontListGlyphProvider.h">
       <Filter>Header Files\Fonts</Filter>
     </ClInclude>
+    <ClInclude Include="Inc\DateTime.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Src\ActionOwner.cpp">
@@ -732,6 +738,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Src\FontListGlyphProvider.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\DateTime.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

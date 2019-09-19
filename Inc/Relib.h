@@ -25,6 +25,7 @@
 #include <ComponentGroup.h>
 #include <ConditionVariable.h>
 #include <ConvexShapeCollisionDetector.h>
+#include <DateTime.h>
 #include <DynamicAllocators.h>
 #include <DynamicBitset.h>
 #include <Easing.h>

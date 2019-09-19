@@ -200,6 +200,7 @@
     <ClInclude Include="Inc\CriticalSection.h" />
     <ClInclude Include="Inc\CurlException.h" />
     <ClInclude Include="Inc\CurlInitializer.h" />
+    <ClInclude Include="Inc\DateTime.h" />
     <ClInclude Include="Inc\DynamicAllocators.h" />
     <ClInclude Include="Inc\DynamicBitset.h" />
     <ClInclude Include="Inc\DynamicFile.h" />
@@ -336,6 +337,7 @@
     <ClCompile Include="Src\Archive.cpp" />
     <ClCompile Include="Src\CurlException.cpp" />
     <ClCompile Include="Src\CurlInitializer.cpp" />
+    <ClCompile Include="Src\DateTime.cpp" />
     <ClCompile Include="Src\DynamicAllocators.cpp" />
     <ClCompile Include="Src\Entity.cpp" />
     <ClCompile Include="Src\EntityComponentSystem.cpp" />
