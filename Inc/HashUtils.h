@@ -1,6 +1,7 @@
 #pragma once
 #include <Redefs.h>
 #include <Remath.h>
+#include <RawStringBuffer.h>
 #include <BaseStringView.h>
 #include <BaseStringPart.h>
 

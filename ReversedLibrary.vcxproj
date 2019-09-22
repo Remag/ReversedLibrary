@@ -185,6 +185,8 @@
     <ClInclude Include="Inc\CircleShape.h" />
     <ClInclude Include="Inc\Color.h" />
     <ClInclude Include="Inc\CommonStringOperations.h" />
+    <ClInclude Include="Inc\CommonStringOperationsDefs.h" />
+    <ClInclude Include="Inc\CommonStringOperationsInline.h" />
     <ClInclude Include="Inc\Comparators.h" />
     <ClInclude Include="Inc\ComplexShape.h" />
     <ClInclude Include="Inc\Component.h" />
@@ -198,6 +200,7 @@
     <ClInclude Include="Inc\CriticalSection.h" />
     <ClInclude Include="Inc\CurlException.h" />
     <ClInclude Include="Inc\CurlInitializer.h" />
+    <ClInclude Include="Inc\DateTime.h" />
     <ClInclude Include="Inc\DynamicAllocators.h" />
     <ClInclude Include="Inc\DynamicBitset.h" />
     <ClInclude Include="Inc\DynamicFile.h" />
@@ -224,10 +227,14 @@
     <ClInclude Include="Inc\FileSystem.h" />
     <ClInclude Include="Inc\FileViews.h" />
     <ClInclude Include="Inc\Font.h" />
+    <ClInclude Include="Inc\FontListGlyphProvider.h" />
     <ClInclude Include="Inc\FontSize.h" />
     <ClInclude Include="Inc\FreeTypeException.h" />
+    <ClInclude Include="Inc\FreeTypeGlyphProvider.h" />
     <ClInclude Include="Inc\GeneralBlockAllocator.h" />
     <ClInclude Include="Inc\Glyph.h" />
+    <ClInclude Include="Inc\GlyphInc.h" />
+    <ClInclude Include="Inc\GlyphProvider.h" />
     <ClInclude Include="Inc\GrowStrategy.h" />
     <ClInclude Include="Inc\HashTable.h" />
     <ClInclude Include="Inc\HashTableBase.h" />
@@ -330,6 +337,7 @@
     <ClCompile Include="Src\Archive.cpp" />
     <ClCompile Include="Src\CurlException.cpp" />
     <ClCompile Include="Src\CurlInitializer.cpp" />
+    <ClCompile Include="Src\DateTime.cpp" />
     <ClCompile Include="Src\DynamicAllocators.cpp" />
     <ClCompile Include="Src\Entity.cpp" />
     <ClCompile Include="Src\EntityComponentSystem.cpp" />
@@ -343,8 +351,10 @@
     <ClCompile Include="Src\FileOperations.cpp" />
     <ClCompile Include="Src\FileSystem.cpp" />
     <ClCompile Include="Src\Font.cpp" />
+    <ClCompile Include="Src\FontListGlyphProvider.cpp" />
     <ClCompile Include="Src\FontSize.cpp" />
     <ClCompile Include="Src\FreeTypeException.cpp" />
+    <ClCompile Include="Src\FreeTypeGlyphProvider.cpp" />
     <ClCompile Include="Src\GlobalData.cpp" />
     <ClCompile Include="Src\Glyph.cpp" />
     <ClCompile Include="Src\HashUtils.cpp" />

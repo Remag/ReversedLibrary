@@ -1,6 +1,8 @@
 #pragma once
+#include <GlyphInc.h>
 #include <Redefs.h>
 #include <Vector.h>
+#include <StrConversions.h>
 
 // FreeType declarations.
 struct FT_GlyphRec_;
@@ -16,24 +18,9 @@ namespace Relib {
 
 //////////////////////////////////////////////////////////////////////////
 
-// Structure with the glyphs bitmap information.
-// This structure is created to get all the necessary data in one method call.
-struct CGlyphData {
-	// Distance between current pen position and bitmap's top left position.
-	CVector2<int> Offset;
-	// An offset of the cursor after drawing the bitmap.
-	CVector2<int> Advance;
-	// Bitmap size in pixels.
-	CVector2<int> Size;
-	// Bitmap pitch. May be negative. Buffer + RowSize always gives the next row.
-	int Pitch;
-};
-
-//////////////////////////////////////////////////////////////////////////
-
 // A single glyph from the font. Wraps FreeType structures.
 // This class owns the glyph and all the bitmaps that were rendered from it.
-class REAPI CGlyph {
+class REAPI CGlyph : public IGlyph {
 public:
 	CGlyph();
 	CGlyph( CGlyph&& other );
@@ -41,26 +28,20 @@ public:
 
 	CGlyph& operator=( CGlyph&& other );
 
-	// Get UTF32 glyph code.
-	unsigned GetCode() const
-		{ return glyphCode; }
-
 	bool IsLoaded() const
 		{ return bitmapGlyph != 0; }
-	// Get all the data necessary to draw a glyph.
-	CGlyphData GetGlyphData() const;
-	// Get the bitmap buffer.
-	const BYTE* GetBitmap() const;
+
+	// IGlyph.
+	virtual CGlyphData GetGlyphData() const override final;
 
 	// Font needs access to glyph's constructor.
 	friend class CFontView;
 
 private:
 	FT_BitmapGlyph bitmapGlyph;
-	unsigned glyphCode;
 
 	// Copy a glyph from a given glyph slot.
-	explicit CGlyph( FT_GlyphSlot slot, unsigned glyphCode );
+	explicit CGlyph( FT_GlyphSlot slot );
 
 	void renderGlyph( FT_Glyph glyph );
 

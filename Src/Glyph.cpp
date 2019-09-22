@@ -12,13 +12,11 @@ namespace Relib {
 //////////////////////////////////////////////////////////////////////////
 
 CGlyph::CGlyph() :
-	bitmapGlyph( 0 ),
-	glyphCode( 0 )
+	bitmapGlyph( 0 )
 {
 }
 
-CGlyph::CGlyph( FT_GlyphSlot slot, unsigned _glyphCode ) :
-	glyphCode( _glyphCode )
+CGlyph::CGlyph( FT_GlyphSlot slot )
 {
 	FT_Glyph glyph;
 	checkFreeTypeError( FT_Get_Glyph( slot, &glyph ) );
@@ -26,8 +24,7 @@ CGlyph::CGlyph( FT_GlyphSlot slot, unsigned _glyphCode ) :
 }
 
 CGlyph::CGlyph( CGlyph&& other ) :
-	bitmapGlyph( other.bitmapGlyph ),
-	glyphCode( other.glyphCode )
+	bitmapGlyph( other.bitmapGlyph )
 {
 	other.bitmapGlyph = 0;
 }
@@ -40,7 +37,6 @@ CGlyph::~CGlyph()
 CGlyph& CGlyph::operator=( CGlyph&& other )
 {
 	bitmapGlyph = other.bitmapGlyph;
-	glyphCode = other.glyphCode;
 	other.bitmapGlyph = 0;
 	return *this;
 }
@@ -48,19 +44,15 @@ CGlyph& CGlyph::operator=( CGlyph&& other )
 CGlyphData CGlyph::GetGlyphData() const
 {
 	CGlyphData result;
-	result.Offset.X() = bitmapGlyph->left;
-	result.Offset.Y() = bitmapGlyph->top;
-	result.Size.X() = bitmapGlyph->bitmap.width;
-	result.Size.Y() = bitmapGlyph->bitmap.rows;
-	result.Pitch = bitmapGlyph->bitmap.pitch;
-	result.Advance.X() = bitmapGlyph->root.advance.x >> 16;
-	result.Advance.Y() = bitmapGlyph->root.advance.y >> 16;
+	result.SizeData.Offset.X() = bitmapGlyph->left;
+	result.SizeData.Offset.Y() = bitmapGlyph->top;
+	result.SizeData.Size.X() = bitmapGlyph->bitmap.width;
+	result.SizeData.Size.Y() = bitmapGlyph->bitmap.rows;
+	result.SizeData.Pitch = bitmapGlyph->bitmap.pitch;
+	result.SizeData.Advance.X() = bitmapGlyph->root.advance.x >> 16;
+	result.SizeData.Advance.Y() = bitmapGlyph->root.advance.y >> 16;
+	result.BitmapData = bitmapGlyph->bitmap.buffer;
 	return result;
-}
-
-const BYTE* CGlyph::GetBitmap() const
-{
-	return bitmapGlyph->bitmap.buffer;
 }
 
 void CGlyph::renderGlyph( FT_Glyph glyph )
