@@ -57,8 +57,8 @@ public:
 	void SetRect( CVector2<Type> bottomLeft, CVector2<Type> topRight );
 	void SetRect( CVector2<Type> bottomLeft, Type width, Type height );
 	void Empty();
-	void OffsetRect( Type x, Type y );
-	void OffsetRect( CVector2<Type> offset );
+	void GetOffsetRect( Type left, Type top, Type right, Type bottom ) const;
+	void GetOffsetRect( CVector2<Type> offset ) const;
 
 	// Weak containment and intersection checks. operator<= is used for edge cases.
 	bool Has( CVector2<Type> pos ) const;
@@ -238,18 +238,15 @@ inline void CAARect<Type>::Empty()
 }
 
 template<class Type>
-inline void CAARect<Type>::OffsetRect( Type x, Type y )
+inline void CAARect<Type>::GetOffsetRect( Type leftDelta, Type topDelta, Type rightDelta, Type bottomDelta ) const
 {
-	left += x;
-	right += x;
-	top += y;
-	bottom += y;
+	return CAARect<Type>( left + leftDelta, top + topDelta, right + rightDelta, bottom + bottomDelta );
 }
 
 template<class Type>
-inline void CAARect<Type>::OffsetRect( CVector2<Type> offset )
+inline void CAARect<Type>::GetOffsetRect( CVector2<Type> offset ) const
 {
-	OffsetRect( offset.X(), offset.Y() );
+	return GetOffsetRect( offset.X(), offset.Y(), offset.X(), offset.Y() );
 }
 
 template<class Type>
