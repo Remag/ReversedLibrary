@@ -24,7 +24,7 @@ void* CActionOwnerAllocator::Allocate( int size )
 		CCriticalSectionLock lock( allocationLock );
 		return RELIB_ALLOCATE( biggerActionManager, size );
 	} else {
-		return RELIB_STATIC_ALLOCATE( CRuntimeHeap, size );
+		return RELIB_STATIC_ALLOCATE( CProcessHeap, size );
 	}
 }
 
@@ -35,7 +35,7 @@ void CActionOwnerAllocator::Free( void* ptr, int allocSize )
 	} else if( allocSize <= biggerBlockSize ) {
 		biggerActionManager.Free( ptr );
 	} else {
-		CRuntimeHeap::Free( ptr );
+		CProcessHeap::Free( ptr );
 	}
 }
 

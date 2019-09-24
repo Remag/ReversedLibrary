@@ -35,6 +35,14 @@ void RegisterObject( const type_info& objectInfo, CUnicodePart objectName, CPtrO
 	ObjectRegisteredNames.Set( objectInfo.name(), objectName );
 }
 
+void UnregisterObject( const type_info& objectInfo, CUnicodePart objectName )
+{
+	CCriticalSectionLock lock( ObjectCreationFunctionsSection );
+	assert( ObjectCreationFunctions.Has( objectName ) );
+	ObjectRegisteredNames.Delete( objectInfo.name() );
+	ObjectCreationFunctions.Delete( objectName );
+}
+
 CUnicodeView GetExternalName( const IExternalObject& object )
 {
 	const char* const objectName = typeid( object ).name();

@@ -24,6 +24,8 @@ public:
 
 	template <class... Events>
 	static int WaitAny( const Events&... events );
+	template <class... Events>
+	static int WaitAnyTimeout( int msTimeout, const Events&... events );
 
 private:
 	HANDLE eventHandle;
@@ -31,6 +33,9 @@ private:
 	template <class... Events>
 	static void fillEventHandles( CArrayBuffer<HANDLE> handles, const CKernelEvent& e, const Events&... rest );
 	static void fillEventHandles( CArrayBuffer<HANDLE> handles, const CKernelEvent& e );
+
+	template <class... Events>
+	static int doWaitAny( DWORD timeout, const Events&... events );
 
 	// Copying is prohibited.
 	CKernelEvent( CKernelEvent& ) = delete;
@@ -77,12 +82,25 @@ inline bool CKernelEvent::Wait()
 template<class... Events>
 int CKernelEvent::WaitAny( const Events&... events )
 {
+	return doWaitAny( INFINITE, events... );
+}
+
+template<class... Events>
+int CKernelEvent::WaitAnyTimeout( int msTimeout, const Events&... events )
+{
+	assert( msTimeout >= 0 );
+	return doWaitAny( static_cast<DWORD>( msTimeout ), events... );
+}
+
+template<class... Events>
+int CKernelEvent::doWaitAny( DWORD timeout, const Events&... events )
+{
 	static const int eventCount = sizeof...( Events );
 	staticAssert( eventCount <= MAXIMUM_WAIT_OBJECTS );
 	staticAssert( eventCount > 0 );
 	CStackArray<HANDLE, eventCount> eventHandles;
 	CKernelEvent::fillEventHandles( eventHandles, events... );
-	const auto waitResult = ::WaitForMultipleObjects( eventCount, eventHandles.Ptr(), FALSE, INFINITE );
+	const auto waitResult = ::WaitForMultipleObjects( eventCount, eventHandles.Ptr(), FALSE, timeout );
 	checkLastError( waitResult != WAIT_FAILED );
 	const auto eventId = waitResult - WAIT_OBJECT_0;
 	return ( eventId >= 0 && eventId < eventCount ) ? eventId : NotFound;

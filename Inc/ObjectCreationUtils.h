@@ -84,7 +84,7 @@ class CClassConstructionAction<ClassType, CTuple<Args...>> : public IAction<IExt
 public:
 	// Action invocation creates a class object using its constructor with correctly converted arguments.
 	virtual IExternalObject* Invoke( void* targetMemory, Args... args ) const override final {
-		static_assert( Types::HasConstructor<ClassType, Args...>::Result, "External object must be constructable with the specified arguments." );
+		static_assert( Types::HasConstructor<ClassType, Args...>::Result, "External object must be constructible with the specified arguments." );
 		return ::new( targetMemory ) ClassType( forward<Args>( args )... ); 
 	}
 };
@@ -130,6 +130,8 @@ IExternalObject* CClassCreationAction<ActionType, CTuple<Args...>>::doInvoke( vo
 REAPI const CBaseObjectCreationFunction* GetObjectCreationFunction( CUnicodePart objectName );
 // Register an external name and a creation function for an object of a given type.
 void REAPI RegisterObject( const type_info& objectInfo, CUnicodePart objectName, CPtrOwner<CBaseObjectCreationFunction, CProcessHeap> newFunction );
+// Destroy the association between a given name and a previously registered creation function.
+void REAPI UnregisterObject( const type_info& objectInfo, CUnicodePart objectName );
 // Get the registered external name for an external object.
 // Note that a single object can have several external names.
 // In this case, the latest registered name is returned.

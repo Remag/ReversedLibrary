@@ -4,6 +4,8 @@
 #include <Serializable.h>
 #include <Ptr.h>
 #include <MemoryOwner.h>
+#include <BaseStringPart.h>
+#include <BaseString.h>
 
 namespace Relib {
 
@@ -154,20 +156,33 @@ public:
 
 	// Constructor that registers the default function.
 	// Default function uses ClassType's constructor.
-	explicit CExternalNameConstructor( CUnicodeView className );
+	explicit CExternalNameConstructor( CUnicodePart className );
+	~CExternalNameConstructor();
+
+private:
+	CUnicodeString className;
+	const type_info* classInfo;
 };
 
 //////////////////////////////////////////////////////////////////////////
 
 template <class ClassType>
-CExternalNameConstructor<ClassType>::CExternalNameConstructor( CUnicodeView className )
+CExternalNameConstructor<ClassType>::CExternalNameConstructor( CUnicodePart _className ) :
+	className( _className )
 {
+	classInfo = &typeid( ClassType );
 	const int objectSize = sizeof( ClassType );
 	typedef RelibInternal::CObjectCreationInfo<ClassType>::TCreateFunction TCreateFunction;
 	typedef typename TCreateFunction::TCreationArgsTuple TArgsTuple;
 	auto classCreateAction = CreateOwner<RelibInternal::CClassConstructionAction<ClassType, TArgsTuple>>();
 	auto creationFunction = CreateOwner<TCreateFunction, CProcessHeap>( move( classCreateAction ), objectSize );
-	RegisterObject( typeid( ClassType ), className, move( creationFunction ) );
+	RegisterObject( *classInfo, className, move( creationFunction ) );
+}
+
+template<class ClassType>
+CExternalNameConstructor<ClassType>::~CExternalNameConstructor()
+{
+	UnregisterObject( *classInfo, className );
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -179,20 +194,32 @@ class CExternalNameCreator {
 public:
 	// Register a given creation function.
 	template <class ActionType>
-	explicit CExternalNameCreator( CUnicodeView className, ActionType action );
+	explicit CExternalNameCreator( CUnicodePart className, ActionType action );
+	~CExternalNameCreator();
+
+private:
+	CUnicodeString className;
+	const type_info* classInfo;
 };
 
 //////////////////////////////////////////////////////////////////////////
 
 template <class ActionType>
-CExternalNameCreator::CExternalNameCreator( CUnicodeView className, ActionType action )
+CExternalNameCreator::CExternalNameCreator( CUnicodePart _className, ActionType action ) :
+	className( _className )
 {
 	typedef Types::FunctionInfo<ActionType>::ReturnType TClassType;
+	classInfo = &typeid( TClassType );
 	typedef Types::FunctionInfo<ActionType>::ArgsTuple TArgTuple;
 	const int objectSize = sizeof( TClassType );
 	auto classCreateAction = CreateOwner<RelibInternal::CClassCreationAction<ActionType, TArgTuple>>( move( action ) );
 	auto creationFunction = CreateOwner<CObjectCreationFunction<TArgTuple>, CProcessHeap>( move( classCreateAction ), objectSize );
-	RegisterObject( typeid( TClassType ), className, move( creationFunction ) );
+	RegisterObject( *classInfo, className, move( creationFunction ) );
+}
+
+inline CExternalNameCreator::~CExternalNameCreator()
+{
+	UnregisterObject( *classInfo, className );
 }
 
 //////////////////////////////////////////////////////////////////////////

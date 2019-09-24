@@ -57,8 +57,8 @@ public:
 	void SetRect( CVector2<Type> bottomLeft, CVector2<Type> topRight );
 	void SetRect( CVector2<Type> bottomLeft, Type width, Type height );
 	void Empty();
-	void GetOffsetRect( Type left, Type top, Type right, Type bottom ) const;
-	void GetOffsetRect( CVector2<Type> offset ) const;
+	CAARect<Type> GetOffsetRect( Type left, Type top, Type right, Type bottom ) const;
+	CAARect<Type> GetOffsetRect( CVector2<Type> offset ) const;
 
 	// Weak containment and intersection checks. operator<= is used for edge cases.
 	bool Has( CVector2<Type> pos ) const;
@@ -145,61 +145,61 @@ CVector2<Type> Relib::CAARect<Type>::Size() const
 }
 
 template<class Type>
-inline Type CAARect<Type>::Width() const
+Type CAARect<Type>::Width() const
 {
 	return right - left;
 }
 
 template<class Type>
-inline Type CAARect<Type>::Height() const
+Type CAARect<Type>::Height() const
 {
 	return top - bottom;
 }
 
 template<class Type>
-inline Type CAARect<Type>::Area() const
+Type CAARect<Type>::Area() const
 {
 	return Width() * Height();
 }
 
 template<class Type>
-inline CVector2<Type> CAARect<Type>::TopLeft() const
+CVector2<Type> CAARect<Type>::TopLeft() const
 {
 	return CVector2<Type>( left, top );
 }
 
 template<class Type>
-inline CVector2<Type> CAARect<Type>::TopRight() const
+CVector2<Type> CAARect<Type>::TopRight() const
 {
 	return CVector2<Type>( right, top );
 }
 
 template<class Type>
-inline CVector2<Type> CAARect<Type>::BottomRight() const
+CVector2<Type> CAARect<Type>::BottomRight() const
 {
 	return CVector2<Type>( right, bottom );
 }
 
 template<class Type>
-inline CVector2<Type> CAARect<Type>::BottomLeft() const
+CVector2<Type> CAARect<Type>::BottomLeft() const
 {
 	return CVector2<Type>( left, bottom );
 }
 
 template<class Type>
-inline CVector2<Type> CAARect<Type>::CenterPoint() const
+CVector2<Type> CAARect<Type>::CenterPoint() const
 {
 	return CVector2<Type>( ( left + right ) / 2, ( top + bottom ) / 2 );
 }
 
 template<class Type>
-inline bool CAARect<Type>::IsNull() const
+bool CAARect<Type>::IsNull() const
 {
 	return left == 0 && right == 0 && top == 0 && bottom == 0;
 }
 
 template<class Type>
-inline bool CAARect<Type>::IsEmpty() const
+bool CAARect<Type>::IsEmpty() const
 {
 	return left >= right || top <= bottom;
 }
@@ -211,7 +211,7 @@ bool CAARect<Type>::IsValid() const
 }
 
 template<class Type>
-inline void CAARect<Type>::SetRect( Type _left, Type _top, Type _right, Type _bottom )
+void CAARect<Type>::SetRect( Type _left, Type _top, Type _right, Type _bottom )
 {
 	left = _left;
 	top = _top;
@@ -220,43 +220,43 @@ inline void CAARect<Type>::SetRect( Type _left, Type _top, Type _right, Type _bo
 }
 
 template<class Type>
-inline void CAARect<Type>::SetRect( CVector2<Type> bottomLeft, CVector2<Type> topRight )
+void CAARect<Type>::SetRect( CVector2<Type> bottomLeft, CVector2<Type> topRight )
 {
 	SetRect( bottomLeft.X(), topRight.Y(), topRight.X(), bottomLeft.Y() );
 }
 
 template<class Type>
-inline void CAARect<Type>::SetRect( CVector2<Type> bottomLeft, Type width, Type height )
+void CAARect<Type>::SetRect( CVector2<Type> bottomLeft, Type width, Type height )
 {
 	SetRect( bottomLeft.X(), bottomLeft.Y() + height, bottomLeft.X() + width, bottomLeft.Y() );
 }
 
 template<class Type>
-inline void CAARect<Type>::Empty()
+void CAARect<Type>::Empty()
 {
 	left = right = top = bottom = 0;
 }
 
 template<class Type>
-inline void CAARect<Type>::GetOffsetRect( Type leftDelta, Type topDelta, Type rightDelta, Type bottomDelta ) const
+CAARect<Type> CAARect<Type>::GetOffsetRect( Type leftDelta, Type topDelta, Type rightDelta, Type bottomDelta ) const
 {
 	return CAARect<Type>( left + leftDelta, top + topDelta, right + rightDelta, bottom + bottomDelta );
 }
 
 template<class Type>
-inline void CAARect<Type>::GetOffsetRect( CVector2<Type> offset ) const
+CAARect<Type> CAARect<Type>::GetOffsetRect( CVector2<Type> offset ) const
 {
 	return GetOffsetRect( offset.X(), offset.Y(), offset.X(), offset.Y() );
 }
 
 template<class Type>
-inline bool CAARect<Type>::operator==( CAARect<Type> rect ) const
+bool CAARect<Type>::operator==( CAARect<Type> rect ) const
 {
 	return left == rect.left && right == rect.right && top == rect.top && bottom == rect.bottom;
 }
 
 template<class Type>
-inline bool CAARect<Type>::operator!=( CAARect<Type> rect ) const
+bool CAARect<Type>::operator!=( CAARect<Type> rect ) const
 {
 	return left != rect.left || right != rect.right || top != rect.top || bottom != rect.bottom;
 }
@@ -306,13 +306,13 @@ bool CAARect<Type>::StrictIntersects( CAARect<Type> other ) const
 //////////////////////////////////////////////////////////////////////////
 
 template<class Type>
-inline CAARect<Type> operator*( typename CAARect<Type>::FloatingPointType mul, CAARect<Type> rect )
+CAARect<Type> operator*( typename CAARect<Type>::FloatingPointType mul, CAARect<Type> rect )
 {
 	return rect * mul;
 }
 
 template<class Type>
-inline CAARect<Type> operator/( typename CAARect<Type>::FloatingPointType div, CAARect<Type> rect )
+CAARect<Type> operator/( typename CAARect<Type>::FloatingPointType div, CAARect<Type> rect )
 {
 	return rect / div;
 }
