@@ -22,9 +22,9 @@ struct CJsonListNode;
 struct CJsonKeyValue;
 //////////////////////////////////////////////////////////////////////////
 
-class CJsonException : public CException {
+class CJsonParseException : public CException {
 public:
-	explicit CJsonException( int _parsePos ) : parsePos( _parsePos ) {}
+	explicit CJsonParseException( int _parsePos ) : parsePos( _parsePos ) {}
 
 	// CException.
 	virtual CUnicodeString GetMessageText() const override;

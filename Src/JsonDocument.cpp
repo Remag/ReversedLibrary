@@ -7,7 +7,7 @@ namespace Relib {
 //////////////////////////////////////////////////////////////////////////
 
 extern const REAPI CUnicodeView JsonParsingError;
-CUnicodeString CJsonException::GetMessageText() const
+CUnicodeString CJsonParseException::GetMessageText() const
 {
 	return JsonParsingError.SubstParam( parsePos );
 }
@@ -53,7 +53,7 @@ void CJsonDocument::parseJson( CStringView jsonStr )
 
 void CJsonDocument::throwParseException( int parsePos ) const
 {
-	throw CJsonException( parsePos );
+	throw CJsonParseException( parsePos );
 }
 
 int CJsonDocument::skipWhitespace( CStringView str, int startPos ) const

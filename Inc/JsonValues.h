@@ -5,6 +5,7 @@
 #include <RawStringBuffer.h>
 #include <StrConversions.h>
 #include <ArrayBuffer.h>
+#include <Errors.h>
 
 namespace Relib {
 
@@ -60,26 +61,59 @@ private:
 
 //////////////////////////////////////////////////////////////////////////
 
+// Exception thrown on value type mismatch or missing values.
+class REAPI CJsonValueException : public CException {
+public:
+	// Initialize a conversion error.
+	CJsonValueException( TJsonValueType expected, TJsonValueType actual );
+	// Initialize a missing object key error.
+	explicit CJsonValueException( CUnicodePart missingKeyName );
+
+	virtual CUnicodeString GetMessageText() const override final;
+
+private:
+	CUnicodeString errorText;
+
+	static CUnicodeView getValueTypeName( TJsonValueType type );
+};
+
+//////////////////////////////////////////////////////////////////////////
+
 // Base value in the JSON hierarchy.
 class CJsonValue {
 public:
 	TJsonValueType GetType() const
 		{ return valueType; }
 
-	// Quick access methods. Value type must correspond correctly to the requested value.
+	bool IsNull() const
+		{ return valueType == JVT_Null; }
+	bool IsBool() const
+		{ return valueType == JVT_Bool; }
+	bool IsNumber() const
+		{ return valueType == JVT_Number; }
+	bool IsString() const
+		{ return valueType == JVT_String; }
+	bool IsArray() const
+		{ return valueType == JVT_Array; }
+	bool IsObject() const
+		{ return valueType == JVT_Object; }
+
+	// Quick access methods. Value type must correspond correctly to the requested value, otherwise an exception is thrown.
 	double GetAsNumber() const;
 	CStringPart GetAsString() const;
 	bool GetAsBool() const;
 	CJsonListEnumerator<CJsonValue*> GetAsArray() const;
-	CJsonValue* FindObjectValue( CStringPart key ) const;
+	CJsonValue& FindObjectValue( CStringPart key ) const;
+	CJsonValue* TryFindObjectValue( CStringPart key ) const;
 	CJsonListEnumerator<CJsonKeyValue> GetObjectKeyValues() const;
-
 
 protected:
 	explicit CJsonValue( TJsonValueType type ) : valueType( type ) {}
 
 private:
 	TJsonValueType valueType;
+
+	void checkValidConversion( TJsonValueType expected ) const;
 
 	// Copying is prohibited.
 	CJsonValue( CJsonValue& ) = delete;
@@ -175,7 +209,8 @@ public:
 		{ return CJsonListEnumerator<CJsonKeyValue>( listHead ); }
 
 	// Return the value under the specified key or nullptr if no value exists.
-	CJsonValue* FindValue( CStringPart keyName ) const;
+	CJsonValue* TryFindValue( CStringPart keyName ) const;
+	CJsonValue& FindValue( CStringPart keyName ) const;
 
 	// Json document needs access to the underlying implementation in order to change values.
 	friend class CJsonDocument;
@@ -195,7 +230,7 @@ private:
 
 //////////////////////////////////////////////////////////////////////////
 
-inline CJsonValue* CJsonObject::FindValue( CStringPart keyName ) const
+inline CJsonValue* CJsonObject::TryFindValue( CStringPart keyName ) const
 {
 	for( auto keyVal : GetKeyValueList() ) {
 		if( keyVal.Key == keyName ) {
@@ -205,37 +240,62 @@ inline CJsonValue* CJsonObject::FindValue( CStringPart keyName ) const
 	return nullptr;
 }
 
+inline CJsonValue& CJsonObject::FindValue( CStringPart keyName ) const
+{
+	for( auto keyVal : GetKeyValueList() ) {
+		if( keyVal.Key == keyName ) {
+			return *keyVal.Value;
+		}
+	}
+	throw CJsonValueException( UnicodeStr( keyName, CP_UTF8 ) );
+}
+
 //////////////////////////////////////////////////////////////////////////
 
 inline double CJsonValue::GetAsNumber() const
 {
-	assert( valueType == JVT_Number );
+	checkValidConversion( JVT_Number );
 	return static_cast<const CJsonNumber*>( this )->GetNumber();
 }
 
 inline CStringPart CJsonValue::GetAsString() const
 {
-	assert( valueType == JVT_String );
+	checkValidConversion( JVT_String );
 	return static_cast<const CJsonString*>( this )->GetString();
 }
 
 inline bool CJsonValue::GetAsBool() const
 {
-	assert( valueType == JVT_Bool );
+	checkValidConversion( JVT_Bool );
 	return static_cast<const CJsonBool*>( this )->GetBool();
 }
 
 inline CJsonListEnumerator<CJsonValue*> CJsonValue::GetAsArray() const
 {
-	assert( valueType == JVT_Array );
+	checkValidConversion( JVT_Array );
 	return static_cast<const CJsonDynamicArray*>( this )->GetValues();
 }
 
-inline CJsonValue* CJsonValue::FindObjectValue( CStringPart key ) const
+inline CJsonValue& CJsonValue::FindObjectValue( CStringPart key ) const
 {
-	assert( valueType == JVT_Object );
+	checkValidConversion( JVT_Object );
 	return static_cast<const CJsonObject*>( this )->FindValue( key );
 }
+
+inline CJsonValue* CJsonValue::TryFindObjectValue( CStringPart key ) const
+{
+	checkValidConversion( JVT_Object );
+	return static_cast<const CJsonObject*>( this )->TryFindValue( key );
+}
+
+inline void CJsonValue::checkValidConversion( TJsonValueType expected ) const
+{
+	if( valueType != expected ) {
+		throw CJsonValueException( expected, valueType );
+	}
+}
+
+//////////////////////////////////////////////////////////////////////////
 
 inline CJsonListEnumerator<CJsonKeyValue> CJsonValue::GetObjectKeyValues() const
 {
