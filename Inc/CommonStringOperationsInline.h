@@ -49,6 +49,78 @@ int CCommonStringOperations<T>::Find( CStringData<T> data, T symbol, int from )
 }
 
 template <class T>
+int CCommonStringOperations<T>::FindCommon( CStringData<T> data, CStringData<T> substr, int from )
+{
+	const auto dataPtr = data.begin();
+	const auto substrPtr = substr.begin();
+	const auto dataLen = data.Length();
+	const auto substrLen = substr.Length();
+	if( substrLen == 0 ) {
+		return from < dataLen ? from : NotFound;
+	}
+	int dataPos = from;
+	int substrPos = 0;
+	int currentResultPos = NotFound;
+	while( substrPos < substrLen ) {
+		if( dataPos >= dataLen ) {
+			return NotFound;
+		}
+		if( dataPtr[dataPos] == substrPtr[substrPos] ) {
+			if( currentResultPos == NotFound ) {
+				currentResultPos = dataPos;
+			}
+			substrPos++;
+			dataPos++;
+		} else {
+			substrPos = 0;
+			if( currentResultPos != NotFound ) {
+				dataPos = currentResultPos + 1;
+				currentResultPos = NotFound;
+			} else {
+				dataPos++;
+			}
+		}
+	}
+	return currentResultPos;
+}
+
+template <class T>
+int CCommonStringOperations<T>::FindNoCase( CStringData<T> data, CStringData<T> substr, int from )
+{
+	const auto dataPtr = data.begin();
+	const auto substrPtr = substr.begin();
+	const auto dataLen = data.Length();
+	const auto substrLen = substr.Length();
+	if( substrLen == 0 ) {
+		return from < dataLen ? from : NotFound;
+	}
+	int dataPos = from;
+	int substrPos = 0;
+	int currentResultPos = NotFound;
+	while( substrPos < substrLen ) {
+		if( dataPos >= dataLen ) {
+			return NotFound;
+		}
+		if( ::tolower( static_cast<unsigned char>( dataPtr[dataPos] ) ) == ::tolower( static_cast<unsigned char>( substrPtr[substrPos] ) ) ) {
+			if( currentResultPos == NotFound ) {
+				currentResultPos = dataPos;
+			}
+			substrPos++;
+			dataPos++;
+		} else {
+			substrPos = 0;
+			if( currentResultPos != NotFound ) {
+				dataPos = currentResultPos + 1;
+				currentResultPos = NotFound;
+			} else {
+				dataPos++;
+			}
+		}
+	}
+	return currentResultPos;
+}
+
+template <class T>
 int CCommonStringOperations<T>::ReverseFind( CStringData<T> data, T symbol, int from )
 {
 	assert( from >= 0 && from <= data.Length() );

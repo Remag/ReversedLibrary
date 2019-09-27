@@ -314,6 +314,7 @@
     <ClInclude Include="Inc\StringAllocator.h" />
     <ClInclude Include="Inc\StringData.h" />
     <ClInclude Include="Inc\StringOperations.h" />
+    <ClInclude Include="Inc\StringSearchEnumerator.h" />
     <ClInclude Include="Inc\SystemOwner.h" />
     <ClInclude Include="Inc\Systems.h" />
     <ClInclude Include="Inc\TempFile.h" />

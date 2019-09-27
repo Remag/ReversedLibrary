@@ -2,6 +2,7 @@
 #include <StringData.h>
 #include <StringOperations.h>
 #include <SplitEnumerators.h>
+#include <StringSearchEnumerator.h>
 #include <Remath.h>
 
 namespace Relib {
@@ -42,7 +43,7 @@ public:
 		{ return CStringOperations<T>::Find( *this, symbol, from ); }
 	int Find( CBaseStringView<T> substring, int from = 0 ) const
 		{ return CStringOperations<T>::Find( *this, substring, from ); }
-	int FindNoCase( CBaseStringView<T> substring, int from = 0 ) const
+	int FindNoCase( CBaseStringPart<T> substring, int from = 0 ) const
 		{ return CStringOperations<T>::FindNoCase( *this, substring, from ); }
 	int FindOneOf( CBaseStringView<T> charSet, int from = 0 ) const
 		{ return CStringOperations<T>::FindOneOf( *this, charSet, from ); }
@@ -54,6 +55,12 @@ public:
 		{ return ReverseFind( symbol, this->Length() ); }
 	int ReverseFindOneOf( CBaseStringView<T> charSet ) const
 		{ return ReverseFindOneOf( charSet, this->Length() ); }
+	auto FindAll( T symbol ) const
+		{ return CStringSearchEnumerator<CBaseStringView<T>, T>( *this, symbol ); }
+	auto FindAll( CBaseStringView<T> substring ) const
+		{ return CStringSearchEnumerator<CBaseStringView<T>, CBaseStringView<T>>( *this, substring ); }
+	auto FindAllNoCase( CBaseStringView<T> substring ) const
+		{ return CNoCaseStringSearchEnumerator<CBaseStringView<T>, CBaseStringView<T>>( *this, substring ); }
 
 	// Left trimming.
 	CBaseStringView<T> TrimLeft() const;

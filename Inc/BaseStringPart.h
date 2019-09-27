@@ -2,6 +2,7 @@
 #include <StringData.h>
 #include <StringOperations.h>
 #include <SplitEnumerators.h>
+#include <StringSearchEnumerator.h>
 
 namespace Relib {
 
@@ -39,6 +40,10 @@ public:
 	// Symbol search.
 	int Find( T symbol, int from = 0 ) const
 		{ return CStringOperations<T>::Find( *this, symbol, from ); }
+	int Find( CBaseStringPart<T> substring, int from = 0 ) const
+		{ return CStringOperations<T>::FindCommon( *this, substring, from ); }
+	int FindNoCase( CBaseStringPart<T> substring, int from = 0 ) const
+		{ return CStringOperations<T>::FindNoCase( *this, substring, from ); }
 	int ReverseFind( T symbol, int from ) const
 		{ return CStringOperations<T>::ReverseFind( *this, symbol, from ); }
 	int ReverseFind( T symbol ) const
@@ -50,6 +55,9 @@ public:
 		{ return CStringOperations<T>::ReverseFindOneOf( *this, symbols, from ); }
 	int ReverseFindOneOf( CBaseStringView<T> symbols ) const
 		{ return ReverseFindOneOf( symbols, this->Length() ); }
+	
+	auto FindAll( T symbol ) const
+		{ return CStringSearchEnumerator<CBaseStringView<T>, T>( *this, symbol ); }
 
 	// Left trimming.
 	CBaseStringPart<T> TrimLeft() const

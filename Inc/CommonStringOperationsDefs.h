@@ -53,6 +53,8 @@ public:
 	static int Compare( CStringData<T> left, CStringData<T> right );
 	static bool Equals( CStringData<T> left, CStringData<T> right );
 	static int Find( CStringData<T> data, T symbol, int from );
+	static int FindCommon( CStringData<T> data, CStringData<T> substr, int from );
+	static int FindNoCase( CStringData<T> data, CStringData<T> substr, int from );
 	static int ReverseFind( CStringData<T> data, T symbol, int from );
 	static int FindOneOf( CStringData<T> data, CStringData<T> charSet, int from );
 	static int ReverseFindOneOf( CStringData<T> data, CStringData<T> charSet, int from );
