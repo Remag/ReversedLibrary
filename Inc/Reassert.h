@@ -26,17 +26,19 @@ inline void ProgramBreakPoint()
 
 // Assert macro.
 #if !defined( RELIB_FINAL )
-#define assert( expr ) \
+#define relib_assert( expr ) \
 if( !( expr ) ) { \
 	ProgramDebugModeBreak()	\
 	Relib::GenerateInternalError( __FUNCTION__, L###expr, __UNICODEFILE__, __LINE__ ); \
 } else {}
 #else
-#define assert( expr ) ( ( void ) 0 )
+#define relib_assert( expr ) ( ( void ) 0 )
 #endif
 
+#define assert relib_assert
+
 #ifdef DEBUG
-#define debug_assert( expr ) assert( ( expr ) )
+#define debug_assert( expr ) relib_assert( ( expr ) )
 
 #else
 #define debug_assert( expr ) ( ( void ) 0 )
