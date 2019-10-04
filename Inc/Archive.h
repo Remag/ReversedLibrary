@@ -714,7 +714,8 @@ inline CArchiveReader& operator>>( CArchiveReader& reader, CColor& color )
 {
 	unsigned hexValue;
 	reader >> hexValue;
-	color = CColor( hexValue );
+	const auto alphaValue = hexValue >> 24;
+	color = CColor( hexValue, alphaValue );
 	return reader;
 }
 
