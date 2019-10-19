@@ -41,6 +41,8 @@ public:
 	CJsonDocument() = default;
 
 	void Empty();
+	bool IsEmpty() const
+		{ return root == nullptr; }
 
 	void CreateFromFile( CUnicodeView fileName );
 	void CreateFromString( CStringPart str );
