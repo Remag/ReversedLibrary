@@ -44,7 +44,7 @@ struct CColor {
 	CColor() = default;
 
 	// Construct a color from a single value in RGB format.
-	explicit CColor( unsigned colorValue, int alpha = 0 );
+	explicit CColor( unsigned colorValue, int alpha = 255 );
 	CColor( CVector3<int> rgb ) : CColor( rgb.X(), rgb.Y(), rgb.Z() ) {}
 	CColor( CVector4<int> rgba ) : CColor( rgba.X(), rgba.Y(), rgba.Z(), rgba.W() ) {}
 	CColor( CVector3<float> rgb ) : CColor( rgb.X(), rgb.Y(), rgb.Z() ) {}
