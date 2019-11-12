@@ -56,6 +56,13 @@
 #pragma comment( lib, "zlib.lib" )
 #endif
 
+// Some dependencies come from a static build of curl and are only required for static builds.
+#ifdef USE_STATIC_RELIB
+#pragma comment( lib, "Ws2_32.lib" )
+#pragma comment( lib, "wldap32.lib" )
+#pragma comment( lib, "crypt32.lib" )
+#endif
+
 namespace Relib {
 
 namespace RelibInternal {
@@ -203,6 +210,7 @@ namespace RelibInternal {
 #pragma warning( disable : 4592 )	// symbol will be dynamically initialized (implementation limitation). [ this warning is a bug in VS2015 Update 1 ].
 #pragma warning( disable : 4521 )	// multiple copy constructors specified. [ used for correct overload resolution in COptional ].
 #pragma warning( disable : 4471 )	// a forward declaration of an unscoped enumeration must have an underlying type.
+#pragma warning( disable : 5045 )	// compiler will insert Spectre mitigation for memory load if /Qspectre switch specified.
 
 // Library defines its own min and max functions.
 #ifdef min
