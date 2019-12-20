@@ -6,6 +6,7 @@
 #include <StaticAllocators.h>
 #include <Tuple.h>
 #include <Action.h>
+#include <Invoke.h>
 #include <ExternalObject.h>
 
 namespace Relib {

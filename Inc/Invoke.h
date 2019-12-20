@@ -7,26 +7,6 @@ namespace RelibInternal {
 
 //////////////////////////////////////////////////////////////////////////
 
-// Invoke a method pointer.
-template <class ObjectType, class BaseType, class MethodType, class... MethodArgs, class... CallArgs>
-auto doInvoke( Types::TrueType methodMarker, MethodType BaseType::*action, ObjectType&& o, CallArgs&&... args )
-{
-	methodMarker;
-	typedef Types::Conditional<Types::IsConstRef<ObjectType>::Result, const BaseType&, BaseType&>::Result TTargetBaseType;
-	return RelibInternal::doMethodInvoke( Types::IsConvertible<ObjectType, TTargetBaseType>(), action, forward<ObjectType>( o ), forward<CallArgs>( args )... );
-}
-
-// Invoke a member pointer.
-template <class ObjectType, class BaseType, class MemberType, class... MethodArgs, class... CallArgs>
-decltype( auto ) doInvoke( Types::FalseType methodMarker, MemberType BaseType::*member, ObjectType&& o, CallArgs&&... )
-{
-	staticAssert( sizeof...( CallArgs ) == 0 );
-	methodMarker;
-	typedef Types::PureType<ObjectType>::Result TPureObjectType;
-	static const bool isInvokable = Types::IsSame<BaseType, TPureObjectType>::Result || Types::IsDerivedFrom<TPureObjectType, BaseType>::Result;
-	return RelibInternal::doMemberInvoke( Types::BoolType<isInvokable>(), member, forward<ObjectType>( o ) );
-}
-
 // Perform member invocation on objects that are directly related.
 template <class ObjectType, class BaseType, class MemberType>
 decltype( auto ) doMemberInvoke( Types::TrueType derivedMarker, MemberType BaseType::*member, ObjectType&& o )
@@ -71,6 +51,26 @@ ReturnType doMethodInvoke( Types::FalseType derivedMarker, ReturnType ( BaseType
 {
 	derivedMarker;
 	return ( static_cast<const BaseType&>( *o ).*action )( forward<CallArgs>( args )... );
+}
+
+// Invoke a method pointer.
+template <class ObjectType, class BaseType, class MethodType, class... MethodArgs, class... CallArgs>
+auto doInvoke( Types::TrueType methodMarker, MethodType BaseType::*action, ObjectType&& o, CallArgs&&... args )
+{
+	methodMarker;
+	typedef Types::Conditional<Types::IsConstRef<ObjectType>::Result, const BaseType&, BaseType&>::Result TTargetBaseType;
+	return RelibInternal::doMethodInvoke( Types::IsConvertible<ObjectType, TTargetBaseType>(), action, forward<ObjectType>( o ), forward<CallArgs>( args )... );
+}
+
+// Invoke a member pointer.
+template <class ObjectType, class BaseType, class MemberType, class... MethodArgs, class... CallArgs>
+decltype( auto ) doInvoke( Types::FalseType methodMarker, MemberType BaseType::*member, ObjectType&& o, CallArgs&&... )
+{
+	staticAssert( sizeof...( CallArgs ) == 0 );
+	methodMarker;
+	typedef Types::PureType<ObjectType>::Result TPureObjectType;
+	static const bool isInvokable = Types::IsSame<BaseType, TPureObjectType>::Result || Types::IsDerivedFrom<TPureObjectType, BaseType>::Result;
+	return RelibInternal::doMemberInvoke( Types::BoolType<isInvokable>(), member, forward<ObjectType>( o ) );
 }
 
 }	// namespace RelibInternal.

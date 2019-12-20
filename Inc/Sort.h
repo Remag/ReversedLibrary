@@ -4,7 +4,7 @@ namespace Relib {
 
 namespace Sort {
 
-namespace Internal {
+namespace RelibInternal {
 
 //////////////////////////////////////////////////////////////////////////
 
@@ -64,7 +64,7 @@ void internalMoveElements( Type* src, Type* dest, int count, Types::FalseType )
 
 //////////////////////////////////////////////////////////////////////////
 
-}	// namespace Internal.
+}	// namespace RelibInternal.
 
 //////////////////////////////////////////////////////////////////////////
 
@@ -138,7 +138,7 @@ void QSort( Type* arr, int elemCount, const LessAction& less )
 			// Insertion sort is faster at this point.
 			Sort::SelSort( subArray, subArraySize, less );
 		} else {
-			const int mean = Internal::divideArray( subArray, subArraySize, less );
+			const int mean = RelibInternal::divideArray( subArray, subArraySize, less );
 			const int rightHalfSize = subArraySize - mean - 1;
 			if( mean < rightHalfSize ) {
 				// The right half is bigger.

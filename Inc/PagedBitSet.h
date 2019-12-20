@@ -179,7 +179,7 @@ template <int bitSetSize, int pageSize, class Allocator>
 void swap( RelibInternal::CPagedStorage<bitSetSize, pageSize, Allocator>& first, RelibInternal::CPagedStorage<bitSetSize, pageSize, Allocator>& second )
 {
 	assert( first.PagesCount == second.PagesCount );
-	typename CPagedStorage<bitSetSize, pageSize, Allocator>::TPage* temp[first.PagesCount];
+	typename RelibInternal::CPagedStorage<bitSetSize, pageSize, Allocator>::TPage* temp[first.PagesCount];
 	const int pagesLength = sizeof( first.Pages() );
 	memmove( temp, first.Pages(), pagesLength );
 	memmove( first.Pages(), second.Pages(), pagesLength );
