@@ -256,6 +256,7 @@ bool CCommonConversionFunctions<T>::tryGetHexDigit( T ch, int& result )
 
 	return false;
 }
+
 inline char CCommonConversionFunctions<char>::getCapitalA()
 {
 	return 'A';
