@@ -211,6 +211,7 @@ namespace RelibInternal {
 #pragma warning( disable : 4521 )	// multiple copy constructors specified. [ used for correct overload resolution in COptional ].
 #pragma warning( disable : 4471 )	// a forward declaration of an unscoped enumeration must have an underlying type.
 #pragma warning( disable : 5045 )	// compiler will insert Spectre mitigation for memory load if /Qspectre switch specified.
+#pragma warning( disable : 26812 )	// The enum type 'TType' is unscoped. Prefer 'enum class' over 'enum'
 
 // Library defines its own min and max functions.
 #ifdef min
