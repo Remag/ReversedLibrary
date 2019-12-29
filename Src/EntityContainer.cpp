@@ -97,7 +97,7 @@ CFullEntityData& CEntityContainer::FillEntity( CEntityInitializer&& initializer 
 
 bool CEntityContainer::doesRightContainLeft( const CDynamicBitSet<>& left, const CDynamicBitSet<>& right ) const
 {
-	return right.Size() >= left.Size() && right.Has( left );
+	return right.Size() >= left.Size() && right.HasAll( left );
 }
 
 bool CEntityContainer::isComponentSetEqual( const CDynamicBitSet<>& left, const CDynamicBitSet<>& right ) const

@@ -46,7 +46,7 @@ public:
 	void FillWithOnes();
 
 	bool Has( Elem element ) const;
-	bool Has( const CBaseBitSet& subset ) const;
+	bool HasAll( const CBaseBitSet& subset ) const;
 	bool Intersects( const CBaseBitSet& other ) const;
 	bool operator==( const CBaseBitSet& other ) const;
 	bool operator!=( const CBaseBitSet& other ) const
@@ -194,7 +194,7 @@ bool CBaseBitSet<BitSetStorage, Elem>::Has( Elem element ) const
 }
 
 template <class BitSetStorage, class Elem>
-bool CBaseBitSet<BitSetStorage, Elem>::Has( const CBaseBitSet<BitSetStorage, Elem>& subset ) const
+bool CBaseBitSet<BitSetStorage, Elem>::HasAll( const CBaseBitSet<BitSetStorage, Elem>& subset ) const
 {
 	const auto subsetSize = subset.storage.Size();
 	for( int i = 0; i < subsetSize; i++ ) {
