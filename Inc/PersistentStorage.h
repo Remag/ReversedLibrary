@@ -242,7 +242,7 @@ Elem& CPersistentStorage<Elem, groupSize, GeneralAllocator, GroupAllocator>::Add
 		growBuffer( 1 );
 	}
 	const int lastGroupIndex = size / groupSize;
-	Elem* result = ::new( groups[lastGroupIndex] + lastGroupOffset ) Elem( forward<AddArgs>( args )... );
+	Elem* result = ::new( groups[lastGroupIndex] + lastGroupOffset ) Elem{ forward<AddArgs>( args )... };
 	size++;
 	return *result;
 }
