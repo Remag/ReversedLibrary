@@ -10,13 +10,16 @@ class CStackArray {
 public:
 	typedef Elem TElemType;
 
-	// Default constructor. 
-	// Copying and movement are defaulted.
 	CStackArray() = default;
 	// Construct the array from a range of arguments.
-	// This method of construction provides compile-time size checking.
-	template <class FirstType, class... Types>
-	CStackArray( FirstType&& first, Types&&... rest );
+	template<class... TT>
+	CStackArray( TT&&... argList );
+	// All versions of copy and move constructors need to explicitly declared to prevent the previous constructor from rerplacing them.
+	CStackArray( CStackArray<Elem, dim>& other );
+	CStackArray( const CStackArray<Elem, dim>& other );
+	CStackArray( CStackArray<Elem, dim>&& other ) = default;
+	CStackArray& operator=( const CStackArray<Elem, dim>& other ) = default;
+	CStackArray& operator=( CStackArray<Elem, dim>&& other ) = default;
 
 	static int Size()
 		{ return dim; }
@@ -28,9 +31,9 @@ public:
 		{ return CArrayBuffer<Elem>( Ptr(), Size() ); }
 
 	Elem ( &Ptr() )[dim]
-		{ return buffer; }
+		{ return bufferWrapper.Buffer; }
 	const Elem ( &Ptr() const )[dim]
-		{ return buffer; }
+		{ return bufferWrapper.Buffer; }
 
 	// Access operators.
 	Elem& operator[]( int index );
@@ -51,23 +54,38 @@ public:
 		{ return Mid( Size() - count, count ); }
 		
 	CArrayView<Elem> Mid( int first, int count ) const
-		{ return CArrayView<Elem>( buffer + first, count ); }
+		{ return CArrayView<Elem>( bufferWrapper.Buffer + first, count ); }
 	CArrayBuffer<Elem> Mid( int first, int count )
-		{ return CArrayBuffer<Elem>( buffer + first, count ); }
+		{ return CArrayBuffer<Elem>( bufferWrapper.Buffer + first, count ); }
 
 private:
-	// Internal buffer.
-	Elem buffer[dim] = {};
+	// An array wrapper is necessary in order to invoke the plain array's copy constructor.
+	struct CArrayWrapper {
+		Elem Buffer[dim] = {};
+	};
+	CArrayWrapper bufferWrapper;
 };
 
 //////////////////////////////////////////////////////////////////////////
 
 template <class ElemType, int dim>
-template <class FirstType, class... Types>
-CStackArray<ElemType, dim>::CStackArray( FirstType&& first, Types&&... rest ) :
-	buffer{ forward<FirstType>( first ), forward<Types>( rest )... }
+template<class... TT>
+CStackArray<ElemType, dim>::CStackArray( TT&&... argList ) :
+	bufferWrapper{ forward<TT>( argList )... }
 {
-	static_assert( sizeof...( Types ) + 1 == dim, "Stack array size mismatch." );
+	static_assert( sizeof...( TT ) == dim, "Stack array size mismatch." );
+}
+
+template <class Elem, int dim>
+CStackArray<Elem, dim>::CStackArray( CStackArray<Elem, dim>& other ) :
+	bufferWrapper( other.bufferWrapper )
+{
+}
+
+template <class Elem, int dim>
+CStackArray<Elem, dim>::CStackArray( const CStackArray<Elem, dim>& other ) :
+	bufferWrapper( other.bufferWrapper )
+{
 }
 
 template <class ElemType, int dim>
@@ -75,7 +93,7 @@ const ElemType& CStackArray<ElemType, dim>::operator[]( int index ) const
 {
 	assert( index >= 0 );
 	assert( index < Size() );
-	return buffer[index];
+	return bufferWrapper.Buffer[index];
 }
 
 template <class ElemType, int dim>
@@ -83,7 +101,7 @@ ElemType& CStackArray<ElemType, dim>::operator[]( int index )
 {
 	assert( index >= 0 );
 	assert( index < Size() );
-	return buffer[index];
+	return bufferWrapper.Buffer[index];
 }
 
 //////////////////////////////////////////////////////////////////////////

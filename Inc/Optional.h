@@ -176,7 +176,7 @@ InnerType& COptional<InnerType>::CreateValue( Args&&... args )
 	if( isValid ) {
 		getTypeFromData().~InnerType();
 	}
-	InnerType& result = *new( innerTypeData ) InnerType( forward<Args>( args )... );
+	InnerType& result = *::new( innerTypeData ) InnerType( forward<Args>( args )... );
 	isValid = true;
 	return result;
 }
@@ -185,7 +185,7 @@ template <class InnerType>
 template <class... Args>
 void COptional<InnerType>::createData( Args&&... args )
 {
-	new( innerTypeData ) InnerType( forward<Args>( args )... );
+	::new( innerTypeData ) InnerType( forward<Args>( args )... );
 }
 
 // Access the previously constructed value in the memory buffer.
