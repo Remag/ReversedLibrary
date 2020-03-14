@@ -72,14 +72,9 @@ void CFileReadWriteOperations::ReadExact( void* buffer, int bytesCount )
 	}
 }
 
-TFileTextEncoding CFileReadWriteOperations::ReadByteString( CArray<BYTE>& result, int& strStartPos )
+TFileTextEncoding CFileReadWriteOperations::ReadByteString( CArrayBuffer<BYTE> result, int& strStartPos )
 {
-	assert( result.IsEmpty() );
-	const int length = GetLength32();
-	result.IncreaseSizeNoInitialize( length + 2 );
-	ReadExact( result.Ptr(), length );
-	result[length] = 0;
-	result[length + 1] = 0;
+	Read( result.Ptr(), result.Size() );
 	return findFileEncoding( result, strStartPos );
 }
 

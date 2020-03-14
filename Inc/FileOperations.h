@@ -82,9 +82,10 @@ public:
 	// Safe read function. Throws a file exception if it is impossible to read the specified number of bytes.
 	void ReadExact( void* buffer, int bytesCount );
 	// Read a potential byte order mark and the rest of the file as a sequence of bytes.
+	// A given buffer is expected to fit an entire file.
 	// File position is asserted to be at the start of the file.
-	// Result contains a potential BOM, the actual file content starts at strStartPos;
-	TFileTextEncoding ReadByteString( CArray<BYTE>& result, int& strStartPos );
+	// Result contains a potential BOM, actual file content starts at strStartPos;
+	TFileTextEncoding ReadByteString( CArrayBuffer<BYTE> result, int& strStartPos );
 
 	__int64 GetLength() const;
 	int GetLength32() const;

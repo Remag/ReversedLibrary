@@ -23,11 +23,19 @@ void CJsonDocument::Empty()
 void CJsonDocument::CreateFromFile( CUnicodeView fileName )
 {
 	CFileReader jsonFile( fileName, FCM_OpenExisting );
+	CreateFromFile( jsonFile );
+}
+
+void CJsonDocument::CreateFromFile( CFileReader& jsonFile )
+{
 	const auto length = jsonFile.GetLength32();
 	auto jsonStrBuffer = jsonData.Create( length + 1, alignof( char ) );
-	jsonFile.ReadExact( jsonStrBuffer.Ptr(), length );
-	reinterpret_cast<BYTE*>( jsonStrBuffer.Ptr() )[length] = 0;
-	const CStringView jsonStr( static_cast<const char*>( jsonStrBuffer.Ptr() ), length );
+	CArrayBuffer<BYTE> jsonArrayBuffer( static_cast<BYTE*>( jsonStrBuffer.Ptr() ), length + 1 );
+	int bufferStartPos;
+	const auto encoding = jsonFile.ReadByteString( jsonArrayBuffer.Left( length ), bufferStartPos );
+	assert( encoding == FTE_UTF8 || encoding == FTE_Undefined );
+	jsonArrayBuffer[length] = 0;
+	const CStringView jsonStr( reinterpret_cast<const char*>( jsonArrayBuffer.Mid( bufferStartPos ).Ptr() ), length - bufferStartPos );
 	parseJson( jsonStr );
 }
 
@@ -127,7 +135,7 @@ char CJsonDocument::getEscapeCharacter( char escapeCode ) const
 double CJsonDocument::parseNumber( CStringView str, int& parsePos ) const
 {
 	int endPos = parsePos;
-	while( CStringView::IsCharDigit( str[endPos] ) ) {
+	while( CStringView::IsCharDigit( str[endPos] ) || str[endPos] == '.' || str[endPos] == 'e' ) {
 		endPos++;
 	}
 
@@ -431,7 +439,7 @@ CJsonDynamicArray& CJsonDocument::CreateArray()
 	return allocateJsonDynamicArray( nullptr, nullptr, 0 );
 }
 
-void CJsonDocument::AddValue( CJsonDynamicArray& arr, CJsonValue& val )
+void CJsonDocument::AddArrayValue( CJsonDynamicArray& arr, CJsonValue& val )
 {
 	const auto tail = arr.getTail();
 	if( tail == nullptr ) {
@@ -450,7 +458,7 @@ CJsonObject& CJsonDocument::CreateObject()
 	return allocateJsonObject( nullptr, nullptr, 0 );
 }
 
-void CJsonDocument::AddValue( CJsonObject& obj, CStringPart key, CJsonValue& val )
+void CJsonDocument::AddObjectValue( CJsonObject& obj, CStringPart key, CJsonValue& val )
 {
 	const auto docKey = allocateStringPart( key );
 	const auto tail = obj.getTail();
