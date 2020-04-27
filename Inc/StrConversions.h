@@ -771,10 +771,11 @@ template<class VecType, int dim>
 CString CStrConversionFunctions<char>::ToString( CVector<VecType,dim> vec, char delim )
 {
 	CString result;
-	for( int i = 0; i < dim; i++ ) {
+	for( int i = 0; i < dim - 1; i++ ) {
 		result += ToString( vec[i] );
 		result += delim;
 	}
+	result += ToString( vec[dim - 1] );
 	return result;
 }
 
@@ -976,10 +977,11 @@ template<class VecType, int dim>
 CUnicodeString CStrConversionFunctions<wchar_t>::ToString( CVector<VecType,dim> vec, wchar_t delim )
 {
 	CUnicodeString result;
-	for( int i = 0; i < dim; i++ ) {
+	for( int i = 0; i < dim - 1; i++ ) {
 		result += ToString( vec[i] );
 		result += delim;
 	}
+	result += ToString( vec[dim -1] );
 	return result;
 }
 
