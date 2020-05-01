@@ -44,6 +44,8 @@ public:
 	CTypelessActionOwner& operator=( CTypelessActionOwner other );
 	~CTypelessActionOwner();
 
+	bool IsNull() const
+		{ return action == nullptr; }
 	const IExternalObject* GetActionObject() const
 		{ return action; }
 

@@ -69,6 +69,7 @@ wchar_t CUnicodeView::emptyBufferStr = 0;
 // Constant Strings.
 extern const CUnicodeView DefaultAssertFailedMessage = L"Assertion failed: %0\nFile: %1\nFunction: %2, line: %3.";
 extern const CUnicodeView UnknownComErrorMessage = L"Unknown COM Error:\nResult code: %0.";
+extern const CUnicodeView GeneralMultiCurlError = L"LibCurl multi interface returned an error.";
 const CUnicodeView CMemoryException::NotEnoughMemoryMessage = L"Not enough memory!";
 extern const CUnicodeView TempFilePrefix = L"relibtmp";
 extern const CUnicodeView TempFileExt = L"tmp";

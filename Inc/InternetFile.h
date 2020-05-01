@@ -1,9 +1,9 @@
 #pragma once
 #include <Redefs.h>
-#include <BaseString.h>
-#include <RawStringBuffer.h>
 #include <ActionOwner.h>
+#include <Array.h>
 #include <ArrayBuffer.h>
+#include <CurlEasyHandle.h>
 
 typedef void CURL;
 struct curl_slist;
@@ -18,27 +18,37 @@ public:
 
 	CInternetFile();
 	explicit CInternetFile( CStringView url );
+	CInternetFile( CInternetFile&& other );
 	~CInternetFile();
 
-	void SetUrl( CStringView urlName );
+	CInternetFile& operator=( CInternetFile&& other );
 
-	void DownloadFile( CArray<BYTE>& result );
-	void UploadFile( CArrayView<BYTE> data, CArray<BYTE>& response );
+	operator CCurlEasyHandle() const
+		{ return CCurlEasyHandle( easyHandle ); }
+
+	void SetUrl( CStringView urlName );
 
 	void SetFollowRedirects( bool isSet );
 
 	void EmptyCustomHeaders();
 	void AddCustomHeader( CStringView headerStr );
 
+	// Synchronous download and upload operations.
+	// The thread will block until the operation is complete.
+	void DownloadFile( CArray<BYTE>& result );
+	void UploadFile( CArrayView<BYTE> data, CArray<BYTE>& response );
+
 	// Set an action that gets called when the download progress is made.
 	// Function can return false if it wants to abort the download process, otherwise it should return true.
 	// If an empty action is provided, the progress reporting is turned off.
 	void SetProgressFunction( TProgressAction progressAction );
 
+	// An internet batching mechanism needs access to setting upload parameters.
+	friend class CInternetFileBatch;
+
 private:
 	CURL* easyHandle;
-	CString errorBuffer;
-	CStringBuffer errorBufferPtr;
+	CArray<char> errorBuffer;
 	TProgressAction progressAction;
 	curl_slist* headerList = nullptr;
 
@@ -51,6 +61,10 @@ private:
 	static size_t curlWriteFunction( void* buffer, size_t size, size_t nmemb, void* userData );
 	static size_t curlReadFunction( void* buffer, size_t size, size_t nmemb, void* userData );
 	void checkCurlError( bool condition );
+
+	static void setUploadData( CArrayView<BYTE> data, CURL* easyHandle );
+	static void disableUploadData( CURL* easyHandle );
+	static void setDownloadData( CArray<BYTE>& buffer, CURL* easyHandle );
 	
 	// Copying is prohibited.
 	CInternetFile( CInternetFile& ) = delete;

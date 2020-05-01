@@ -198,9 +198,6 @@
     <ClInclude Include="Inc\CurlException.h">
       <Filter>Header Files\Internet</Filter>
     </ClInclude>
-    <ClInclude Include="Inc\CurlInitializer.h">
-      <Filter>Header Files\Internet</Filter>
-    </ClInclude>
     <ClInclude Include="Inc\DynamicAllocators.h">
       <Filter>Header Files\MemoryManagement</Filter>
     </ClInclude>
@@ -591,6 +588,27 @@
     <ClInclude Include="Inc\StringSearchEnumerator.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Inc\Future.h">
+      <Filter>Header Files\Threads</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\FutureSharedState.h">
+      <Filter>Header Files\Threads</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\Promise.h">
+      <Filter>Header Files\Threads</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\CurlInitializer.h">
+      <Filter>Header Files\Internet</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\WebConnectionScheduler.h">
+      <Filter>Header Files\Internet</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\InternetFileBatch.h">
+      <Filter>Header Files\Internet</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\CurlEasyHandle.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Src\ActionOwner.cpp">
@@ -744,6 +762,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Src\DateTime.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Inc\InternetFileBatch.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Inc\WebConnectionScheduler.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
