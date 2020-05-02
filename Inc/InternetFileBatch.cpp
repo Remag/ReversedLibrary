@@ -20,6 +20,7 @@ void CCompletedHandlesRange::advanceReadMessage()
 			return;
 		} else if( newMsgPtr->msg == CURLMSG_DONE ) {
 			currentEasyHandle = CCurlEasyHandle( newMsgPtr->easy_handle );
+			currentErrorCode = newMsgPtr->data.result;
 			return;
 		}
 	}
@@ -65,18 +66,21 @@ void CInternetFileBatch::DetachConnection( CCurlEasyHandle connection )
 
 void CInternetFileBatch::Poll( int timeoutMs )
 {
-	curl_multi_poll( multiHandle, nullptr, 0, timeoutMs, nullptr );
+	const auto resultCode = curl_multi_poll( multiHandle, nullptr, 0, timeoutMs, nullptr );
+	checkMultiCurlError( resultCode );
 }
 
-void CInternetFileBatch::Wakeup()
+void CInternetFileBatch::WakeUp()
 {
-	curl_multi_wakeup( multiHandle );
+	const auto resultCode = curl_multi_wakeup( multiHandle );
+	checkMultiCurlError( resultCode );
 }
 
 CCompletedHandlesRange CInternetFileBatch::Perform()
 {
 	int newActiveCount;
-	curl_multi_perform( multiHandle, &newActiveCount );
+	const auto resultCode = curl_multi_perform( multiHandle, &newActiveCount );
+	checkMultiCurlError( resultCode );
 	return CCompletedHandlesRange( multiHandle );
 }
 

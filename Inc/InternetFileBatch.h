@@ -7,16 +7,23 @@ namespace Relib {
 typedef void CURLM;
 //////////////////////////////////////////////////////////////////////////
 
+struct CEasyHandleResultData {
+	CCurlEasyHandle Handle;
+	int ErrorCode = NotFound;
+};
+
+//////////////////////////////////////////////////////////////////////////
+
 // A range of CURL handles with finished transfers.
 // Provides minimal range-based for loop support.
-class CCompletedHandlesRange {
+class REAPI CCompletedHandlesRange {
 public:
 	explicit CCompletedHandlesRange( CURLM* _handle ) : multiHandle( _handle ), currentEasyHandle( nullptr ) { advanceReadMessage(); }
 
 	void operator++()
 		{ advanceReadMessage(); }
-	CCurlEasyHandle operator*() const
-		{ return currentEasyHandle; }
+	CEasyHandleResultData operator*() const
+		{ return CEasyHandleResultData{ currentEasyHandle, currentErrorCode }; }
 	bool operator!=( const CCompletedHandlesRange& other ) const
 		{ return multiHandle != other.multiHandle; }
 
@@ -28,6 +35,7 @@ public:
 private:
 	CURLM* multiHandle;
 	CCurlEasyHandle currentEasyHandle;
+	int currentErrorCode = NotFound;
 
 	void advanceReadMessage();
 };
@@ -51,7 +59,7 @@ public:
 	// Wait for the attached handles to have something interesting to do.
 	void Poll( int timeoutMs );
 	// Wakeup the thread that is currently polling on this handle.
-	void Wakeup();
+	void WakeUp();
 	// Perform all currently ready operations.
 	CCompletedHandlesRange Perform();
 

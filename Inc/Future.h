@@ -10,8 +10,16 @@ namespace Relib {
 template <class T> 
 class CFuture {
 public:
+	typedef T Elem;
+
+	CFuture() = default;
 	// Futures are created by promises and continuations.
 	explicit CFuture( CSharedPtr<RelibInternal::CFutureSharedState<T>, CProcessHeap> _sharedState ) : sharedState( move( _sharedState ) ) {}
+
+	bool IsNull() const
+		{ return sharedState == nullptr; }
+	void Release()
+		{ sharedState = nullptr; }
 
 	// Wait for the value to be created and retrieve it.
 	T& GetValue();
@@ -58,6 +66,49 @@ inline auto CFuture<T>::Then( Func&& action )
 	staticAssert( Types::FunctionInfo<Func>::ArgCount == 1 );
 	typedef typename Types::FunctionInfo<Func>::template ArgTypeAt<0> TFirstArg;
 	return sharedState->AttachContinuation( forward<Func>( action ) );
+}
+
+//////////////////////////////////////////////////////////////////////////
+
+namespace RelibInternal {
+
+template <class FinalizerFunc, class FirstFuture>
+inline void attachCounterContinuation( CSharedPtr<CAtomic<int>> counter, const FinalizerFunc& finalizer, FirstFuture& future )
+{
+	auto continuation = [atomicCounter = move( counter ), finalizer]( typename FirstFuture::Elem& ) {
+		if( atomicCounter->PreDecrement() == 0 ) {
+			finalizer();
+		}
+	};
+	future.Then( move( continuation ) );
+}
+
+template <class FinalizerFunc, class FirstFuture, class... FutureList>
+inline void attachCounterContinuation( CSharedPtr<CAtomic<int>> counter, const FinalizerFunc& finalizer, FirstFuture& firstFuture, FutureList&... rest )
+{
+	attachCounterContinuation( counter, finalizer, firstFuture );
+	attachCounterContinuation( counter, finalizer, rest... );
+}
+
+}	// namespace RelibInternal.
+
+//////////////////////////////////////////////////////////////////////////
+
+// Invoke a given action after all the futures in the list are completed.
+template<class Func, class... FutureList>
+inline auto ExecuteAfterAll( Func&& action, FutureList&&... futures )
+{
+	typedef typename Types::FunctionInfo<Func>::ReturnType TReturnType;
+	auto finalizationState = CreateShared<RelibInternal::CFutureSharedState<TReturnType>, CProcessHeap>();
+
+	const auto futureCount = sizeof...( futures );
+	auto counter = CreateShared<CAtomic<int>>( futureCount );
+
+	auto finalizerFunction = [state = finalizationState, finalAction = forward<Func>( action ), futures...]() {
+		state->CreateValue( finalAction( futures.GetValue()... ) );
+	};
+	RelibInternal::attachCounterContinuation( move( counter ), finalizerFunction, futures... );
+	return CFuture<TReturnType>( move( finalizationState ) );
 }
 
 //////////////////////////////////////////////////////////////////////////

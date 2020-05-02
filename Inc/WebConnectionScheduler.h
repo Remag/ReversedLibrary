@@ -11,8 +11,9 @@ namespace Relib {
 
 //////////////////////////////////////////////////////////////////////////
 
-class CWebConnectionScheduler {
+class REAPI CWebConnectionScheduler {
 public:
+	CWebConnectionScheduler() = default;
 	~CWebConnectionScheduler();
 
 	CFuture<CArray<BYTE>> ScheduleDownload( CInternetFile connection );
@@ -20,6 +21,8 @@ public:
 
 	// Wait for upcoming connection changes and perform them.
 	void Run( int pollTimeoutMs );
+	// Wake up the thread that is currently waiting inside the Run call.
+	void WakeUp();
 
 private:
 	CInternetFileBatch batchConnection;
@@ -28,9 +31,9 @@ private:
 		CInternetFile Connection;
 		CPromise<CArray<BYTE>> Promise;
 		CArray<BYTE> UploadData;
-		CArray<BYTE> DownloadData;
+		CPtrOwner<CArray<BYTE>> DownloadData;
 
-		explicit CWebConnection( CInternetFile connection ) : Connection( move( connection ) ) {}
+		explicit CWebConnection( CInternetFile connection ) : Connection( move( connection ) ) { DownloadData = CreateOwner<CArray<BYTE>>(); }
 	};
 
 	CReadWriteSection pendingSection;
@@ -39,6 +42,8 @@ private:
 
 	void addPendingConnections();
 	void detachConnection( CCurlEasyHandle handle );
+	void attachConnection( CWebConnection& connection );
+	int findConnectionIndex( CCurlEasyHandle handle );
 
 	// Copying is prohibited.
 	CWebConnectionScheduler( const CWebConnectionScheduler& ) = delete;

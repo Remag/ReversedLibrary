@@ -120,6 +120,7 @@
 #include <ValueAnimator.h>
 #include <VarArgsUtils.h>
 #include <Vector.h>
+#include <WebConnectionScheduler.h>
 #include <XmlDocument.h>
 #include <XmlElement.h>
 #include <ZipConverter.h>
