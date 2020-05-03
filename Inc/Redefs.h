@@ -141,6 +141,9 @@ namespace RelibInternal {
 	class CWebConnectionScheduler;
 	class CRegistryKey;
 	class CRegistryKeyValueEnumerator;
+	class CReadWriteSection;
+	class CReadLock;
+	class CWriteLock;
 	struct CColor;
 
 	class CEntityGroup;

@@ -25,6 +25,9 @@ public:
 	T& WaitForValue();
 	const T& WaitForValue() const;
 
+	T* TryGetValue();
+	const T* TryGetValue() const;
+
 	template <class... Args>
 	void CreateValue( Args&&... createArgs );
 
@@ -66,6 +69,20 @@ inline const T& CFutureSharedState<T>::WaitForValue() const
 	CReadLock lock( valueSection );
 	assert( value.IsValid() );
 	return *value;
+}
+
+template<class T>
+inline T* CFutureSharedState<T>::TryGetValue()
+{
+	auto lock = valueSection.TryLockRead();
+	return lock.IsValid() ? &( *value ) : nullptr;
+}
+
+template<class T>
+inline const T* CFutureSharedState<T>::TryGetValue() const
+{
+	auto lock = valueSection.TryLockRead();
+	return lock.IsValid() ? &( *value ) : nullptr;
 }
 
 template<class T>

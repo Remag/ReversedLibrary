@@ -1,5 +1,6 @@
 #pragma once
 #include <Redefs.h>
+#include <Remath.h>
 #include <TemplateUtils.h>
 
 namespace Relib {

@@ -25,6 +25,10 @@ public:
 	T& GetValue();
 	const T& GetValue() const;
 
+	// Check for the value and retrieve it if its ready. Return null otherwise.
+	T* TryGetValue();
+	const T* TryGetValue() const;
+
 	// Block until the value is created.
 	void Wait() const;
 
@@ -51,6 +55,18 @@ template<class T>
 inline const T& CFuture<T>::GetValue() const
 {
 	return sharedState->WaitForValue();
+}
+
+template<class T>
+inline T* CFuture<T>::TryGetValue()
+{
+	return sharedState->TryGetValue();
+}
+
+template<class T>
+inline const T* CFuture<T>::TryGetValue() const
+{
+	return sharedState->TryGetValue();
 }
 
 template<class T>
