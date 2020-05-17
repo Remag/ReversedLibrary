@@ -188,5 +188,44 @@ Rect AARectTransform( const Mat& affineMatrix, Rect aaRect )
 
 //////////////////////////////////////////////////////////////////////////
 
+// 2D column major transformation creation.
+template <class T>
+CMatrix<T, 3, 3> CreateTransformation( CVector2<T> offset, typename CVector2<T>::FloatingPointVecType angleSin, 
+	typename CVector2<T>::FloatingPointVecType angleCos )
+{
+	auto result = CMatrix<T, 3, 3>::CreateRawMatrix();
+	result( 0, 0 ) = angleCos;
+	result( 1, 0 ) = -angleSin;
+	result( 0, 1 ) = angleSin;
+	result( 1, 1 ) = angleCos;
+	result( 2, 0 ) = offset[0];
+	result( 2, 1 ) = offset[1];
+
+	result( 0, 2 ) = T( 0 );
+	result( 1, 2 ) = T( 0 );
+	result( 2, 2 ) = T( 1 );
+	return result;
+}
+
+template <class T>
+CMatrix<T, 3, 3> CreateTransformation( CVector2<T> offset, CVector2<T> scale, typename CVector2<T>::FloatingPointVecType angleSin, 
+	typename CVector2<T>::FloatingPointVecType angleCos )
+{
+	auto result = CMatrix<T, 3, 3>::CreateRawMatrix();
+	result( 0, 0 ) = angleCos * scale.X();
+	result( 1, 0 ) = -angleSin * scale.Y();
+	result( 0, 1 ) = angleSin * scale.X();
+	result( 1, 1 ) = angleCos * scale.Y();
+	result( 2, 0 ) = offset[0];
+	result( 2, 1 ) = offset[1];
+
+	result( 0, 2 ) = T( 0 );
+	result( 1, 2 ) = T( 0 );
+	result( 2, 2 ) = T( 1 );
+	return result;
+}
+
+//////////////////////////////////////////////////////////////////////////
+
 }	// namespace Relib.
 
