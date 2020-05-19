@@ -33,12 +33,12 @@ public:
 	__int64 operator-( CDateTime other ) const;
 
 private:
-	unsigned short year;
-	char month;
-	char day;
-	char hour;
-	char minute;
-	char second;
+	unsigned short year = 0;
+	char month = 0;
+	char day = 0;
+	char hour = 0;
+	char minute = 0;
+	char second = 0;
 
 	__int64 getSecondsPassed() const;
 	int getDaysPassed( int year, int month, int day ) const;

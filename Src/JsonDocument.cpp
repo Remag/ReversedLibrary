@@ -28,7 +28,11 @@ void CJsonDocument::CreateFromFile( CUnicodeView fileName )
 
 void CJsonDocument::CreateFromFile( CFileReader& jsonFile )
 {
+	Empty();
 	const auto length = jsonFile.GetLength32();
+	if( length == 0 ) {
+		return;
+	}
 	auto jsonStrBuffer = jsonData.Create( length + 1, alignof( char ) );
 	CArrayBuffer<BYTE> jsonArrayBuffer( static_cast<BYTE*>( jsonStrBuffer.Ptr() ), length + 1 );
 	int bufferStartPos;

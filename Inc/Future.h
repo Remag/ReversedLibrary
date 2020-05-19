@@ -15,6 +15,8 @@ public:
 	CFuture() = default;
 	// Futures are created by promises and continuations.
 	explicit CFuture( CSharedPtr<RelibInternal::CFutureSharedState<T>, CProcessHeap> _sharedState ) : sharedState( move( _sharedState ) ) {}
+	// Unwrap a chain of futures.
+	CFuture( CFuture<CFuture<T>> chainedFuture );
 
 	bool IsNull() const
 		{ return sharedState == nullptr; }
@@ -39,11 +41,27 @@ public:
 	template <class Func>
 	auto Then( Func&& action );
 
+	// A promise needs access to shared state for comparison.
+	friend class CPromise<T>;
+
 private:
 	CSharedPtr<RelibInternal::CFutureSharedState<T>, CProcessHeap> sharedState;
 };
 
 //////////////////////////////////////////////////////////////////////////
+
+template<class T>
+inline CFuture<T>::CFuture( CFuture<CFuture<T>> chainedFuture )
+{
+	sharedState = CreateShared<RelibInternal::CFutureSharedState<T>, CProcessHeap>();
+	auto firstContinuationHandler = [state = sharedState]( CFuture<T>& future ) {
+		const auto secondContinuationHandler = [state]( const T& result ) {
+			state->CreateValue( copy( result ) );
+		};
+		future.Then( secondContinuationHandler );
+	};
+	chainedFuture.Then( firstContinuationHandler );
+}
 
 template<class T>
 inline T& CFuture<T>::GetValue()
@@ -107,6 +125,17 @@ inline void attachCounterContinuation( CSharedPtr<CAtomic<int>> counter, const F
 }
 
 }	// namespace RelibInternal.
+
+//////////////////////////////////////////////////////////////////////////
+
+// Create a future that has been fulfilled.
+template <class T>
+CFuture<T> CreateReadyFuture( T&& futureValue )
+{
+	auto result = CreateShared<RelibInternal::CFutureSharedState<T>, CProcessHeap>();
+	result->CreateValue( forward<T>( futureValue ) );
+	return CFuture<T>( move( result ) );
+}
 
 //////////////////////////////////////////////////////////////////////////
 

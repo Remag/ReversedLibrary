@@ -202,6 +202,10 @@ namespace RelibInternal {
 	class CActionOwner;
 	template <class Callable>
 	class CMutableActionOwner;
+	template <class T>
+	class CFuture;
+	template <class T>
+	class CPromise;
 
 	const int NotFound = -1;
 } // namespace Relib.

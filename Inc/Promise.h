@@ -15,6 +15,7 @@ public:
 	CPromise( CPromise<T>&& other ) = default;
 	CPromise& operator=( CPromise<T>&& other ) = default;
 
+	bool IsConnectedWith( const CFuture<T>& future ) const;
 	CFuture<T> GetFuture() const;
 
 	template <class... Args> 
@@ -34,6 +35,12 @@ template<class T>
 inline CPromise<T>::CPromise() :
 	sharedState( CreateShared<RelibInternal::CFutureSharedState<T>, CProcessHeap>() )
 {
+}
+
+template<class T>
+inline bool CPromise<T>::IsConnectedWith( const CFuture<T>& future ) const
+{
+	return future.sharedState == sharedState;
 }
 
 template<class T>
