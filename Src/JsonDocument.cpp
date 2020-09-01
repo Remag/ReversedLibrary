@@ -60,7 +60,8 @@ CString CJsonDocument::GetDocumentString() const
 void CJsonDocument::parseJson( CStringView jsonStr )
 {
 	int startPos = 0;
-	root = &parseElement( jsonStr, startPos );
+	const auto parseResult = &parseElement( jsonStr, startPos );
+	root = parseResult;
 }
 
 void CJsonDocument::throwParseException( int parsePos ) const

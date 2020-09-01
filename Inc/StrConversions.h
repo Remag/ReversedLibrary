@@ -807,6 +807,7 @@ public:
 	static CUnicodeString ToString( double value, int digitCount = 3 );
 	static CUnicodeString ToString( CUnicodePart value );
 	static CUnicodeString ToString( const wchar_t* value );
+	static CUnicodeString ToString( const char* value, unsigned codePage = CP_ACP );
 	static CUnicodeString ToString( CStringPart value, unsigned codePage = CP_ACP );
 	static CUnicodeString ToString( CColor value );
 	template <class VecType, int dim>
@@ -946,6 +947,14 @@ inline CUnicodeString CStrConversionFunctions<wchar_t>::ToString( CUnicodePart v
 inline CUnicodeString CStrConversionFunctions<wchar_t>::ToString( const wchar_t* value )
 {
 	return CUnicodeString( value );
+}
+
+inline CUnicodeString CStrConversionFunctions<wchar_t>::ToString( const char* value, unsigned codePage /*= CP_ACP */ )
+{
+	CUnicodeString result;
+	const CStringView valueStr = value;
+	CStringOperations<wchar_t>::ConvertStr( valueStr, codePage, result );
+	return result;
 }
 
 inline CUnicodeString CStrConversionFunctions<wchar_t>::ToString( CStringPart value, unsigned codePage /*= CP_ACP */ )
