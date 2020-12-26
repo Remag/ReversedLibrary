@@ -47,7 +47,7 @@ CRegistryKey::CRegistryKey( const CRegistryKey& parentKey, CUnicodeView keyName,
 void CRegistryKey::initializeRegistryKey( HKEY parent, CUnicodeView name, TRegistryAccessType accessType )
 {
 	const auto openResult = ::RegCreateKeyEx( parent, name.Ptr(), 0, nullptr, 0, accessType, nullptr, &keyHandle, nullptr );
-	check( openResult == ERROR_SUCCESS, Err_RegistryOpenError, name, openResult );
+	check( openResult == ERROR_SUCCESS, Err_RegistryOpenError, name, static_cast<int>( openResult ) );
 }
 
 CRegistryKey::~CRegistryKey()
@@ -189,7 +189,7 @@ extern const CError Err_RegistryWriteError;
 void CRegistryKey::setRegValue( CUnicodeView valueName, DWORD dataType, const void* dataPtr, DWORD dataSize ) const
 {
 	const auto writeResult = ::RegSetKeyValue( keyHandle, nullptr, valueName.Ptr(), dataType, dataPtr, dataSize );
-	check( writeResult == ERROR_SUCCESS, Err_RegistryWriteError, valueName, writeResult );
+	check( writeResult == ERROR_SUCCESS, Err_RegistryWriteError, valueName, static_cast<int>( writeResult ) );
 }
 
 //////////////////////////////////////////////////////////////////////////

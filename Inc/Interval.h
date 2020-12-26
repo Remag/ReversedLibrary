@@ -7,7 +7,8 @@ namespace Relib {
 template <class Type>
 class CInterval {
 public:
-	explicit CInterval( Type value = Type{} ) : lower( value ), upper( value ) {}
+	CInterval() = default;
+	explicit CInterval( Type value ) : lower( value ), upper( value ) {}
 	// It is asserted that lower <= upper.
 	CInterval( Type lower, Type upper );
 
@@ -36,8 +37,8 @@ public:
 	bool StrictIntersects( const CInterval& other ) const;
 
 private:
-	Type lower;
-	Type upper;
+	Type lower = Type{};
+	Type upper = Type{};
 };
 
 //////////////////////////////////////////////////////////////////////////
