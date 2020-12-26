@@ -771,10 +771,11 @@ template<class VecType, int dim>
 CString CStrConversionFunctions<char>::ToString( CVector<VecType,dim> vec, char delim )
 {
 	CString result;
-	for( int i = 0; i < dim; i++ ) {
+	for( int i = 0; i < dim - 1; i++ ) {
 		result += ToString( vec[i] );
 		result += delim;
 	}
+	result += ToString( vec[dim - 1] );
 	return result;
 }
 
@@ -806,6 +807,7 @@ public:
 	static CUnicodeString ToString( double value, int digitCount = 3 );
 	static CUnicodeString ToString( CUnicodePart value );
 	static CUnicodeString ToString( const wchar_t* value );
+	static CUnicodeString ToString( const char* value, unsigned codePage = CP_ACP );
 	static CUnicodeString ToString( CStringPart value, unsigned codePage = CP_ACP );
 	static CUnicodeString ToString( CColor value );
 	template <class VecType, int dim>
@@ -947,6 +949,14 @@ inline CUnicodeString CStrConversionFunctions<wchar_t>::ToString( const wchar_t*
 	return CUnicodeString( value );
 }
 
+inline CUnicodeString CStrConversionFunctions<wchar_t>::ToString( const char* value, unsigned codePage /*= CP_ACP */ )
+{
+	CUnicodeString result;
+	const CStringView valueStr = value;
+	CStringOperations<wchar_t>::ConvertStr( valueStr, codePage, result );
+	return result;
+}
+
 inline CUnicodeString CStrConversionFunctions<wchar_t>::ToString( CStringPart value, unsigned codePage /*= CP_ACP */ )
 {
 	CUnicodeString result;
@@ -976,10 +986,11 @@ template<class VecType, int dim>
 CUnicodeString CStrConversionFunctions<wchar_t>::ToString( CVector<VecType,dim> vec, wchar_t delim )
 {
 	CUnicodeString result;
-	for( int i = 0; i < dim; i++ ) {
+	for( int i = 0; i < dim - 1; i++ ) {
 		result += ToString( vec[i] );
 		result += delim;
 	}
+	result += ToString( vec[dim -1] );
 	return result;
 }
 

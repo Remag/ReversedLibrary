@@ -279,6 +279,7 @@
     <ClInclude Include="Inc\ConditionVariable.h" />
     <ClInclude Include="Inc\ConvexShapeCollisionDetector.h" />
     <ClInclude Include="Inc\CriticalSection.h" />
+    <ClInclude Include="Inc\CurlEasyHandle.h" />
     <ClInclude Include="Inc\CurlException.h" />
     <ClInclude Include="Inc\CurlInitializer.h" />
     <ClInclude Include="Inc\DateTime.h" />
@@ -312,6 +313,8 @@
     <ClInclude Include="Inc\FontSize.h" />
     <ClInclude Include="Inc\FreeTypeException.h" />
     <ClInclude Include="Inc\FreeTypeGlyphProvider.h" />
+    <ClInclude Include="Inc\Future.h" />
+    <ClInclude Include="Inc\FutureSharedState.h" />
     <ClInclude Include="Inc\GeneralBlockAllocator.h" />
     <ClInclude Include="Inc\Glyph.h" />
     <ClInclude Include="Inc\GlyphInc.h" />
@@ -328,6 +331,10 @@
     <ClInclude Include="Inc\InlineEntityStorage.h" />
     <ClInclude Include="Inc\InlineStackAllocator.h" />
     <ClInclude Include="Inc\InternetFile.h" />
+    <ClInclude Include="Inc\InternetFileBatch.h">
+      <SubType>
+      </SubType>
+    </ClInclude>
     <ClInclude Include="Inc\Interval.h" />
     <ClInclude Include="Inc\Invoke.h" />
     <ClInclude Include="Inc\JsonDocument.h" />
@@ -361,6 +368,7 @@
     <ClInclude Include="Inc\PersistentStorage.h" />
     <ClInclude Include="Inc\PointShape.h" />
     <ClInclude Include="Inc\PolygonShape.h" />
+    <ClInclude Include="Inc\Promise.h" />
     <ClInclude Include="Inc\Ptr.h" />
     <ClInclude Include="Inc\PtrCastUtils.h" />
     <ClInclude Include="Inc\PtrOwner.h" />
@@ -409,12 +417,24 @@
     <ClInclude Include="Inc\ValueAnimator.h" />
     <ClInclude Include="Inc\VarArgsUtils.h" />
     <ClInclude Include="Inc\Vector.h" />
+    <ClInclude Include="Inc\WebConnectionScheduler.h">
+      <SubType>
+      </SubType>
+    </ClInclude>
     <ClInclude Include="Inc\XmlDocument.h" />
     <ClInclude Include="Inc\XmlElement.h" />
     <ClInclude Include="Inc\ZipConverter.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Ext\Src\RapidXml\rapidxml.cpp" />
+    <ClCompile Include="Inc\InternetFileBatch.cpp">
+      <SubType>
+      </SubType>
+    </ClCompile>
+    <ClCompile Include="Inc\WebConnectionScheduler.cpp">
+      <SubType>
+      </SubType>
+    </ClCompile>
     <ClCompile Include="Src\ActionOwner.cpp" />
     <ClCompile Include="Src\Archive.cpp" />
     <ClCompile Include="Src\CurlException.cpp" />

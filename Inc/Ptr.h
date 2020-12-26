@@ -218,7 +218,7 @@ CSharedPtr<ObjectType, Allocator> CreateShared( ConstructorArgs&&... args )
 	BYTE* objectMemory = reinterpret_cast<BYTE*>( memOwner.Ptr() );
 	ObjectType* newObject = ::new( objectMemory + counterOffset ) ObjectType( forward<ConstructorArgs>( args )... );
 	memOwner.Detach();
-	return CSharedPtr<ObjectType>::CreateNewPtr( newObject, objectMemory );
+	return CSharedPtr<ObjectType, Allocator>::CreateNewPtr( newObject, objectMemory );
 }
 
 template <class ObjectType, class Allocator, class... ConstructorArgs>

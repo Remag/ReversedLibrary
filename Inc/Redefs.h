@@ -137,8 +137,13 @@ namespace RelibInternal {
 	class CExplicitCopyTag;
 	class CMessageSource;
 	class CInternetFile;
+	class CInternetFileBatch;
+	class CWebConnectionScheduler;
 	class CRegistryKey;
 	class CRegistryKeyValueEnumerator;
+	class CReadWriteSection;
+	class CReadLock;
+	class CWriteLock;
 	struct CColor;
 
 	class CEntityGroup;
@@ -197,6 +202,10 @@ namespace RelibInternal {
 	class CActionOwner;
 	template <class Callable>
 	class CMutableActionOwner;
+	template <class T>
+	class CFuture;
+	template <class T>
+	class CPromise;
 
 	const int NotFound = -1;
 } // namespace Relib.

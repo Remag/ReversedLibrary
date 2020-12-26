@@ -49,6 +49,7 @@
 #include <FontListGlyphProvider.h>
 #include <FontSize.h>
 #include <FreeTypeGlyphProvider.h>
+#include <Future.h>
 #include <GeneralBlockAllocator.h>
 #include <Glyph.h>
 #include <HashTable.h>
@@ -84,6 +85,7 @@
 #include <PersistentStorage.h>
 #include <PointShape.h>
 #include <PolygonShape.h>
+#include <Promise.h>
 #include <Ptr.h>
 #include <PtrOwner.h>
 #include <Quaternion.h>
@@ -118,6 +120,7 @@
 #include <ValueAnimator.h>
 #include <VarArgsUtils.h>
 #include <Vector.h>
+#include <WebConnectionScheduler.h>
 #include <XmlDocument.h>
 #include <XmlElement.h>
 #include <ZipConverter.h>

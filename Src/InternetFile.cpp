@@ -16,10 +16,10 @@ CInternetFile::CInternetFile()
 {
 	InitializeCurl();
 	easyHandle = curl_easy_init();
-	errorBufferPtr = errorBuffer.CreateRawBuffer( CURL_ERROR_SIZE );
+	errorBuffer.ReserveBuffer( CURL_ERROR_SIZE );
 	curl_easy_setopt( easyHandle, CURLOPT_WRITEFUNCTION, curlWriteFunction );
 	curl_easy_setopt( easyHandle, CURLOPT_READFUNCTION, curlReadFunction );
-	curl_easy_setopt( easyHandle, CURLOPT_ERRORBUFFER, errorBufferPtr.Ptr() );
+	curl_easy_setopt( easyHandle, CURLOPT_ERRORBUFFER, errorBuffer.Ptr() );
 	curl_easy_setopt( easyHandle, CURLOPT_XFERINFOFUNCTION, curlProgressCallback );
 }
 
@@ -29,10 +29,31 @@ CInternetFile::CInternetFile( CStringView url ) :
 	curl_easy_setopt( easyHandle, CURLOPT_URL, url.Ptr() );
 }
 
+CInternetFile::CInternetFile( CInternetFile&& other ) :
+	easyHandle( other.easyHandle ),
+	errorBuffer( move( other.errorBuffer ) ),
+	progressAction( move( other.progressAction ) ),
+	headerList( other.headerList )
+{
+	other.easyHandle = nullptr;
+	other.headerList = nullptr;
+}
+
 CInternetFile::~CInternetFile()
 {
-	curl_slist_free_all( headerList );
-	curl_easy_cleanup( easyHandle );
+	if( easyHandle != nullptr ) {
+		curl_slist_free_all( headerList );
+		curl_easy_cleanup( easyHandle );
+	}
+}
+
+CInternetFile& CInternetFile::operator=( CInternetFile&& other )
+{
+	swap( easyHandle, other.easyHandle );
+	swap( errorBuffer, other.errorBuffer );
+	swap( progressAction, other.progressAction );
+	swap( headerList, other.headerList );
+	return *this;
 }
 
 void CInternetFile::SetUrl( CStringView urlName )
@@ -40,11 +61,29 @@ void CInternetFile::SetUrl( CStringView urlName )
 	curl_easy_setopt( easyHandle, CURLOPT_URL, urlName.Ptr() );
 }
 
+void CInternetFile::setUploadData( CArrayView<BYTE> data, CURL* handle )
+{
+	CCurlReadData readData{ data, 0 };
+	curl_easy_setopt( handle, CURLOPT_READDATA, &readData );
+	curl_easy_setopt( handle, CURLOPT_INFILESIZE, numeric_cast<long>( data.Size() ) );
+	curl_easy_setopt( handle, CURLOPT_UPLOAD, 1L );
+}
+
+void CInternetFile::disableUploadData( CURL* handle )
+{
+	curl_easy_setopt( handle, CURLOPT_UPLOAD, 0L );
+}
+
+void CInternetFile::setDownloadData( CArray<BYTE>& buffer, CURL* handle )
+{
+	curl_easy_setopt( handle, CURLOPT_WRITEDATA, &buffer );
+}
+
 void CInternetFile::DownloadFile( CArray<BYTE>& result )
 {
 	assert( result.IsEmpty() );
-	curl_easy_setopt( easyHandle, CURLOPT_WRITEDATA, &result );
-	curl_easy_setopt( easyHandle, CURLOPT_UPLOAD, 0L );
+	setDownloadData( result, easyHandle );
+	disableUploadData( easyHandle );
 
 	const auto performResult = curl_easy_perform( easyHandle );
 	checkCurlError( performResult == CURLE_OK );
@@ -52,11 +91,8 @@ void CInternetFile::DownloadFile( CArray<BYTE>& result )
 
 void CInternetFile::UploadFile( CArrayView<BYTE> data, CArray<BYTE>& response )
 {
-	CCurlReadData readData{ data, 0 };
-	curl_easy_setopt( easyHandle, CURLOPT_WRITEDATA, &response );
-	curl_easy_setopt( easyHandle, CURLOPT_READDATA, &readData );
-	curl_easy_setopt( easyHandle, CURLOPT_INFILESIZE, numeric_cast<long>( data.Size() ) );
-	curl_easy_setopt( easyHandle, CURLOPT_UPLOAD, 1L );
+	setDownloadData( response, easyHandle );
+	setUploadData( data, easyHandle );
 
 	const auto performResult = curl_easy_perform( easyHandle );
 	checkCurlError( performResult == CURLE_OK );
@@ -123,9 +159,7 @@ size_t CInternetFile::curlReadFunction( void* buffer, size_t size, size_t nmemb,
 void CInternetFile::checkCurlError( bool condition )
 {
 	if( !condition ) {
-		errorBufferPtr.Release();
-		auto errorStr = UnicodeStr( errorBuffer );
-		errorBufferPtr = errorBuffer.CreateRawBuffer();
+		auto errorStr = UnicodeStr( errorBuffer.Ptr() );
 		throw CCurlException( move( errorStr ) );
 	}
 }

@@ -45,6 +45,7 @@ public:
 		{ return root == nullptr; }
 
 	void CreateFromFile( CUnicodeView fileName );
+	void CreateFromFile( CFileReader& fileReader );
 	void CreateFromString( CStringPart str );
 
 	CString GetDocumentString() const;
@@ -52,7 +53,7 @@ public:
 	const CJsonValue& GetRoot() const
 		{ assert( root != nullptr ); return *root; }
 	// Set the specified value as document's root.
-	// Value should be created using this document.
+	// Value must have been created in this document.
 	void SetRoot( const CJsonValue& newRoot )
 		{ root = &newRoot; }
 
@@ -63,9 +64,9 @@ public:
 	CJsonBool& CreateBool( bool value );
 
 	CJsonDynamicArray& CreateArray();
-	void AddValue( CJsonDynamicArray& arr, CJsonValue& val );
+	void AddArrayValue( CJsonDynamicArray& arr, CJsonValue& val );
 	CJsonObject& CreateObject();
-	void AddValue( CJsonObject& obj, CStringPart key, CJsonValue& val );
+	void AddObjectValue( CJsonObject& obj, CStringPart key, CJsonValue& val );
 
 private:
 	CArena<> jsonData;

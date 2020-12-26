@@ -132,7 +132,6 @@ bool CHashTable<Elem, HashStrategy, Allocator>::Set( Key&& elem )
 	auto entry = hashIndex.GetRootPosition( hash );
 	while( !hashIndex.IsPositionFree( entry ) ) {
 		if( HashStrategy::IsEqual( elem, hashIndex.GetValue( entry ) ) ) {
-			hashIndex.GetValue( entry ) = forward<Key>( elem );
 			return false;
 		} else {
 			entry = hashIndex.NextIndexPosition( entry );

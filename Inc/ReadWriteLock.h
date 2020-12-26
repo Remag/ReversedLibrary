@@ -1,4 +1,6 @@
 #pragma once
+#include <Redefs.h>
+#include <Optional.h>
 #include <Synchapi.h>
 
 namespace Relib {
@@ -26,6 +28,9 @@ public:
 	void UnlockWrite()
 		{ ::ReleaseSRWLockExclusive( &lock ); }
 
+	COptional<CReadLock> TryLockRead() const;
+	COptional<CWriteLock> TryLockWrite();
+
 private:
 	// Read locking operations are logically constant.
 	mutable SRWLOCK lock;
@@ -39,31 +44,97 @@ private:
 
 class CReadLock {
 public:
-	explicit CReadLock( const CReadWriteSection& target ) : lock( target ) { lock.LockRead(); }
-	~CReadLock()
-		{ lock.UnlockRead(); }
+	CReadLock() = default;
+	explicit CReadLock( const CReadWriteSection& target ) : lock( &target ) { lock->LockRead(); }
+	CReadLock( CReadLock&& other ) : lock( other.lock ) { other.lock = nullptr; }
+	CReadLock& operator=( CReadLock&& other );
+	~CReadLock();
 
 	const CReadWriteSection& GetSection() const
-		{ return lock; }
+		{ return *lock; }
+
+	// Sections can create locks without locking them.
+	friend class CReadWriteSection;
 
 private:
-	const CReadWriteSection& lock;
+	const CReadWriteSection* lock = nullptr;
+
+	CReadLock( const CReadWriteSection& target, bool /*noLock*/ ) : lock( &target ) {}
+
+	// Copying is prohibited.
+	CReadLock( const CReadLock& ) = delete;
+	void operator=( const CReadLock& ) = delete;
 };
 
 //////////////////////////////////////////////////////////////////////////
 
 class CWriteLock {
 public:
-	explicit CWriteLock( CReadWriteSection& target ) : lock( target ) { lock.LockWrite(); }
-	~CWriteLock()
-		{ lock.UnlockWrite(); }
+	CWriteLock() = default;
+	explicit CWriteLock( CReadWriteSection& target ) : lock( &target ) { lock->LockWrite(); }
+	CWriteLock( CWriteLock&& other ) : lock( other.lock ) { other.lock = nullptr; }
+	CWriteLock& operator=( CWriteLock&& other );
+	~CWriteLock();
 
 	CReadWriteSection& GetSection()
-		{ return lock; }
+		{ return *lock; }
+
+	// Sections can create locks without locking them.
+	friend class CReadWriteSection;
 
 private:
-	CReadWriteSection& lock;
+	CReadWriteSection* lock = nullptr;
+
+	CWriteLock( CReadWriteSection& target, bool /*noLock*/ ) : lock( &target ) {}
+
+	// Copying is prohibited.
+	CWriteLock( const CWriteLock& ) = delete;
+	void operator=( const CWriteLock& ) = delete;
 };
+
+//////////////////////////////////////////////////////////////////////////
+
+inline COptional<CReadLock> CReadWriteSection::TryLockRead() const
+{
+	const auto result = ::TryAcquireSRWLockShared( &lock );
+	return ( result != 0 ) ? CreateOptional( CReadLock( *this, false ) ) : COptional<CReadLock>();
+}
+
+inline COptional<CWriteLock> CReadWriteSection::TryLockWrite()
+{
+	const auto result = ::TryAcquireSRWLockExclusive( &lock );
+	return ( result != 0 ) ? CreateOptional( CWriteLock( *this, false ) ) : COptional<CWriteLock>();
+}
+
+//////////////////////////////////////////////////////////////////////////
+
+inline CReadLock& CReadLock::operator=( CReadLock&& other )
+{
+	swap( lock, other.lock );
+	return *this;
+}
+
+inline CReadLock::~CReadLock()
+{
+	if( lock != nullptr ) {
+		lock->UnlockRead();
+	}
+}
+
+//////////////////////////////////////////////////////////////////////////
+
+inline CWriteLock& CWriteLock::operator=( CWriteLock&& other )
+{
+	swap( lock, other.lock );
+	return *this;
+}
+
+inline CWriteLock::~CWriteLock()
+{
+	if( lock != nullptr ) {
+		lock->UnlockWrite();
+	}
+}
 
 //////////////////////////////////////////////////////////////////////////
 
