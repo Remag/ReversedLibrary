@@ -46,15 +46,15 @@ private:
 
 //////////////////////////////////////////////////////////////////////////
 
-// Class for changing the contents of a mapped file. Owns the view buffer. Also supports reading.
-class REAPI CMappingWriteView {
+// Class for changing the contents of a mapped file. Owns the view buffer.
+class REAPI CMappingReadWriteView {
 public:
-	CMappingWriteView() = default;
+	CMappingReadWriteView() = default;
 	// Views are movable.
-	CMappingWriteView( CMappingWriteView&& other );
-	CMappingWriteView& operator=( CMappingWriteView&& other );
+	CMappingReadWriteView( CMappingReadWriteView&& other );
+	CMappingReadWriteView& operator=( CMappingReadWriteView&& other );
 	// Destructor that unmaps the view.
-	~CMappingWriteView();
+	~CMappingReadWriteView();
 
 	int Size() const
 		{ return bufferSize; }
@@ -81,11 +81,11 @@ private:
 	// Offset that needs to be subtracted from buffer to get the aligned allocation position.
 	int allocationOffset = 0;
 
-	CMappingWriteView( BYTE* buffer, int size, int allocationOffset );
+	CMappingReadWriteView( BYTE* buffer, int size, int allocationOffset );
 
 	// Copying is prohibited.
-	CMappingWriteView( CMappingWriteView& ) = delete;
-	void operator=( CMappingWriteView& ) = delete;
+	CMappingReadWriteView( CMappingReadWriteView& ) = delete;
+	void operator=( CMappingReadWriteView& ) = delete;
 };
 
 //////////////////////////////////////////////////////////////////////////
@@ -126,10 +126,10 @@ public:
 	
 	// Create the view of the whole file.
 	CMappingReadView CreateReadView();
-	CMappingWriteView CreateWriteView();
+	CMappingReadWriteView CreateReadWriteView();
 	// Create the view of a given region of the mapped file.
 	CMappingReadView CreateReadView( __int64 offset, int length );
-	CMappingWriteView CreateWriteView( __int64 offset, int length );
+	CMappingReadWriteView CreateReadWriteView( __int64 offset, int length );
 	;
 	// Close the mapping. File will not be freed until all created views are closed as well.
 	void Close();

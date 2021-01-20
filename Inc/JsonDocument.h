@@ -52,6 +52,8 @@ public:
 
 	const CJsonValue& GetRoot() const
 		{ assert( root != nullptr ); return *root; }
+	const CJsonValue* TryGetRoot() const
+		{ return root; }
 	// Set the specified value as document's root.
 	// Value must have been created in this document.
 	void SetRoot( const CJsonValue& newRoot )
@@ -95,6 +97,7 @@ private:
 	double parseNumber( CStringView str, int& parsePos ) const;
 	CJsonObject& parseObject( CStringView str, int& parsePos );
 	CJsonValue& parseArray( CStringView str, int& parsePos );
+	CJsonValue& parseValueList( CStringView str, int& parsePos, char terminator, CJsonValue& firstValue );
 	CJsonValue& parseValue( CStringView str, int& parsePos );
 	CJsonValue& parseElement( CStringView str, int& parsePos );
 
@@ -109,8 +112,6 @@ private:
 	void writeToString( const CJsonBool& value, CString& result ) const;
 	void writeToString( const CJsonDynamicArray& value, CString& result ) const;
 	void writeToString( const CJsonObject& value, CString& result ) const;
-
-	CStringPart copyStringToDocument( CStringPart src );
 };
 
 //////////////////////////////////////////////////////////////////////////

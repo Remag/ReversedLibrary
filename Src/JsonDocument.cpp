@@ -60,8 +60,9 @@ CString CJsonDocument::GetDocumentString() const
 void CJsonDocument::parseJson( CStringView jsonStr )
 {
 	int startPos = 0;
-	const auto parseResult = &parseElement( jsonStr, startPos );
-	root = parseResult;
+	auto& parseResult = parseElement( jsonStr, startPos );
+	assert( startPos == jsonStr.Length() );
+	root = &parseResult;
 }
 
 void CJsonDocument::throwParseException( int parsePos ) const
@@ -192,26 +193,34 @@ CJsonObject& CJsonDocument::parseObject( CStringView str, int& parsePos )
 CJsonValue& CJsonDocument::parseArray( CStringView str, int& parsePos )
 {
 	auto currentPos = skipWhitespace( str, parsePos + 1 );
-	if( str[currentPos] == L']' ) {
+	if( str[currentPos] == ']' ) {
 		parsePos = currentPos + 1;
 		return allocateJsonDynamicArray( nullptr, nullptr, 0 );
 	}
 
+	auto& firstValue = parseValue( str, currentPos );
+	parsePos = skipWhitespace( str, currentPos );
+	return parseValueList( str, parsePos, ']', firstValue );
+}
+
+CJsonValue& CJsonDocument::parseValueList( CStringView str, int& currentPos, char terminator, CJsonValue& firstValue )
+{
 	auto currentNode = allocateListNode<CJsonValue*>();
+	currentNode->Value = &firstValue;
 	const auto listHead = currentNode;
 	int listSize = 1;
 	for( ;; ) {
-		auto& value = parseValue( str, currentPos );
-		currentPos = skipWhitespace( str, currentPos );
-		currentNode->Value = &value;
-		if( str[currentPos] == L']' ) {
-			parsePos = currentPos + 1;
+		if( str[currentPos] == terminator ) {
+			currentPos = currentPos + 1;
 			return allocateJsonDynamicArray( listHead, currentNode, listSize );
 		} else if( str[currentPos] != ',' ) {
 			throwParseException( currentPos );
 		}
-		currentNode = addListNode( *currentNode );
 		currentPos = skipWhitespace( str, currentPos + 1 );
+		currentNode = addListNode( *currentNode );
+		auto& value = parseValue( str, currentPos );
+		currentNode->Value = &value;
+		currentPos = skipWhitespace( str, currentPos );
 		listSize++;
 	}
 }

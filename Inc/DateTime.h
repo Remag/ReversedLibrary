@@ -27,8 +27,10 @@ public:
 	int GetSecond() const
 		{ return second; }
 
-	// Current system time.
+	// Current local time.
 	static CDateTime Now();
+	// Current system time.
+	static CDateTime NowSystem();
 	// Time difference in seconds.
 	__int64 operator-( CDateTime other ) const;
 

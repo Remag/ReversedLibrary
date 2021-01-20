@@ -5,8 +5,10 @@
 #include <BaseStringView.h>
 #include <Color.h>
 #include <Optional.h>
+#include <DateTime.h>
 #include <RawStringBuffer.h>
 #include <Relimits.h>
+#include <StackArray.h>
 #include <TemplateUtils.h>
 
 namespace Relib {
@@ -604,6 +606,15 @@ public:
 	static CString ToString( CColor value );
 	template <class VecType, int dim>
 	static CString ToString( CVector<VecType, dim> vec, char delim = ';' );
+	// Date format:
+	// YYYY - full year.
+	// YY - short year.
+	// MM - month.
+	// DD - day.
+	// H - hour.
+	// M - minute.
+	// S - second.
+	static CString ToString( CDateTime date, CStringPart format	);
 
 private:
 	// String values of bool type.
@@ -779,6 +790,37 @@ CString CStrConversionFunctions<char>::ToString( CVector<VecType,dim> vec, char 
 	return result;
 }
 
+inline CString CStrConversionFunctions<char>::ToString( CDateTime date, CStringPart format )
+{
+	CString result( format );
+	const auto fullYear = ToString( date.GetYear() );
+	const auto shortYearCount = max( 2, fullYear.Length() );
+	const auto shortYear = fullYear.Right( shortYearCount );
+
+	CStackArray<CString, 5> dateStr {
+		ToString( date.GetMonth() ),
+		ToString( date.GetDay() ),
+		ToString( date.GetHour() ),
+		ToString( date.GetMinute() ),
+		ToString( date.GetSecond() )
+	};
+
+	for( auto& dateNum : dateStr ) {
+		if( dateNum.Length() == 1 ) {
+			dateNum.InsertAt( 0, '0' );
+		}
+	}
+
+	result.ReplaceAll( "YYYY", fullYear );
+	result.ReplaceAll( "YY", shortYear );
+	result.ReplaceAll( "MM", dateStr[0] );
+	result.ReplaceAll( "DD", dateStr[1] );
+	result.ReplaceAll( "H", dateStr[2] );
+	result.ReplaceAll( "M", dateStr[3] );
+	result.ReplaceAll( "S", dateStr[4] );
+	return result;
+}
+
 //////////////////////////////////////////////////////////////////////////
 
 template <>
@@ -812,6 +854,15 @@ public:
 	static CUnicodeString ToString( CColor value );
 	template <class VecType, int dim>
 	static CUnicodeString ToString( CVector<VecType, dim> vec, wchar_t delim = L';' );
+	// Date format:
+	// YYYY - full year.
+	// YY - short year.
+	// MM - month.
+	// DD - day.
+	// H - hour.
+	// M - minute.
+	// S - second.
+	static CUnicodeString ToString( CDateTime date, CUnicodePart format	);
 
 private:
 	// String values of bool type.
@@ -994,6 +1045,37 @@ CUnicodeString CStrConversionFunctions<wchar_t>::ToString( CVector<VecType,dim> 
 	return result;
 }
 
+inline CUnicodeString CStrConversionFunctions<wchar_t>::ToString( CDateTime date, CUnicodePart format )
+{
+	CUnicodeString result( format );
+	const auto fullYear = ToString( date.GetYear() );
+	const auto shortYearCount = max( 2, fullYear.Length() );
+	const auto shortYear = fullYear.Right( shortYearCount );
+
+	CStackArray<CUnicodeString, 5> dateStr {
+		ToString( date.GetMonth() ),
+		ToString( date.GetDay() ),
+		ToString( date.GetHour() ),
+		ToString( date.GetMinute() ),
+		ToString( date.GetSecond() )
+	};
+
+	for( auto& dateNum : dateStr ) {
+		if( dateNum.Length() == 1 ) {
+			dateNum.InsertAt( 0, L'0' );
+		}
+	}
+
+	result.ReplaceAll( L"YYYY", fullYear );
+	result.ReplaceAll( L"YY", shortYear );
+	result.ReplaceAll( L"MM", dateStr[0] );
+	result.ReplaceAll( L"DD", dateStr[1] );
+	result.ReplaceAll( L"H", dateStr[2] );
+	result.ReplaceAll( L"M", dateStr[3] );
+	result.ReplaceAll( L"S", dateStr[4] );
+	return result;
+}
+
 //////////////////////////////////////////////////////////////////////////
 
 }	// namespace RelibInternal.
@@ -1032,81 +1114,16 @@ COptional<CVector<VecType, dim>> Value( RelibInternal::CStringData<StrType> str,
 
 //////////////////////////////////////////////////////////////////////////
 
-template <class T>
-CString Str( const T& val )
+template <class T, class... Args>
+CString Str( const T& val, Args&&... args )
 {
-	return RelibInternal::CStrConversionFunctions<char>::ToString( val );
+	return RelibInternal::CStrConversionFunctions<char>::ToString( val, args... );
 }
 
-inline CString Str( float val, int digitCount = 3 )
+template <class T, class... Args>
+CUnicodeString UnicodeStr( const T& val, Args&&... args )
 {
-	return RelibInternal::CStrConversionFunctions<char>::ToString( val, digitCount );
-}
-
-inline CString Str( double val, int digitCount = 3 )
-{
-	return RelibInternal::CStrConversionFunctions<char>::ToString( val, digitCount );
-}
-
-inline CString Str( int val, int base )
-{
-	return RelibInternal::CStrConversionFunctions<char>::ToString( val, base );
-}
-
-inline CString Str( unsigned val, int base )
-{
-	return RelibInternal::CStrConversionFunctions<char>::ToString( val, base );
-}
-
-inline CString Str( __int64 val, int base )
-{
-	return RelibInternal::CStrConversionFunctions<char>::ToString( val, base );
-}
-
-inline CString Str( CUnicodePart val, unsigned codePage = CP_ACP )
-{
-	return RelibInternal::CStrConversionFunctions<char>::ToString( val, codePage );
-}
-
-inline CString Str( CUnicodePart val, char defaultChar, unsigned codePage )
-{
-	return RelibInternal::CStrConversionFunctions<char>::ToString( val, defaultChar, codePage );
-}
-
-template <class T>
-CUnicodeString UnicodeStr( const T& val )
-{
-	return RelibInternal::CStrConversionFunctions<wchar_t>::ToString( val );
-}
-
-inline CUnicodeString UnicodeStr( float val, int digitCount = 3 )
-{
-	return RelibInternal::CStrConversionFunctions<wchar_t>::ToString( val, digitCount );
-}
-
-inline CUnicodeString UnicodeStr( double val, int digitCount = 3 )
-{
-	return RelibInternal::CStrConversionFunctions<wchar_t>::ToString( val, digitCount );
-}
-
-inline CUnicodeString UnicodeStr( int val, int base )
-{
-	return RelibInternal::CStrConversionFunctions<wchar_t>::ToString( val, base );
-}
-
-inline CUnicodeString UnicodeStr( unsigned val, int base )
-{
-	return RelibInternal::CStrConversionFunctions<wchar_t>::ToString( val, base );
-}
-
-inline CUnicodeString UnicodeStr( __int64 val, int base )
-{
-	return RelibInternal::CStrConversionFunctions<wchar_t>::ToString( val, base );
-}
-
-inline CUnicodeString UnicodeStr( CStringPart val, unsigned codePage = CP_ACP )
-{
-	return RelibInternal::CStrConversionFunctions<wchar_t>::ToString( val, codePage );
+	return RelibInternal::CStrConversionFunctions<wchar_t>::ToString( val, args... );
 }
 
 //////////////////////////////////////////////////////////////////////////

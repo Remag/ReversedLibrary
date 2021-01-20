@@ -7,6 +7,7 @@
 #include <CriticalSection.h>
 #include <FileOwners.h>
 #include <FileSystem.h>
+#include <FileMapping.h>
 #include <MessageUtils.h>
 
 namespace Relib {
@@ -85,20 +86,34 @@ void CStdOutputLog::AddMessage( CUnicodeView text, TLogMessageType, CMessageSour
 //////////////////////////////////////////////////////////////////////////
 
 extern CCriticalSection FileWriteSection;
-extern const CUnicodeView FirstFileLogSuffix;
-extern const CUnicodeView SecondFileLogSuffix;
 CFileMessageLog::CFileMessageLog( CUnicodeView _fileName, int targetFileSize ) :
-	currentFileName( _fileName + FirstFileLogSuffix ),
-	backFileName( _fileName + SecondFileLogSuffix ),
-	maxSize( targetFileSize )
+	currentFileName( _fileName )
 {
-	assert( targetFileSize > 0 );
-	CCriticalSectionLock lock( FileWriteSection );
+	const auto maxSize = max( 32, targetFileSize );
 	
-	CFileWriter file( currentFileName, FCM_CreateOrOpen );
-	if( file.GetLength() > targetFileSize ) {
-		swap( currentFileName, backFileName );
+	CCriticalSectionLock lock( FileWriteSection );
+	CFileReadWriter file( currentFileName, FCM_CreateOrOpen );
+	const auto length = file.GetLength32();
+	if( length >= maxSize ) {
+		const auto newFileSize = FloorTo( maxSize / 2, sizeof( wchar_t ) );
+		moveRecentLogToStart( _fileName, length, newFileSize );
+		file.SetLength( newFileSize );
 	}
+}
+
+void CFileMessageLog::moveRecentLogToStart( CUnicodeView fileName, int oldFileSize, int newFileSize )
+{
+	assert( newFileSize > 2 );
+	assert( newFileSize <= oldFileSize );
+	CFileMapping logMapping( fileName, CFileMapping::MM_ReadWrite );
+	auto view = logMapping.CreateReadWriteView( 0, oldFileSize );
+	assert( view.Size() >= newFileSize );
+	const auto cutFileSize = view.Size() - newFileSize;
+	const auto buffer = view.GetBuffer();
+	::memcpy( buffer, buffer + cutFileSize, newFileSize );
+	const CUnicodeView newLineBuffer = L"\r\n";
+	const auto newLineBufferSize = sizeof( wchar_t ) * newLineBuffer.Length();
+	::memcpy( buffer + cutFileSize - newLineBufferSize, newLineBuffer.Ptr(), newLineBufferSize );
 }
 
 void CFileMessageLog::AddMessage( CUnicodeView text, TLogMessageType, CMessageSource )
@@ -107,19 +122,11 @@ void CFileMessageLog::AddMessage( CUnicodeView text, TLogMessageType, CMessageSo
 	CFileWriter file( currentFileName, FCM_CreateOrOpen );
 
 	const auto filePos = file.SeekToEnd();
-	if( filePos >= maxSize ) {
-		// Maximum size reached, rotate the file.
-		swap( currentFileName, backFileName );
-		CFileWriter newCurrentFile( currentFileName, FCM_CreateAlways );
-		initializeUnicodeFile( newCurrentFile );
-		writeToFile( newCurrentFile, text );
-	} else if( filePos == 0 ) {
+	if( filePos == 0 ) {
 		// File is empty, make it unicode.
 		initializeUnicodeFile( file );
-		writeToFile( file, text );
-	} else {
-		writeToFile( file, text );
 	}
+	writeToFile( file, text );
 }
 
 namespace RelibInternal {
@@ -132,8 +139,15 @@ void CFileMessageLog::initializeUnicodeFile( CFileWriteView target )
 
 void CFileMessageLog::writeToFile( CFileWriteView target, CUnicodeView text )
 {
-	const CUnicodeString output = createOutputString( text );
+	const auto rawOutput = createOutputString( text );
+	const auto output = addUtilityInfo( rawOutput );
 	target.Write( output.Ptr(), output.Length() * sizeof( wchar_t ) );
+}
+
+CUnicodeString CFileMessageLog::addUtilityInfo( CUnicodeView text ) const
+{
+	const auto dateStr = UnicodeStr( CDateTime::Now(), L"[YYYY.MM.DD H:M:S] " );
+	return dateStr + text;
 }
 
 //////////////////////////////////////////////////////////////////////////

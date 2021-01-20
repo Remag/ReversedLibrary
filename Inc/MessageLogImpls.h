@@ -45,11 +45,11 @@ public:
 
 private:
 	CUnicodeString currentFileName;
-	CUnicodeString backFileName;
-	int maxSize;
 
+	void moveRecentLogToStart( CUnicodeView fileName, int oldFileSize, int newFileSize );
 	void initializeUnicodeFile( CFileWriteView target );
 	void writeToFile( CFileWriteView target, CUnicodeView text );
+	CUnicodeString addUtilityInfo( CUnicodeView text ) const;
 };
 
 //////////////////////////////////////////////////////////////////////////

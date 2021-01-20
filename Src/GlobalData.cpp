@@ -106,10 +106,6 @@ extern const CUnicodeView JsonMissingKeyError = L"JSON object is missing a key: 
 extern const CUnicodeView GeneralFreeTypeError = L"FreeType error. Error code: %0.\nFreeType module name: %1.";
 extern const CUnicodeView GeneralCurlError = L"Curl error. Error string buffer: %0.";
 
-// Log suffices.
-extern const CUnicodeView FirstFileLogSuffix = L"_1.log";
-extern const CUnicodeView SecondFileLogSuffix = L"_2.log";
-
 // Symbol sets.
 extern const CUnicodeSet InvalidFileNameSymbols{
 	L'*', L'?', L'<', L'>', L':', L'\"', L'|', L'\\', L'/',

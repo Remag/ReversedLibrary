@@ -56,7 +56,7 @@ void CMappingReadView::Close()
 
 //////////////////////////////////////////////////////////////////////////
 
-CMappingWriteView::CMappingWriteView( CMappingWriteView&& other ) :
+CMappingReadWriteView::CMappingReadWriteView( CMappingReadWriteView&& other ) :
 	buffer( other.buffer ),
 	bufferSize( other.bufferSize ),
 	allocationOffset( other.allocationOffset )
@@ -66,7 +66,7 @@ CMappingWriteView::CMappingWriteView( CMappingWriteView&& other ) :
 	other.allocationOffset = 0;
 }
 
-CMappingWriteView& CMappingWriteView::operator=( CMappingWriteView&& other )
+CMappingReadWriteView& CMappingReadWriteView::operator=( CMappingReadWriteView&& other )
 {
 	swap( buffer, other.buffer );
 	swap( bufferSize, other.bufferSize );
@@ -74,26 +74,26 @@ CMappingWriteView& CMappingWriteView::operator=( CMappingWriteView&& other )
 	return *this;
 }
 
-CMappingWriteView::CMappingWriteView( BYTE* _buffer, int size, int _allocationOffset ) :
+CMappingReadWriteView::CMappingReadWriteView( BYTE* _buffer, int size, int _allocationOffset ) :
 	buffer( _buffer ),
 	bufferSize( size ),
 	allocationOffset( _allocationOffset )
 {
 }
 
-CMappingWriteView::~CMappingWriteView()
+CMappingReadWriteView::~CMappingReadWriteView()
 {
 	Close();
 }
 
-void CMappingWriteView::Flush()
+void CMappingReadWriteView::Flush()
 {
 	const void* allocatedBuffer = buffer - allocationOffset;
 	const bool result = ::FlushViewOfFile( allocatedBuffer, 0 ) != 0;
 	checkLastError( result );
 }
 
-void CMappingWriteView::Close()
+void CMappingReadWriteView::Close()
 {
 	if( buffer != 0 ) {
 		const void* allocatedBuffer = buffer - allocationOffset;
@@ -196,7 +196,7 @@ CMappingReadView CFileMapping::CreateReadView()
 	return CMappingReadView( buffer, NotFound, allocationOffset );
 }
 
-CMappingWriteView CFileMapping::CreateWriteView()
+CMappingReadWriteView CFileMapping::CreateReadWriteView()
 {
 	assert( IsOpen() );
 	assert( mode == MM_ReadWrite );
@@ -204,7 +204,7 @@ CMappingWriteView CFileMapping::CreateWriteView()
 	BYTE* buffer;
 	int allocationOffset;
 	openView( FILE_MAP_WRITE, 0, 0, buffer, allocationOffset );
-	return CMappingWriteView( buffer, NotFound, allocationOffset );
+	return CMappingReadWriteView( buffer, NotFound, allocationOffset );
 }
 
 CMappingReadView CFileMapping::CreateReadView( __int64 offset, int length )
@@ -218,7 +218,7 @@ CMappingReadView CFileMapping::CreateReadView( __int64 offset, int length )
 	return CMappingReadView( buffer, length, allocationOffset );
 }
 
-CMappingWriteView CFileMapping::CreateWriteView( __int64 offset, int length )
+CMappingReadWriteView CFileMapping::CreateReadWriteView( __int64 offset, int length )
 {
 	assert( IsOpen() );
 	assert( offset >= 0 && length >= 0 );
@@ -227,7 +227,7 @@ CMappingWriteView CFileMapping::CreateWriteView( __int64 offset, int length )
 	BYTE* buffer;
 	int allocationOffset;
 	openView( FILE_MAP_WRITE, offset, length, buffer, allocationOffset );
-	return CMappingWriteView( buffer, length, allocationOffset );
+	return CMappingReadWriteView( buffer, length, allocationOffset );
 }
 
 void CFileMapping::Close()

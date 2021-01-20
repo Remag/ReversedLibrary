@@ -49,6 +49,14 @@ bool CDateTime::isLeapYear( int year ) const
 
 CDateTime CDateTime::Now()
 {
+	SYSTEMTIME localTime;
+	::GetLocalTime( &localTime );
+	return CDateTime( localTime.wYear, localTime.wMonth, localTime.wDay, 
+		localTime.wHour, localTime.wMinute, localTime.wSecond );
+}
+
+CDateTime CDateTime::NowSystem()
+{
 	SYSTEMTIME systemTime;
 	::GetSystemTime( &systemTime );
 	return CDateTime( systemTime.wYear, systemTime.wMonth, systemTime.wDay, 

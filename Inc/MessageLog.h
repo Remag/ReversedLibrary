@@ -42,6 +42,10 @@ public:
 
 private:
 	IMessageLog* prevLog;
+
+	// Copying is prohibited.
+	CMessageLogSwitcher( const CMessageLogSwitcher& ) = delete;
+	void operator=( const CMessageLogSwitcher& ) = delete;
 };
 
 //////////////////////////////////////////////////////////////////////////
