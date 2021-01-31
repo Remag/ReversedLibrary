@@ -316,7 +316,7 @@ template <class T>
 T& CBaseString<T>::operator[]( int pos )
 {
 	assert( pos >= 0 );
-	assert( pos <= this->Length() );
+	assert( pos < this->Length() );
 	return this->getWritableBuffer()[pos];
 }
 
