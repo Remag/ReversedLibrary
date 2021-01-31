@@ -61,29 +61,52 @@ void CInternetFile::SetUrl( CStringView urlName )
 	curl_easy_setopt( easyHandle, CURLOPT_URL, urlName.Ptr() );
 }
 
-void CInternetFile::setUploadData( CArrayView<BYTE> data, CURL* handle )
+void CInternetFile::setDownloadData( CArray<BYTE>& buffer, CURL* handle )
 {
+	curl_easy_setopt( handle, CURLOPT_WRITEDATA, &buffer );
+}
+
+void CInternetFile::prepareGetRequest( CURL* handle )
+{
+	curl_easy_setopt( handle, CURLOPT_CUSTOMREQUEST, nullptr );
+	curl_easy_setopt( handle, CURLOPT_POSTFIELDS, nullptr );
+	curl_easy_setopt( handle, CURLOPT_POSTFIELDSIZE, 0L );
+
+	curl_easy_setopt( handle, CURLOPT_HTTPGET, 1L );
+}
+
+void CInternetFile::preparePutRequest( CURL* handle, CArrayView<BYTE> data )
+{
+	curl_easy_setopt( handle, CURLOPT_CUSTOMREQUEST, nullptr );
+	curl_easy_setopt( handle, CURLOPT_POSTFIELDS, nullptr );
+	curl_easy_setopt( handle, CURLOPT_POSTFIELDSIZE, 0L );
+
 	CCurlReadData readData{ data, 0 };
 	curl_easy_setopt( handle, CURLOPT_READDATA, &readData );
 	curl_easy_setopt( handle, CURLOPT_INFILESIZE, numeric_cast<long>( data.Size() ) );
 	curl_easy_setopt( handle, CURLOPT_UPLOAD, 1L );
 }
 
-void CInternetFile::disableUploadData( CURL* handle )
+void CInternetFile::preparePostRequest( CURL* handle, CArrayView<BYTE> data )
 {
+	curl_easy_setopt( handle, CURLOPT_CUSTOMREQUEST, nullptr );
 	curl_easy_setopt( handle, CURLOPT_UPLOAD, 0L );
+	curl_easy_setopt( handle, CURLOPT_POST, 1L );
+	curl_easy_setopt( handle, CURLOPT_POSTFIELDS, data.Ptr() );
+	curl_easy_setopt( handle, CURLOPT_POSTFIELDSIZE, numeric_cast<long>( data.Size() ) );
 }
 
-void CInternetFile::setDownloadData( CArray<BYTE>& buffer, CURL* handle )
+void CInternetFile::preparePatchRequest( CURL* handle, CArrayView<BYTE> data )
 {
-	curl_easy_setopt( handle, CURLOPT_WRITEDATA, &buffer );
+	preparePostRequest( handle, data );
+	curl_easy_setopt( handle, CURLOPT_CUSTOMREQUEST, "PATCH" );
 }
 
 void CInternetFile::DownloadFile( CArray<BYTE>& result )
 {
 	assert( result.IsEmpty() );
+	prepareGetRequest( easyHandle );
 	setDownloadData( result, easyHandle );
-	disableUploadData( easyHandle );
 
 	const auto performResult = curl_easy_perform( easyHandle );
 	checkCurlError( performResult == CURLE_OK );
@@ -91,9 +114,25 @@ void CInternetFile::DownloadFile( CArray<BYTE>& result )
 
 void CInternetFile::UploadFile( CArrayView<BYTE> data, CArray<BYTE>& response )
 {
+	preparePutRequest( easyHandle, data );
 	setDownloadData( response, easyHandle );
-	setUploadData( data, easyHandle );
 
+	const auto performResult = curl_easy_perform( easyHandle );
+	checkCurlError( performResult == CURLE_OK );
+}
+
+void CInternetFile::PostFile( CArrayView<BYTE> data, CArray<BYTE>& response )
+{
+	preparePostRequest( easyHandle, data );
+	setDownloadData( response, easyHandle );
+	const auto performResult = curl_easy_perform( easyHandle );
+	checkCurlError( performResult == CURLE_OK );
+}
+
+void CInternetFile::PatchFile( CArrayView<BYTE> data, CArray<BYTE>& response )
+{
+	preparePatchRequest( easyHandle, data );
+	setDownloadData( response, easyHandle );
 	const auto performResult = curl_easy_perform( easyHandle );
 	checkCurlError( performResult == CURLE_OK );
 }

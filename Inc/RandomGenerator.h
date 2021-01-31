@@ -29,7 +29,7 @@ public:
 	// Boolean with a weighted chance of true.
 	bool RandomBool( float trueChance );
 
-	// Random numbers of various types.
+	// Random numbers of various types. Both edge values can be returned.
 	int RandomNumber( int minVal, int maxVal );
 	float RandomNumber( float minVal, float maxVal );
 	double RandomNumber( double minVal, double maxVal );
@@ -43,6 +43,10 @@ public:
 	// Random unit direction in 2D space within a given angle range in radians.
 	template <class T>
 	CVector2<T> RandomDirection( T minAngleRad, T maxAngleRad );
+
+	// Randomly shuffle elements in the given buffer.
+	template <class T>
+	void Shuffle( CArrayBuffer<T> elements );
 
 private:
 	// Initial value in a random sequence.
@@ -148,6 +152,16 @@ inline CVector2<T> CRandomGenerator::RandomDirection( T minAngleRad, T maxAngleR
 	T dirY;
 	relibSinCos( angle, dirX, dirY );
 	return CVector2<T>{ dirX, dirY };
+}
+
+template<class T>
+inline void CRandomGenerator::Shuffle( CArrayBuffer<T> elements )
+{
+	// Fisher-Yates shuffle.
+	for( int i = elements.Size() - 1; i >= 1; i-- ) {
+		const auto swapIndex = RandomNumber( 0, i );
+		swap( elements[swapIndex], elements[i] );
+	}
 }
 
 inline void CRandomGenerator::updateSeed()

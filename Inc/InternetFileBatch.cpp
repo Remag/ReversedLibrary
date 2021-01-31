@@ -43,7 +43,7 @@ CInternetFileBatch::~CInternetFileBatch()
 void CInternetFileBatch::AttachDownload( CCurlEasyHandle file, CArray<BYTE>& downloadBuffer )
 {
 	const auto handle = file.GetHandle();
-	CInternetFile::disableUploadData( handle );
+	CInternetFile::prepareGetRequest( handle );
 	CInternetFile::setDownloadData( downloadBuffer, handle );
 	const auto resultCode = curl_multi_add_handle( multiHandle, handle );
 	checkMultiCurlError( resultCode );
@@ -52,7 +52,7 @@ void CInternetFileBatch::AttachDownload( CCurlEasyHandle file, CArray<BYTE>& dow
 void CInternetFileBatch::AttachUpload( CCurlEasyHandle file, CArrayView<BYTE> data, CArray<BYTE>& downloadBuffer )
 {
 	const auto handle = file.GetHandle();
-	CInternetFile::setUploadData( data, handle );
+	CInternetFile::preparePutRequest( handle, data );
 	CInternetFile::setDownloadData( downloadBuffer, handle );
 	const auto resultCode = curl_multi_add_handle( multiHandle, handle );
 	checkMultiCurlError( resultCode );
