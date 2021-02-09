@@ -11,6 +11,7 @@ enum TLogMessageType {
 	LMT_Warning,
 	LMT_Error,
 	LMT_Exception,
+	LMT_CriticalException,
 	LMT_Periodic,
 	LMT_EnumCount
 };
@@ -56,8 +57,10 @@ namespace Log {
 // Display an error message. Error messages should be used when further behavior of the program is unpredictable.
 // Errors cannot be filtered out.
 void REAPI Error( CUnicodeView text, CMessageSource subsystem );
-// Display an thrown exception. Exceptions are treated as errors.
+// Display a thrown exception. Exceptions are treated as errors.
 void REAPI Exception( const CException& e );
+// Display an unhangled exception. Should be used in cases where the system cannot recover.
+void REAPI CriticalException( const CException& e );
 
 // Display a warning. Warnings indicate that a given subsystem does not behave in an intended way.
 void REAPI Warning( CUnicodeView text, CMessageSource subsystem );

@@ -49,6 +49,12 @@ void Exception( const CException& e )
 	getCurrentMessageLog().AddMessage( e.GetMessageText(), LMT_Exception, CExceptionMessageTag{} );
 }
 
+void CriticalException( const CException& e )
+{
+	struct CExceptionMessageTag{};
+	getCurrentMessageLog().AddMessage( e.GetMessageText(), LMT_CriticalException, CExceptionMessageTag{} );
+}
+
 void Warning( CUnicodeView text, CMessageSource subsystem )
 {
 	if( IsMessageSourceShown( subsystem ) ) {

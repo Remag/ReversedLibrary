@@ -94,7 +94,7 @@ inline CThread::~CThread()
 		checkLastError( ::CloseHandle( threadHandle ) != 0 );
 		threadHandle = 0;
 	} catch( const CException& e ) {
-		Log::Exception( e );
+		Log::CriticalException( e );
 		if( threadHandle != 0 ) {
 			::CloseHandle( threadHandle );
 		}

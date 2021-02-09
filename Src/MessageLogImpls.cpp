@@ -22,10 +22,11 @@ void CWindowMessageLog::AddMessage( CUnicodeView text, TLogMessageType type, CMe
 
 UINT CWindowMessageLog::getIconFlag( TLogMessageType type )
 {
-	staticAssert( LMT_EnumCount == 5 );
+	staticAssert( LMT_EnumCount == 6 );
 	switch( type ) {
 		case LMT_Error:
 		case LMT_Exception:
+		case LMT_CriticalException:
 			return MB_ICONSTOP;
 		case LMT_Warning:
 			return MB_ICONEXCLAMATION;

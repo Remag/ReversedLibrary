@@ -109,6 +109,9 @@ public:
 
 	template <class EventClass>
 	int GetEventClassId() const;
+
+	template <class EventClass>
+	bool HasListeners() const;
 	
 	template <class ActionType>
 	CEventTarget AddEventTarget( ActionType&& eventAction );
@@ -142,6 +145,13 @@ template <class EventClass>
 int CEventSystem::GetEventClassId() const
 {
 	return RelibInternal::CEventClassInstance<EventClass>::GetEventClassId();
+}
+
+template <class EventClass>
+bool CEventSystem::HasListeners() const
+{
+	const auto classId = GetEventClassId<EventClass>();
+	return classId < listeners.Size() && !listeners[classId].IsEmpty();
 }
 
 template <class ActionType>

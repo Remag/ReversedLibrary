@@ -81,8 +81,6 @@ void CInternetFile::preparePutRequest( CURL* handle, CArrayView<BYTE> data )
 	curl_easy_setopt( handle, CURLOPT_POSTFIELDS, nullptr );
 	curl_easy_setopt( handle, CURLOPT_POSTFIELDSIZE, 0L );
 
-	CCurlReadData readData{ data, 0 };
-	curl_easy_setopt( handle, CURLOPT_READDATA, &readData );
 	curl_easy_setopt( handle, CURLOPT_INFILESIZE, numeric_cast<long>( data.Size() ) );
 	curl_easy_setopt( handle, CURLOPT_UPLOAD, 1L );
 }
@@ -117,6 +115,8 @@ void CInternetFile::UploadFile( CArrayView<BYTE> data, CArray<BYTE>& response )
 	preparePutRequest( easyHandle, data );
 	setDownloadData( response, easyHandle );
 
+	CCurlReadData readData{ data, 0 };
+	curl_easy_setopt( easyHandle, CURLOPT_READDATA, &readData );
 	const auto performResult = curl_easy_perform( easyHandle );
 	checkCurlError( performResult == CURLE_OK );
 }
