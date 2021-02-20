@@ -19,7 +19,8 @@ struct CPair {
 	CPair( const CPair<FirstType, SecondType>& other, CExplicitCopyTag&& ) : First( copy( other.First ) ), Second( copy( other.Second ) ) {}
 
 	int HashKey() const;
-	bool operator==( const CPair<FirstType, SecondType>& other ) const
+	template <class OtherFirst, class OtherSecond>
+	bool operator==( const CPair<OtherFirst, OtherSecond>& other ) const
 		{ return First == other.First && Second == other.Second; }
 };
 
