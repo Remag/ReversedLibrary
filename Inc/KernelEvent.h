@@ -25,7 +25,7 @@ public:
 	template <class... Events>
 	static int WaitAny( const Events&... events );
 	template <class... Events>
-	static int WaitAnyTimeout( int msTimeout, const Events&... events );
+	static int WaitAnyTimeout( unsigned msTimeout, const Events&... events );
 
 private:
 	HANDLE eventHandle;
@@ -86,9 +86,8 @@ int CKernelEvent::WaitAny( const Events&... events )
 }
 
 template<class... Events>
-int CKernelEvent::WaitAnyTimeout( int msTimeout, const Events&... events )
+int CKernelEvent::WaitAnyTimeout( unsigned msTimeout, const Events&... events )
 {
-	assert( msTimeout >= 0 );
 	return doWaitAny( static_cast<DWORD>( msTimeout ), events... );
 }
 
