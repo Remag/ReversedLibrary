@@ -593,6 +593,8 @@ public:
 	static COptional<CVector<VecType, dim>> GetValue( CStringPart str, Types::Type<CVector<VecType, dim>>, char delim );
 	template <class VecType, int dim>
 	static COptional<CVector<VecType, dim>> GetValue( CStringPart str, Types::Type<CVector<VecType, dim>> );
+	// Date format for values: YYYY-MM-DDTH:M:SZ (ISO 8601).
+	static COptional<CDateTime> GetValue( CStringPart str, Types::Type<CDateTime> );
 
 	static CString ToString( bool value );
 	static CString ToString( int value, int base = 10 );
@@ -614,7 +616,8 @@ public:
 	// H - hour.
 	// M - minute.
 	// S - second.
-	static CString ToString( CDateTime date, CStringPart format	);
+	// Default format is ISO 8601.
+	static CString ToString( CDateTime date, CStringPart format = "YYYY-MM-DDTH:M:SZ" );
 
 private:
 	// String values of bool type.
@@ -700,6 +703,29 @@ template <class VecType, int dim>
 inline COptional<CVector<VecType, dim>> CStrConversionFunctions<char>::GetValue( CStringPart str, Types::Type<CVector<VecType, dim>> type )
 {
 	return GetValue( str, type, ';' );
+}
+
+inline COptional<CDateTime> CStrConversionFunctions<char>::GetValue( CStringPart str, Types::Type<CDateTime> )
+{
+	const auto yearEndPos = str.Find( '-' );
+	const auto monthEndPos = str.Find( '-', yearEndPos + 1 );
+	const auto dayEndPos = str.Find( 'T', monthEndPos + 1 );
+	const auto hourEndPos = str.Find( ':', dayEndPos + 1 );
+	const auto minuteEndPos = str.Find( ':', hourEndPos + 1 );
+	const auto secondEndPos = str.Find( 'Z', minuteEndPos + 1 );
+	if( yearEndPos == NotFound || monthEndPos == NotFound || dayEndPos == NotFound || hourEndPos == NotFound || minuteEndPos == NotFound || secondEndPos == NotFound ) {
+		return COptional<CDateTime>();
+	}
+	const auto yearsVal = ParseInteger<int>( str.Left( yearEndPos ) );
+	const auto monthVal = ParseInteger<int>( str.Mid( yearEndPos + 1, monthEndPos - yearEndPos - 1 ) );
+	const auto dayVal = ParseInteger<int>( str.Mid( monthEndPos + 1, dayEndPos - monthEndPos - 1 ) );
+	const auto hourVal = ParseInteger<int>( str.Mid( dayEndPos + 1, hourEndPos - dayEndPos - 1 ) );
+	const auto minuteVal = ParseInteger<int>( str.Mid( hourEndPos + 1, minuteEndPos - hourEndPos - 1 ) );
+	const auto secondVal = ParseInteger<int>( str.Mid( minuteEndPos + 1, secondEndPos - minuteEndPos - 1 ) );
+	if( !yearsVal.IsValid() || !monthVal.IsValid() || !dayVal.IsValid() || !hourVal.IsValid() || !minuteVal.IsValid() || !secondVal.IsValid() ) {
+		return COptional<CDateTime>();
+	}
+	return CreateOptional( CDateTime{ *yearsVal, *monthVal, *dayVal, *hourVal, *minuteVal, *secondVal } );
 }
 
 inline CString CStrConversionFunctions<char>::ToString( bool value )
@@ -841,6 +867,8 @@ public:
 	static COptional<CVector<VecType, dim>> GetValue( CUnicodePart str, Types::Type<CVector<VecType, dim>>, wchar_t delim );
 	template <class VecType, int dim>
 	static COptional<CVector<VecType, dim>> GetValue( CUnicodePart str, Types::Type<CVector<VecType, dim>> );
+	// Date format for values: YYYY-MM-DDTH:M:SZ (ISO 8601).
+	static COptional<CDateTime> GetValue( CUnicodePart str, Types::Type<CDateTime> );
 
 	static CUnicodeString ToString( bool value );
 	static CUnicodeString ToString( int value, int base = 10 );
@@ -862,7 +890,8 @@ public:
 	// H - hour.
 	// M - minute.
 	// S - second.
-	static CUnicodeString ToString( CDateTime date, CUnicodePart format	);
+	// Default format is ISO 8601.
+	static CUnicodeString ToString( CDateTime date, CUnicodePart format = L"YYYY-MM-DDTH:M:SZ" );
 
 private:
 	// String values of bool type.
@@ -953,6 +982,28 @@ inline COptional<CVector<VecType, dim>> CStrConversionFunctions<wchar_t>::GetVal
 inline COptional<CString> CStrConversionFunctions<wchar_t>::GetValue( CUnicodePart str, Types::Type<CString> )
 {
 	return CreateOptional( CStrConversionFunctions<char>::ToString( str ) );
+}
+inline COptional<CDateTime> CStrConversionFunctions<wchar_t>::GetValue( CUnicodePart str, Types::Type<CDateTime> )
+{
+	const auto yearEndPos = str.Find( L'-' );
+	const auto monthEndPos = str.Find( L'-', yearEndPos + 1 );
+	const auto dayEndPos = str.Find( L'T', monthEndPos + 1 );
+	const auto hourEndPos = str.Find( L':', dayEndPos + 1 );
+	const auto minuteEndPos = str.Find( L':', hourEndPos + 1 );
+	const auto secondEndPos = str.Find( L'Z', minuteEndPos + 1 );
+	if( yearEndPos == NotFound || monthEndPos == NotFound || dayEndPos == NotFound || hourEndPos == NotFound || minuteEndPos == NotFound || secondEndPos == NotFound ) {
+		return COptional<CDateTime>();
+	}
+	const auto yearsVal = ParseInteger<int>( str.Left( yearEndPos ) );
+	const auto monthVal = ParseInteger<int>( str.Mid( yearEndPos + 1, monthEndPos - yearEndPos - 1 ) );
+	const auto dayVal = ParseInteger<int>( str.Mid( monthEndPos + 1, dayEndPos - monthEndPos - 1 ) );
+	const auto hourVal = ParseInteger<int>( str.Mid( dayEndPos + 1, hourEndPos - dayEndPos - 1 ) );
+	const auto minuteVal = ParseInteger<int>( str.Mid( hourEndPos + 1, minuteEndPos - hourEndPos - 1 ) );
+	const auto secondVal = ParseInteger<int>( str.Mid( minuteEndPos + 1, secondEndPos - minuteEndPos - 1 ) );
+	if( !yearsVal.IsValid() || !monthVal.IsValid() || !dayVal.IsValid() || !hourVal.IsValid() || !minuteVal.IsValid() || !secondVal.IsValid() ) {
+		return COptional<CDateTime>();
+	}
+	return CreateOptional( CDateTime{ *yearsVal, *monthVal, *dayVal, *hourVal, *minuteVal, *secondVal } );
 }
 
 inline CUnicodeString CStrConversionFunctions<wchar_t>::ToString( int value, int base )
