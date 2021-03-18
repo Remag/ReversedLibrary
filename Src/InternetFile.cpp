@@ -26,7 +26,7 @@ CInternetFile::CInternetFile()
 CInternetFile::CInternetFile( CStringView url ) :
 	CInternetFile()
 {
-	curl_easy_setopt( easyHandle, CURLOPT_URL, url.Ptr() );
+	SetUrl( url );
 }
 
 CInternetFile::CInternetFile( CInternetFile&& other ) :

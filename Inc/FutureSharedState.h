@@ -22,6 +22,9 @@ class CFutureSharedState {
 public:
 	CFutureSharedState();
 
+	// Mark the future as the one that will never be completed.
+	void Abandon();
+
 	T& WaitForValue();
 	const T& WaitForValue() const;
 
@@ -40,6 +43,8 @@ private:
 	COptional<T> value;
 	CReadWriteSection continuationSection;
 	CActionOwner<void( T& )> continuationAction;
+	CActionOwner<void()> abandonAction;
+	bool isAbandoned = false;
 
 	template <class Func>
 	auto attachContinuation( Func&& action, Types::FalseType voidReturnMark );
@@ -53,6 +58,18 @@ template<class T>
 inline CFutureSharedState<T>::CFutureSharedState() :
 	sectionLock( valueSection )
 {
+}
+
+template<class T>
+inline void CFutureSharedState<T>::Abandon()
+{
+	CWriteLock lock( continuationSection );
+	continuationAction = CActionOwner<void( T& )>();
+	if( !abandonAction.IsNull() ) {
+		abandonAction();
+		abandonAction = CActionOwner<void()>();
+	}
+	isAbandoned = true;
 }
 
 template<class T>
@@ -90,13 +107,14 @@ template<class... Args>
 inline void CFutureSharedState<T>::CreateValue( Args&&... createArgs )
 {
 	CWriteLock lock( continuationSection );
-	assert( !value.IsValid() );
+	assert( !isAbandoned && !value.IsValid() );
 	value.CreateValue( forward<Args>( createArgs )... );
 	sectionLock.DeleteValue();
 	
 	if( !continuationAction.IsNull() ) {
 		continuationAction( *value );
 		continuationAction = CActionOwner<void( T& )>{};
+		abandonAction = CActionOwner<void()>();
 	}
 }
 
@@ -122,10 +140,19 @@ inline auto CFutureSharedState<T>::attachContinuation( Func&& action, Types::Fal
 		state->CreateValue( userAction( arg ) );
 	};
 	continuationAction = move( newAction );
+	// Attach an action that recursively abandons continuations.
+	auto newAbandonAction = [prevAction = move( abandonAction ), state = continuationState]() {
+		if( !prevAction.IsNull() ) {
+			prevAction();
+		}
+		state->Abandon();
+	};
+	abandonAction = move( newAbandonAction );
 	if( value.IsValid() ) {
 		// Executed if the value is already created.
 		continuationAction( *value );
 		continuationAction = CActionOwner<void( T& )>{};
+		abandonAction = CActionOwner<void()>();
 	}
 	return CFuture<TReturnType>( move( continuationState ) );
 }
@@ -145,6 +172,7 @@ inline void CFutureSharedState<T>::attachContinuation( Func&& action, Types::Tru
 		// Executed if the value is already created.
 		continuationAction( *value );
 		continuationAction = CActionOwner<void( T& )>{};
+		abandonAction = CActionOwner<void()>();
 	}
 }
 

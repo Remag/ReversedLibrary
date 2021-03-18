@@ -13,7 +13,7 @@ class CPromise {
 public:
 	CPromise();
 	CPromise( CPromise<T>&& other ) = default;
-	CPromise& operator=( CPromise<T>&& other ) = default;
+	~CPromise();
 
 	bool IsConnectedWith( const CFuture<T>& future ) const;
 	CFuture<T> GetFuture() const;
@@ -38,6 +38,14 @@ inline CPromise<T>::CPromise() :
 }
 
 template<class T>
+inline CPromise<T>::~CPromise()
+{
+	if( sharedState != nullptr ) {
+		sharedState->Abandon();
+	}
+}
+
+template<class T>
 inline bool CPromise<T>::IsConnectedWith( const CFuture<T>& future ) const
 {
 	return future.sharedState == sharedState;
@@ -54,6 +62,7 @@ template<class ...Args>
 inline void CPromise<T>::CreateValue( Args&& ...args )
 {
 	sharedState->CreateValue( forward<Args>( args )... );
+	sharedState = nullptr;
 }
 
 //////////////////////////////////////////////////////////////////////////
