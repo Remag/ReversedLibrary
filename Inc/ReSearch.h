@@ -6,7 +6,7 @@ namespace Relib {
 // Container search functions.
 //////////////////////////////////////////////////////////////////////////
 
-// Searching with comparison operator.
+// Linear search with comparison operator.
 template <class Container, class TargetType, class Comparator>
 int SearchPos( const Container& container, const TargetType& elem, const Comparator& comp, int startPos = 0 )
 {
@@ -19,7 +19,7 @@ int SearchPos( const Container& container, const TargetType& elem, const Compara
 	return NotFound;
 }
 
-// Search using an equality operator comparison.
+// Linear search using an equality operator comparison.
 template <class Container, class TargetType>
 int SearchPos( const Container& container, const TargetType& elem, int startPos = 0 )
 {

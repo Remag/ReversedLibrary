@@ -26,6 +26,10 @@ class CEvent : public IEvent {
 public:
 	typedef EventClass TEventClass;
 
+	CEvent() = default;
+	CEvent( CEvent<EventClass>&& ) = default;
+	CEvent<EventClass>& operator=( CEvent<EventClass>&& ) = default;
+
 	// An event class. Only listeners of this class will be notified of the event.
 	static int GetEventClassId()
 		{ return RelibInternal::CEventClassInstance<EventClass>::GetEventClassId(); }
