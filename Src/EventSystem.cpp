@@ -8,14 +8,14 @@ namespace Relib {
 
 //////////////////////////////////////////////////////////////////////////
 
-CExternalEventTarget CEventSystem::AddExternalEventTarget( int classId, const IExternalObject* eventAction )
+void CEventSystem::AddExternalEventTarget( int classId, const IExternalObject* eventAction, CExternalEventTarget& target )
 {
 	if( classId >= listeners.Size() ) {
 		listeners.IncreaseSize( classId + 1 );
 	}
 	listeners[classId].Add( eventAction );
 
-	return CExternalEventTarget( *this, eventAction, classId );
+	target = CExternalEventTarget( *this, eventAction, classId );
 }
 
 void CEventSystem::removeListener( int classId, const IExternalObject* listenerObject )

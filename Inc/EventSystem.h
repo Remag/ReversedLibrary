@@ -118,8 +118,8 @@ public:
 	bool HasListeners() const;
 	
 	template <class ActionType>
-	CEventTarget AddEventTarget( ActionType&& eventAction );
-	CExternalEventTarget AddExternalEventTarget( int eventClassId, const IExternalObject* eventAction );
+	void AddEventTarget( ActionType&& eventAction, CEventTarget& target );
+	void AddExternalEventTarget( int eventClassId, const IExternalObject* eventAction, CExternalEventTarget& target );
 
 	// Notify all the listeners.
 	template <class Event>
@@ -159,7 +159,7 @@ bool CEventSystem::HasListeners() const
 }
 
 template <class ActionType>
-CEventTarget CEventSystem::AddEventTarget( ActionType&& eventAction )
+void CEventSystem::AddEventTarget( ActionType&& eventAction, CEventTarget& target )
 {
 	staticAssert( ( Types::IsSame<Types::FunctionInfo<ActionType>::ReturnType, void>::Result ) );
 	staticAssert( Types::FunctionInfo<ActionType>::ArgCount == 1 );
@@ -177,7 +177,7 @@ CEventTarget CEventSystem::AddEventTarget( ActionType&& eventAction )
 	}
 	listeners[classId].Add( typelessAction.GetActionObject() );
 
-	return CEventTarget( *this, move( typelessAction ), classId );
+	target = CEventTarget( *this, move( typelessAction ), classId );
 }
 
 template <class Event>
