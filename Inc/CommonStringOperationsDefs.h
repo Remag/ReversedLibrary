@@ -60,7 +60,9 @@ public:
 	static int ReverseFindOneOf( CStringData<T> data, CStringData<T> charSet, int from );
 
 	static bool HasPrefix( CBaseStringPart<T> str, CBaseStringPart<T> prefix );
+	static bool HasPrefixNoCase( CBaseStringPart<T> str, CBaseStringPart<T> prefix );
 	static bool HasSuffix( CBaseStringPart<T> str, CBaseStringPart<T> suffix );
+	static bool HasSuffixNoCase( CBaseStringPart<T> str, CBaseStringPart<T> suffix );
 	static CBaseString<T> Concatenate( const T* leftStr, int leftLen, CBaseString<T>&& rightStr );
 	static CBaseString<T> Concatenate( const T* leftStr, int leftLen, const T* rightStr, int rightLen );
 	static CBaseStringPart<T> TrimRight( CStringData<T> data );

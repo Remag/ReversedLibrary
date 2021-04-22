@@ -168,10 +168,24 @@ bool CCommonStringOperations<T>::HasPrefix( CBaseStringPart<T> str, CBaseStringP
 }
 
 template <class T>
+bool CCommonStringOperations<T>::HasPrefixNoCase( CBaseStringPart<T> str, CBaseStringPart<T> prefix )
+{
+	const auto prefixLength = prefix.Length();
+	return str.Length() >= prefixLength && str.Left( prefixLength ).EqualsNoCase( prefix );
+}
+
+template <class T>
 bool CCommonStringOperations<T>::HasSuffix( CBaseStringPart<T> str, CBaseStringPart<T> suffix )
 {
 	const auto suffixLength = suffix.Length();
 	return str.Length() >= suffixLength && str.Right( suffixLength ) == suffix;
+}
+
+template <class T>
+bool CCommonStringOperations<T>::HasSuffixNoCase( CBaseStringPart<T> str, CBaseStringPart<T> suffix )
+{
+	const auto suffixLength = suffix.Length();
+	return str.Length() >= suffixLength && str.Right( suffixLength ).EqualsNoCase( suffix );
 }
 
 template <class T>

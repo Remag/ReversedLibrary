@@ -35,19 +35,18 @@ public:
 		{ assert( !IsEmpty() ); return buffer[bufferLength - 1]; }
 
 	// Comparison.
-	int Compare( CBaseStringPart<T> string ) const
-		{ return CStringOperations<T>::Compare( *this, string ); }
-
 	int CompareNoCase( CBaseStringPart<T> string ) const
 		{ return CStringOperations<T>::CompareNoCase( *this, string ); }
-	bool Equals( CBaseStringPart<T> string ) const
-		{ return CStringOperations<T>::Equals( *this, string ); }
 	bool EqualsNoCase( CBaseStringPart<T> string ) const
-		{ return CompareNoCase( string ) == 0; }
+		{ return CStringOperations<T>::CompareNoCase( *this, string ) == 0; }
 	bool HasPrefix( CBaseStringPart<T> prefix ) const
 		{ return CStringOperations<T>::HasPrefix( *this, prefix ); }
+	bool HasPrefixNoCase( CBaseStringPart<T> prefix ) const
+		{ return CStringOperations<T>::HasPrefixNoCase( *this, prefix ); }
 	bool HasSuffix( CBaseStringPart<T> suffix ) const
 		{ return CStringOperations<T>::HasSuffix( *this, suffix ); }
+	bool HasSuffixNoCase( CBaseStringPart<T> suffix ) const
+		{ return CStringOperations<T>::HasSuffixNoCase( *this, suffix ); }
 
 	// Get a part without spaces on the edges.
 	CBaseStringPart<T> TrimRight() const
@@ -94,7 +93,7 @@ T CStringData<T>::emptyBufferStr;
 template <class T>
 bool operator==( RelibInternal::CStringData<T> left, RelibInternal::CStringData<T> right )
 {
-	return left.Equals( right );
+	return CStringOperations<T>::Equals( left, right );
 }
 
 template <class T>
@@ -112,7 +111,7 @@ bool operator==( const T* left, RelibInternal::CStringData<T> right )
 template <class T>
 bool operator!=( RelibInternal::CStringData<T> left, RelibInternal::CStringData<T> right )
 {
-	return !left.Equals( right );
+	return !CStringOperations<T>::Equals( left, right );
 }
 
 template <class T>
@@ -130,7 +129,7 @@ bool operator!=( const T* left, RelibInternal::CStringData<T> right )
 template <class T>
 bool operator<( RelibInternal::CStringData<T> left, RelibInternal::CStringData<T> right )
 {
-	return left.Compare( right ) < 0;
+	return CStringOperations<T>::Compare( left, right ) < 0;
 }
 
 template <class T>
@@ -148,7 +147,7 @@ bool operator<( const T* left, RelibInternal::CStringData<T> right )
 template <class T>
 bool operator<=( RelibInternal::CStringData<T> left, RelibInternal::CStringData<T> right )
 {
-	return left.Compare( right ) <= 0;
+	return CStringOperations<T>::Compare( left, right ) <= 0;
 }
 
 template <class T>
@@ -166,7 +165,7 @@ bool operator<=( const T* left, RelibInternal::CStringData<T> right )
 template <class T>
 bool operator>( RelibInternal::CStringData<T> left, RelibInternal::CStringData<T> right )
 {
-	return left.Compare( right ) > 0;
+	return CStringOperations<T>::Compare( left, right ) > 0;
 }
 
 template <class T>
@@ -184,7 +183,7 @@ bool operator>( const T* left, RelibInternal::CStringData<T> right )
 template <class T>
 bool operator>=( RelibInternal::CStringData<T> left, RelibInternal::CStringData<T> right )
 {
-	return left.Compare( right ) >= 0;
+	return CStringOperations<T>::Compare( left, right ) >= 0;
 }
 
 template <class T>
