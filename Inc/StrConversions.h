@@ -334,7 +334,7 @@ COptional<FltType> CCommonConversionFunctions<T>::ParseFloat( CBaseStringPart<T>
 		}
 		floatResult = mergeBaseWithMantissa( floatBase, mantissa, isMinus );
 	} else {
-		floatResult = static_cast<FltType>( floatBase );
+		floatResult = isMinus ? static_cast<FltType>( -floatBase ) : static_cast<FltType>( floatBase );
 	}
 	if( parsePos < length && ( str[parsePos] == getSmallExponentLetter() || str[parsePos] == getLargeExponentLetter() ) ) {
 		TIntType exponent;

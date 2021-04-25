@@ -48,6 +48,10 @@ public:
 	template <class T>
 	void Shuffle( CArrayBuffer<T> elements );
 
+	// Uniformly choose between a given range of options.
+	template <class T>
+	T Choose( std::initializer_list<T> variants );
+
 private:
 	// Initial value in a random sequence.
 	unsigned __int64 seed;
@@ -162,6 +166,13 @@ inline void CRandomGenerator::Shuffle( CArrayBuffer<T> elements )
 		const auto swapIndex = RandomNumber( 0, i );
 		swap( elements[swapIndex], elements[i] );
 	}
+}
+
+template<class T>
+inline T CRandomGenerator::Choose( std::initializer_list<T> variants )
+{
+	const auto index = RandomNumber( 0, variants.size() - 1 );
+	return variants.begin()[index];
 }
 
 inline void CRandomGenerator::updateSeed()
