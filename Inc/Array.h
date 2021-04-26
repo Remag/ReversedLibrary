@@ -131,6 +131,9 @@ template <class Container>
 CArray<Elem, Allocator, GrowStrategy>::CArray( const Container& src, const CExplicitCopyTag& )
 {
 	const int srcSize = src.Size();
+	if( srcSize == 0 ) {
+		return;
+	}
 	const int srcBufferSize = GrowStrategy::GetInitialValue( srcSize );
 	auto destBuffer = allocateBuffer( srcBufferSize );
 	int i = 0;
