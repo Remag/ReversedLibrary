@@ -14,9 +14,9 @@ CJpgFile::CJpgFile( CUnicodePart _fileName ) :
 {
 }
 
-void CJpgFile::Read( CArray<CColor>& result, CVector2<int>& resultSize ) const
+void CJpgFile::Read( CStaticImageData& result ) const
 {
-	assert( result.IsEmpty() );
+	assert( result.Colors.IsEmpty() );
 
 	CFileReader file( fileName, FCM_OpenExisting );
 	CArray<BYTE> fileData;
@@ -24,12 +24,12 @@ void CJpgFile::Read( CArray<CColor>& result, CVector2<int>& resultSize ) const
 	fileData.IncreaseSize( fileLength );
 	file.Read( fileData.Ptr(), fileLength );
 
-	doReadRawData( fileName, fileData, result, resultSize );
+	doReadRawData( fileName, fileData, result.Colors, result.ImageSize );
 }
 
-void CJpgFile::ReadRawData( CArrayView<BYTE> jpgData, CArray<CColor>& result, CVector2<int>& resultSize )
+void CJpgFile::ReadRawData( CArrayView<BYTE> jpgData, CStaticImageData& result )
 {
-	doReadRawData( CUnicodePart(), jpgData, result, resultSize ); 
+	doReadRawData( CUnicodePart(), jpgData, result.Colors, result.ImageSize ); 
 }
 
 // Internal exception to bypass default JPEG error handling.
@@ -52,20 +52,24 @@ void CJpgFile::doReadRawData( CUnicodePart fileName, CArrayView<BYTE> jpgData, C
 		const auto nonConstJpgData = const_cast<BYTE*>( jpgData.Ptr() );
 		jpeg_mem_src( &jpegInfo, nonConstJpgData, jpgData.Size() );
 		jpeg_read_header( &jpegInfo, TRUE );
+		jpegInfo.out_color_space = JCS_EXT_RGBA;
 		jpeg_start_decompress( &jpegInfo );
 		resultSize.X() = jpegInfo.output_width;
 		resultSize.Y() = jpegInfo.output_height;
-		result.IncreaseSize( resultSize.X() * resultSize.Y() );
+		const auto totalSize = jpegInfo.output_width * jpegInfo.output_height;
+		result.IncreaseSize( totalSize );
 		const auto rowStride = jpegInfo.output_width * jpegInfo.output_components;
 		// Main struct requires to be converted for the allocation routine.
 		const auto commonInfo = ( jpeg_common_struct* )( &jpegInfo );
 		const auto buffer = ( *jpegInfo.mem->alloc_sarray )( commonInfo, JPOOL_IMAGE, rowStride, 1 );
 		auto rawResult = static_cast<CArrayBuffer<BYTE>>( result.Buffer() );
 
+		const auto totalByteSize = sizeof( CColor ) * totalSize;
 		while( jpegInfo.output_scanline < jpegInfo.output_height ) {
-			const auto destPos = jpegInfo.output_scanline * rowStride;
+			// Write rows bottom-to-top.
 			jpeg_read_scanlines( &jpegInfo, buffer, 1 );
-			::memcpy( rawResult.Ptr() + destPos, buffer, rowStride );
+			const auto destPos = totalByteSize - jpegInfo.output_scanline * rowStride;
+			::memcpy( rawResult.Ptr() + destPos, *buffer, rowStride );
 		}
 		jpeg_finish_decompress( &jpegInfo );
 		jpeg_destroy_decompress( &jpegInfo );

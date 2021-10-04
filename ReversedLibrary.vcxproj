@@ -316,6 +316,8 @@
     <ClInclude Include="Inc\Future.h" />
     <ClInclude Include="Inc\FutureSharedState.h" />
     <ClInclude Include="Inc\GeneralBlockAllocator.h" />
+    <ClInclude Include="Inc\gifdec.h" />
+    <ClInclude Include="Inc\GifFile.h" />
     <ClInclude Include="Inc\Glyph.h" />
     <ClInclude Include="Inc\GlyphInc.h" />
     <ClInclude Include="Inc\GlyphProvider.h" />
@@ -324,6 +326,7 @@
     <ClInclude Include="Inc\HashTableBase.h" />
     <ClInclude Include="Inc\HashUtils.h" />
     <ClInclude Include="Inc\Hitbox.h" />
+    <ClInclude Include="Inc\ImageFileUtils.h" />
     <ClInclude Include="Inc\IniFile.h" />
     <ClInclude Include="Inc\IniSetting.h" />
     <ClInclude Include="Inc\InlineComponent.h" />
@@ -367,6 +370,7 @@
     <ClInclude Include="Inc\PagedBitSet.h" />
     <ClInclude Include="Inc\Pair.h" />
     <ClInclude Include="Inc\PersistentStorage.h" />
+    <ClInclude Include="Inc\PngFile.h" />
     <ClInclude Include="Inc\PointShape.h" />
     <ClInclude Include="Inc\PolygonShape.h" />
     <ClInclude Include="Inc\Promise.h" />
@@ -458,6 +462,8 @@
     <ClCompile Include="Src\FontSize.cpp" />
     <ClCompile Include="Src\FreeTypeException.cpp" />
     <ClCompile Include="Src\FreeTypeGlyphProvider.cpp" />
+    <ClCompile Include="Src\gifdec.cpp" />
+    <ClCompile Include="Src\GifFile.cpp" />
     <ClCompile Include="Src\GlobalData.cpp" />
     <ClCompile Include="Src\Glyph.cpp" />
     <ClCompile Include="Src\HashUtils.cpp" />
@@ -474,6 +480,7 @@
     <ClCompile Include="Src\MessageSystem.cpp" />
     <ClCompile Include="Src\MessageUtils.cpp" />
     <ClCompile Include="Src\ObjectCreationUtils.cpp" />
+    <ClCompile Include="Src\PngFile.cpp" />
     <ClCompile Include="Src\Reassert.cpp" />
     <ClCompile Include="Src\RegistryKey.cpp" />
     <ClCompile Include="Src\RelibInitializer.cpp" />

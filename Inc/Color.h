@@ -5,12 +5,13 @@ namespace Relib {
 
 //////////////////////////////////////////////////////////////////////////
 
-// A 32-bit color in BGRA format ( Windows native ).
+// A 32-bit color.
+// An RGBA format is assumed but since the class is mostly used as pass-through it can be used to store any 32-bit color formats.
 struct CColor {
 	// Color components.
-	BYTE B = 0;
-	BYTE G = 0;
 	BYTE R = 0;
+	BYTE G = 0;
+	BYTE B = 0;
 	BYTE A = 255;
 
 	static BYTE MaxValue()
@@ -44,7 +45,7 @@ struct CColor {
 	CColor() = default;
 
 	// Construct a color from a single value in RGB format.
-	explicit CColor( unsigned colorValue, int alpha = 255 );
+	explicit CColor( unsigned rgbValue, int alpha = 255 );
 	CColor( CVector3<int> rgb ) : CColor( rgb.X(), rgb.Y(), rgb.Z() ) {}
 	CColor( CVector4<int> rgba ) : CColor( rgba.X(), rgba.Y(), rgba.Z(), rgba.W() ) {}
 	CColor( CVector3<float> rgb ) : CColor( rgb.X(), rgb.Y(), rgb.Z() ) {}
@@ -79,10 +80,10 @@ private:
 
 //////////////////////////////////////////////////////////////////////////
 
-inline CColor::CColor( unsigned colorValue, int alpha ) :
-	R( ( colorValue >> 16 ) & 0xFF ),
-	G( ( colorValue >> 8 ) & 0xFF ),
-	B( colorValue & 0xFF ),
+inline CColor::CColor( unsigned rgbValue, int alpha ) :
+	R( ( rgbValue >> 16 ) & 0xFF ),
+	G( ( rgbValue >> 8 ) & 0xFF ),
+	B( rgbValue & 0xFF ),
 	A( static_cast<BYTE>( alpha ) )
 {
 	assert( alpha >= 0 && alpha <= UCHAR_MAX );
@@ -101,9 +102,9 @@ inline CColor::CColor( int r, int g, int b, int a /*= 255 */ ) :
 }
 
 inline CColor::CColor( float r, float g, float b, float a /*= 1.0f */ ) :
-	B( static_cast<BYTE>( b * 255 ) ),
+	R( static_cast<BYTE>( b * 255 ) ),
 	G( static_cast<BYTE>( g * 255 ) ),
-	R( static_cast<BYTE>( r * 255 ) ),
+	B( static_cast<BYTE>( r * 255 ) ),
 	A( static_cast<BYTE>( a * 255 ) )
 {
 	assert( r >= 0 && r <= 1 );

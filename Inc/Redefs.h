@@ -54,6 +54,7 @@
 #pragma comment( lib, "FreeType.lib" )
 #pragma comment( lib, "libcurl.lib" )
 #pragma comment( lib, "zlib.lib" )
+#pragma comment( lib, "libpng16.lib" )
 
 #ifndef RELIB_NO_JPEG
 #pragma comment( lib, "jpeg.lib" )

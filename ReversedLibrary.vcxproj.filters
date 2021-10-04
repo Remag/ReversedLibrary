@@ -615,6 +615,18 @@
     <ClInclude Include="Inc\JpgFile.h">
       <Filter>Header Files\Files\Images</Filter>
     </ClInclude>
+    <ClInclude Include="Inc\PngFile.h">
+      <Filter>Header Files\Files\Images</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\ImageFileUtils.h">
+      <Filter>Header Files\Files\Images</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\GifFile.h">
+      <Filter>Header Files\Files\Images</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\gifdec.h">
+      <Filter>Header Files\Files\Images</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Src\ActionOwner.cpp">
@@ -777,6 +789,15 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Src\JpgFile.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\PngFile.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\GifFile.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\gifdec.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

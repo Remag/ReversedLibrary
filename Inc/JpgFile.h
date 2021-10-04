@@ -3,6 +3,7 @@
 
 #include <Redefs.h>
 #include <Errors.h>
+#include <ImageFileUtils.h>
 
 namespace Relib {
 
@@ -26,10 +27,9 @@ public:
 	explicit CJpgFile( CUnicodePart fileName );
 
 	// Read the contents of a JPEG file and decompress them as a JPEG image.
-	// Image pixel dimensions are returned in resultSize.
-	void Read( CArray<CColor>& result, CVector2<int>& resultSize ) const;
+	void Read( CStaticImageData& result ) const;
 	// Read directly from the provided array.
-	static void ReadRawData( CArrayView<BYTE> jpgData, CArray<CColor>& result, CVector2<int>& resultSize );
+	static void ReadRawData( CArrayView<BYTE> jpgData, CStaticImageData& result );
 
 private:
 	CUnicodeString fileName;

@@ -44,7 +44,6 @@ void CRelibInitializer::initAppDataPath()
 {
 	const CUnicodeString processName = FileSystem::GetExecutableName();
 	try {
-		// TODO: Company name.
 		const CUnicodeString relativePath = L"Relib\\" + FileSystem::GetName( processName );
 		FileSystem::SetAppDataRelativePath( relativePath );
 		return;

@@ -51,6 +51,7 @@
 #include <FreeTypeGlyphProvider.h>
 #include <Future.h>
 #include <GeneralBlockAllocator.h>
+#include <GifFile.h>
 #include <Glyph.h>
 #include <HashTable.h>
 #include <Hitbox.h>
@@ -84,6 +85,7 @@
 #include <PagedBitSet.h>
 #include <Pair.h>
 #include <PersistentStorage.h>
+#include <PngFile.h>
 #include <PointShape.h>
 #include <PolygonShape.h>
 #include <Promise.h>
