@@ -105,6 +105,7 @@ extern const CUnicodeView JsonConversionError = L"JSON value was expected to be 
 extern const CUnicodeView JsonMissingKeyError = L"JSON object is missing a key: \"%0\"";
 extern const CUnicodeView GeneralFreeTypeError = L"FreeType error. Error code: %0.\nFreeType module name: %1.";
 extern const CUnicodeView GeneralCurlError = L"Curl error. Error string buffer: %0.";
+extern const CUnicodeView GeneralJpgFileError = L"JPEG parsing error: %1.\nFile name: %0";
 
 // Symbol sets.
 extern const CUnicodeSet InvalidFileNameSymbols{

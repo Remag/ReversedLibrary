@@ -54,6 +54,11 @@
 #pragma comment( lib, "FreeType.lib" )
 #pragma comment( lib, "libcurl.lib" )
 #pragma comment( lib, "zlib.lib" )
+
+#ifndef RELIB_NO_JPEG
+#pragma comment( lib, "jpeg.lib" )
+#endif
+
 #endif
 
 // Some dependencies come from a static build of curl and are only required for static builds.

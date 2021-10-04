@@ -73,6 +73,9 @@
     <Filter Include="Header Files\Time">
       <UniqueIdentifier>{c59e7437-1eb9-43ed-b090-95e95f719a9a}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Files\Images">
+      <UniqueIdentifier>{ad7a5925-2c5f-46d2-81ce-75c47fa18d59}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Inc\Redefs.h">
@@ -609,6 +612,9 @@
     <ClInclude Include="Inc\CurlEasyHandle.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Inc\JpgFile.h">
+      <Filter>Header Files\Files\Images</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Src\ActionOwner.cpp">
@@ -768,6 +774,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Inc\WebConnectionScheduler.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\JpgFile.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

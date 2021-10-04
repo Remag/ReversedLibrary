@@ -61,6 +61,7 @@
 #include <InlineStackAllocator.h>
 #include <InternetFile.h>
 #include <Invoke.h>
+#include <JpgFile.h>
 #include <JsonDocument.h>
 #include <JsonValues.h>
 #include <KernelEvent.h>
