@@ -6,12 +6,12 @@ namespace Relib {
 //////////////////////////////////////////////////////////////////////////
 
 CDateTime::CDateTime( int _year, int _month, int _day, int _hour, int _minute, int _second ) :
-	year( _year ),
-	month( _month ),
-	day( _day ),
-	hour( _hour ),
-	minute( _minute ),
-	second( _second )
+	year( static_cast<unsigned short>( _year ) ),
+	month( static_cast<char>( _month ) ),
+	day( static_cast<char>( _day ) ),
+	hour( static_cast<char>( _hour ) ),
+	minute( static_cast<char>( _minute ) ),
+	second( static_cast<char>( _second ) )
 {
 	// Win API imposed year restrictions.
 	assert( _year >= 1601 && _year < 30827 );
@@ -34,17 +34,17 @@ __int64 CDateTime::getSecondsPassed() const
 	return yearSecondsPassed + daySecondsPassed;
 }
 
-int CDateTime::getDaysPassed( int year, int month, int day ) const
+int CDateTime::getDaysPassed( int targetYear, int targetMonth, int targetDay ) const
 {
 	const int monthDaysPassed[] = { 0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334 };
-	return ( month > 3 && isLeapYear( year ) )
-		? monthDaysPassed[month] + day
-		: monthDaysPassed[month] + day - 1;
+	return ( targetMonth > 3 && isLeapYear( targetYear ) )
+		? monthDaysPassed[targetMonth] + targetDay
+		: monthDaysPassed[targetMonth] + targetDay - 1;
 }
 
-bool CDateTime::isLeapYear( int year ) const
+bool CDateTime::isLeapYear( int targetYear ) const
 {
-	return ( ( year & 3 ) == 0 ) && ( year % 100 != 0 || year % 400 == 0 );
+	return ( ( targetYear & 3 ) == 0 ) && ( targetYear % 100 != 0 || targetYear % 400 == 0 );
 }
 
 CDateTime CDateTime::Now()

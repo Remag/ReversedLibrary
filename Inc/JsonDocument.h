@@ -24,13 +24,14 @@ struct CJsonKeyValue;
 
 class CJsonParseException : public CException {
 public:
-	explicit CJsonParseException( int _parsePos ) : parsePos( _parsePos ) {}
+	explicit CJsonParseException( int _lineNumber, int _linePos ) : lineNumber( _lineNumber ), linePos( _linePos ) {}
 
 	// CException.
 	virtual CUnicodeString GetMessageText() const override;
 
 private:
-	int parsePos;
+	int lineNumber;
+	int linePos;
 };
 
 //////////////////////////////////////////////////////////////////////////
@@ -74,6 +75,12 @@ private:
 	CArena<> jsonData;
 	const CJsonValue* root = nullptr;
 
+	struct CJsonPosition {
+		int Pos = 0;
+		int LineNumber = 1;
+		int LineStartPos = 0;
+	};
+
 	void parseJson( CStringView jsonStr );
 
 	CStringView allocateStringView( CStringPart source );
@@ -91,17 +98,18 @@ private:
 	CJsonDynamicArray& allocateJsonDynamicArray( CJsonListNode<CJsonValue*>* head, CJsonListNode<CJsonValue*>* tail, int size );
 	CJsonObject& allocateJsonObject( CJsonListNode<CJsonKeyValue>* head, CJsonListNode<CJsonKeyValue>* tail, int size );
 
-	void throwParseException( int parsePos ) const;
-	int skipWhitespace( CStringView str, int startPos ) const;
-	CStringPart parseString( CStringView str, int& parsePos );
-	double parseNumber( CStringView str, int& parsePos ) const;
-	CJsonObject& parseObject( CStringView str, int& parsePos );
-	CJsonValue& parseArray( CStringView str, int& parsePos );
-	CJsonValue& parseValueList( CStringView str, int& parsePos, char terminator, CJsonValue& firstValue );
-	CJsonValue& parseValue( CStringView str, int& parsePos );
-	CJsonValue& parseElement( CStringView str, int& parsePos );
+	void throwParseException( CJsonPosition parsePos ) const;
+	CJsonPosition getNextPos( CJsonPosition parsePos ) const;
+	CJsonPosition skipWhitespace( CStringView str, CJsonPosition startPos ) const;
+	CStringPart parseString( CStringView str, CJsonPosition& parsePos );
+	double parseNumber( CStringView str, CJsonPosition& parsePos ) const;
+	CJsonObject& parseObject( CStringView str, CJsonPosition& parsePos );
+	CJsonValue& parseArray( CStringView str, CJsonPosition& parsePos );
+	CJsonValue& parseValueList( CStringView str, CJsonPosition& parsePos, char terminator, CJsonValue& firstValue );
+	CJsonValue& parseValue( CStringView str, CJsonPosition& parsePos );
+	CJsonValue& parseElement( CStringView str, CJsonPosition& parsePos );
 
-	CStringPart replaceEscapeSequences( CStringView str, int firstEscapePos, int& parsePos );
+	CStringPart replaceEscapeSequences( CStringView str, int firstEscapePos, CJsonPosition& parsePos );
 	char getEscapeCharacter( char escapeCode ) const;
 
 	void writeToString( const CJsonValue& value, CString& result ) const;

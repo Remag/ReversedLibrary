@@ -34,7 +34,7 @@ void CJpgFile::ReadRawData( CArrayView<BYTE> jpgData, CStaticImageData& result )
 
 // Internal exception to bypass default JPEG error handling.
 class CJpgInternalException {};
-static void handleDecompressionExit( j_common_ptr jpegInfo )
+static void handleDecompressionExit( j_common_ptr )
 {
 	throw CJpgInternalException();
 }

@@ -9,7 +9,7 @@ namespace Relib {
 extern const REAPI CUnicodeView JsonParsingError;
 CUnicodeString CJsonParseException::GetMessageText() const
 {
-	return JsonParsingError.SubstParam( parsePos );
+	return JsonParsingError.SubstParam( lineNumber, linePos );
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -59,29 +59,42 @@ CString CJsonDocument::GetDocumentString() const
 
 void CJsonDocument::parseJson( CStringView jsonStr )
 {
-	int startPos = 0;
+	CJsonPosition startPos;
 	auto& parseResult = parseElement( jsonStr, startPos );
-	assert( startPos == jsonStr.Length() );
+	if( startPos.Pos != jsonStr.Length() ) {
+		throwParseException( startPos );
+	}
 	root = &parseResult;
 }
 
-void CJsonDocument::throwParseException( int parsePos ) const
+void CJsonDocument::throwParseException( CJsonPosition parsePos ) const
 {
-	throw CJsonParseException( parsePos );
+	throw CJsonParseException( parsePos.LineNumber, parsePos.Pos - parsePos.LineStartPos );
 }
 
-int CJsonDocument::skipWhitespace( CStringView str, int startPos ) const
+CJsonDocument::CJsonPosition CJsonDocument::getNextPos( CJsonPosition parsePos ) const
 {
-	int resultPos = startPos;
+	return CJsonPosition{ parsePos.Pos + 1, parsePos.LineNumber, parsePos.LineStartPos };
+}
+
+CJsonDocument::CJsonPosition CJsonDocument::skipWhitespace( CStringView str, CJsonPosition startPos ) const
+{
+	int resultPos = startPos.Pos;
+	int lineNumber = startPos.LineNumber;
+	int lineStartPos = startPos.LineStartPos;
 	while( CStringPart::IsCharWhiteSpace( str[resultPos] ) ) {
+		if( str[resultPos] == '\n' ) {
+			lineNumber++;
+			lineStartPos = resultPos + 1;
+		}
 		resultPos++;
 	}
-	return resultPos;
+	return CJsonPosition{ resultPos, lineNumber, lineStartPos };
 }
 
-CStringPart CJsonDocument::parseString( CStringView str, int& parsePos )
+CStringPart CJsonDocument::parseString( CStringView str, CJsonPosition& parsePos )
 {
-	const auto strStartPos = parsePos + 1;
+	const auto strStartPos = parsePos.Pos + 1;
 	const auto endOrEscapePos = str.FindOneOf( CStringView( "\\\"" ), strStartPos );
 	if( endOrEscapePos == NotFound ) {
 		throwParseException( parsePos );
@@ -89,14 +102,14 @@ CStringPart CJsonDocument::parseString( CStringView str, int& parsePos )
 	if( str[endOrEscapePos] == '\\' ) {
 		return replaceEscapeSequences( str, endOrEscapePos, parsePos );
 	} else {
-		parsePos = endOrEscapePos + 1;
+		parsePos.Pos = endOrEscapePos + 1;
 		return str.Mid( strStartPos, endOrEscapePos - strStartPos );
 	}
 }
 
-CStringPart CJsonDocument::replaceEscapeSequences( CStringView str, int firstEscapePos, int& parsePos )
+CStringPart CJsonDocument::replaceEscapeSequences( CStringView str, int firstEscapePos, CJsonPosition& parsePos )
 {
-	const auto startPos = parsePos + 1;
+	const auto startPos = parsePos.Pos + 1;
 	auto strPtr = const_cast<char*>( str.Ptr() );
 	int destStrPos = firstEscapePos;
 	int srcStrPos = firstEscapePos + 1;
@@ -108,7 +121,7 @@ CStringPart CJsonDocument::replaceEscapeSequences( CStringView str, int firstEsc
 			strPtr[destStrPos++] = escapeCh;
 			srcStrPos += 2;
 		} else if( ch == L'"' ) {
-			parsePos = srcStrPos + 1;
+			parsePos.Pos = srcStrPos + 1;
 			return str.Mid( startPos, destStrPos - startPos );
 		} else if( ch == 0 ) {
 			throwParseException( parsePos );
@@ -138,27 +151,29 @@ char CJsonDocument::getEscapeCharacter( char escapeCode ) const
 	}
 }
 
-double CJsonDocument::parseNumber( CStringView str, int& parsePos ) const
+double CJsonDocument::parseNumber( CStringView str, CJsonPosition& parsePos ) const
 {
-	int endPos = parsePos;
+	const auto startPos = parsePos.Pos;
+	int endPos = startPos;
 	while( CStringView::IsCharDigit( str[endPos] ) || str[endPos] == '.' || str[endPos] == 'e' ) {
 		endPos++;
 	}
 
-	const auto numberStr = str.Mid( parsePos, endPos - parsePos );
+	const auto numberStr = str.Mid( startPos, endPos - startPos );
 	const auto result = Value<double>( numberStr );
 	if( !result.IsValid() ) {
 		throwParseException( parsePos );
 	}
-	parsePos = endPos;
+	parsePos.Pos = endPos;
 	return *result;
 }
 
-CJsonObject& CJsonDocument::parseObject( CStringView str, int& parsePos )
+CJsonObject& CJsonDocument::parseObject( CStringView str, CJsonPosition& parsePos )
 {
-	auto currentPos = skipWhitespace( str, parsePos + 1 );
-	if( str[currentPos] == L'}' ) {
-		parsePos = currentPos + 1;
+	const auto internalStartPos = getNextPos( parsePos );
+	auto currentPos = skipWhitespace( str, internalStartPos );
+	if( str[currentPos.Pos] == L'}' ) {
+		parsePos = getNextPos( currentPos );
 		return allocateJsonObject( nullptr, nullptr, 0 );
 	}
 
@@ -166,35 +181,35 @@ CJsonObject& CJsonDocument::parseObject( CStringView str, int& parsePos )
 	const auto listHead = currentNode;
 	int listSize = 1;
 	for( ;; ) {
-		if( str[currentPos] != '"' ) {
+		if( str[currentPos.Pos] != '"' ) {
 			throwParseException( currentPos );
 		}
 		const auto keyName = parseString( str, currentPos );
 		currentPos = skipWhitespace( str, currentPos );
-		if( str[currentPos] != ':' ) {
+		if( str[currentPos.Pos] != ':' ) {
 			throwParseException( currentPos );
 		}
-		currentPos = skipWhitespace( str, currentPos + 1 );
+		currentPos = skipWhitespace( str, getNextPos( currentPos ) );
 		auto& keyValue = parseValue( str, currentPos );
 		currentPos = skipWhitespace( str, currentPos );
 		currentNode->Value = CJsonKeyValue{ keyName, &keyValue };
-		if( str[currentPos] == L'}' ) {
-			parsePos = currentPos + 1;
+		if( str[currentPos.Pos] == L'}' ) {
+			parsePos = getNextPos( currentPos );
 			return allocateJsonObject( listHead, currentNode, listSize );
-		} else if( str[currentPos] != ',' ) {
+		} else if( str[currentPos.Pos] != ',' ) {
 			throwParseException( currentPos );
 		}
 		currentNode = addListNode( *currentNode );
-		currentPos = skipWhitespace( str, currentPos + 1 );
+		currentPos = skipWhitespace( str, getNextPos( currentPos ) );
 		listSize++;
 	}
 }
 
-CJsonValue& CJsonDocument::parseArray( CStringView str, int& parsePos )
+CJsonValue& CJsonDocument::parseArray( CStringView str, CJsonPosition& parsePos )
 {
-	auto currentPos = skipWhitespace( str, parsePos + 1 );
-	if( str[currentPos] == ']' ) {
-		parsePos = currentPos + 1;
+	auto currentPos = skipWhitespace( str, getNextPos( parsePos ) );
+	if( str[currentPos.Pos] == ']' ) {
+		parsePos = getNextPos( currentPos );
 		return allocateJsonDynamicArray( nullptr, nullptr, 0 );
 	}
 
@@ -203,20 +218,20 @@ CJsonValue& CJsonDocument::parseArray( CStringView str, int& parsePos )
 	return parseValueList( str, parsePos, ']', firstValue );
 }
 
-CJsonValue& CJsonDocument::parseValueList( CStringView str, int& currentPos, char terminator, CJsonValue& firstValue )
+CJsonValue& CJsonDocument::parseValueList( CStringView str, CJsonPosition& currentPos, char terminator, CJsonValue& firstValue )
 {
 	auto currentNode = allocateListNode<CJsonValue*>();
 	currentNode->Value = &firstValue;
 	const auto listHead = currentNode;
 	int listSize = 1;
 	for( ;; ) {
-		if( str[currentPos] == terminator ) {
-			currentPos = currentPos + 1;
+		if( str[currentPos.Pos] == terminator ) {
+			currentPos = getNextPos( currentPos );
 			return allocateJsonDynamicArray( listHead, currentNode, listSize );
-		} else if( str[currentPos] != ',' ) {
+		} else if( str[currentPos.Pos] != ',' ) {
 			throwParseException( currentPos );
 		}
-		currentPos = skipWhitespace( str, currentPos + 1 );
+		currentPos = skipWhitespace( str, getNextPos( currentPos ) );
 		currentNode = addListNode( *currentNode );
 		auto& value = parseValue( str, currentPos );
 		currentNode->Value = &value;
@@ -225,18 +240,18 @@ CJsonValue& CJsonDocument::parseValueList( CStringView str, int& currentPos, cha
 	}
 }
 
-CJsonValue& CJsonDocument::parseValue( CStringView str, int& parsePos )
+CJsonValue& CJsonDocument::parseValue( CStringView str, CJsonPosition& parsePos )
 {
-	const auto firstCh = str[parsePos];
+	const auto firstCh = str[parsePos.Pos];
 	switch( firstCh ) {
 		case 't':
-			parsePos += 4;
+			parsePos.Pos += 4;
 			return allocateJsonBool( true );
 		case 'f':
-			parsePos += 5;
+			parsePos.Pos += 5;
 			return allocateJsonBool( false );
 		case 'n':
-			parsePos += 4;
+			parsePos.Pos += 4;
 			return allocateJsonNull();
 		case '{':
 			return parseObject( str, parsePos );
@@ -249,7 +264,7 @@ CJsonValue& CJsonDocument::parseValue( CStringView str, int& parsePos )
 	}
 }
 
-CJsonValue& CJsonDocument::parseElement( CStringView str, int& parsePos )
+CJsonValue& CJsonDocument::parseElement( CStringView str, CJsonPosition& parsePos )
 {
 	parsePos = skipWhitespace( str, parsePos );
 	auto& result = parseValue( str, parsePos );
