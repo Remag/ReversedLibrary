@@ -98,7 +98,7 @@ CGiffDecodeData gd_open_gif( CGiffBuffer fd )
 	gif.anim_start = fd.Pos;
 	gif.fd = fd;
 
-	gif.TransparencyMask.SetSize( width * height );
+	gif.TransparencyMask.ReserveBuffer( width * height );
 	gif.TransparencyMask.FillWithOnes();
 
 	return gif;

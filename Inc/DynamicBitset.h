@@ -29,7 +29,7 @@ public:
 
 	int Size() const
 		{ return storage.Size(); }
-	void SetSize( int newBitSize );
+	void ReserveBuffer( int newBitSize );
 	void Empty();
 
 	DWORD& operator[]( int index );
@@ -79,7 +79,7 @@ CDynamicBitSetStorage<ContainerType>& CDynamicBitSetStorage<ContainerType>::oper
 }
 
 template <class ContainerType>
-void CDynamicBitSetStorage<ContainerType>::SetSize( int newBitSize )
+void CDynamicBitSetStorage<ContainerType>::ReserveBuffer( int newBitSize )
 {
 	const auto newByteSize = ( newBitSize + bitsPerElement - 1 ) / bitsPerElement;
 	if( newByteSize > storage.Size() ) {

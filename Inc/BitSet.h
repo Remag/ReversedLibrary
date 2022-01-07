@@ -29,7 +29,7 @@ public:
 	int Size() const
 		{ return storage.Size() * bitsPerElement; }
 	// Change bit set size. This operation only makes sense for dynamic bit sets.
-	void SetSize( int newSize );	
+	void ReserveBuffer( int newBitSize );	
 
 	// Low level access.
 	BitSetStorage& GetStorage()
@@ -182,9 +182,9 @@ void CBaseBitSet<BitSetStorage, Elem>::FillWithOnes()
 }
 
 template<class BitSetStorage, class Elem>
-void CBaseBitSet<BitSetStorage, Elem>::SetSize( int newSize )
+void CBaseBitSet<BitSetStorage, Elem>::ReserveBuffer( int newBitSize )
 {
-	storage.SetSize( newSize );
+	storage.ReserveBuffer( newBitSize );
 }
 
 template <class BitSetStorage, class Elem>

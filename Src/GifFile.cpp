@@ -53,7 +53,7 @@ void CGifFile::readGifFrames( RelibInternal::CGiffDecodeData& decodeData, CArray
 	CStaticArray<BYTE> frameColorData;
 	CDynamicBitSet<> frameTransparencyMask;
 	frameColorData.ResetSize( frameArea * 3 );
-	frameTransparencyMask.SetSize( frameArea );
+	frameTransparencyMask.ReserveBuffer( frameArea );
 	int currentEndTime = 0;
 	while( gd_get_frame( &decodeData ) == 1 ) {
 		auto& newFrameData = result.Add();

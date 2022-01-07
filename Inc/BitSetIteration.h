@@ -51,7 +51,7 @@ public:
 	bool operator!=( CBitSetZeroEnumerator other )
 		{ return pos != other.pos; }
 	int operator*()
-		{ return bitset[pos]; }
+		{ return pos; }
 
 private:
 	BitSetType bitset;
