@@ -1,3 +1,7 @@
+#include <Redefs.h>
+
+#ifndef RELIB_NO_INTERNET
+
 #include <CurlException.h>
 
 namespace Relib {
@@ -13,3 +17,5 @@ CUnicodeString CCurlException::GetMessageText() const
 //////////////////////////////////////////////////////////////////////////
 
 }	// namespace Relib.
+
+#endif	// RELIB_NO_INTERNET

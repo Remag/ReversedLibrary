@@ -1,3 +1,7 @@
+#include <Redefs.h>
+
+#ifndef RELIB_NO_IMAGELIB
+
 #include <PngFile.h>
 
 #include <BaseStringPart.h>
@@ -179,3 +183,5 @@ void CPngFile::writeCompressedData( CArray<BYTE>& compressedData, int dataSize )
 //////////////////////////////////////////////////////////////////////////
 
 }	// namespace Relib.
+
+#endif // RELIB_NO_IMAGELIB

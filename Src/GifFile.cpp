@@ -1,3 +1,7 @@
+#include <Redefs.h>
+
+#ifndef RELIB_NO_IMAGELIB
+
 #include <GifFile.h>
 #include <DynamicBitset.h>
 #include <FileOwners.h>
@@ -96,3 +100,4 @@ int CGifFile::getFrameDelay( RelibInternal::CGiffDecodeData& decodeData )
 
 }	// namespace Relib.
 
+#endif // RELIB_NO_IMAGELIB

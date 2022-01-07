@@ -1,3 +1,7 @@
+#include <Redefs.h>
+
+#ifndef RELIB_NO_INTERNET
+
 #include <CurlInitializer.h>
 #include <LibCurl\curl.h>
 
@@ -25,3 +29,5 @@ void InitializeCurl()
 //////////////////////////////////////////////////////////////////////////
 
 }	// namespace Relib.
+
+#endif	// RELIB_NO_INTERNET

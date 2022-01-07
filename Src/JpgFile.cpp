@@ -1,4 +1,6 @@
-#ifndef RELIB_NO_JPEG
+#include <Redefs.h>
+
+#ifndef RELIB_NO_IMAGELIB
 
 #include <JpgFile.h>
 #include <FileOwners.h>
@@ -86,4 +88,4 @@ void CJpgFile::doReadRawData( CUnicodePart fileName, CArrayView<BYTE> jpgData, C
 
 } // namespace Relib.
 
-#endif // RELIB_NO_JPEG
+#endif // RELIB_NO_IMAGELIB

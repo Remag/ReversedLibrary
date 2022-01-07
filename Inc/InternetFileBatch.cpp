@@ -1,3 +1,7 @@
+#include <Redefs.h>
+
+#ifndef RELIB_NO_INTERNET
+
 #include <InternetFileBatch.h>
 #include <Array.h>
 #include <CurlInitializer.h>
@@ -103,3 +107,5 @@ void CInternetFileBatch::checkMultiCurlError( int errorCode )
 //////////////////////////////////////////////////////////////////////////
 
 }	// namespace Relib.
+
+#endif	// RELIB_NO_INTERNET

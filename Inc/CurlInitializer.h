@@ -1,6 +1,8 @@
 #pragma once
 #include <Redefs.h>
 
+#ifndef RELIB_NO_INTERNET
+
 namespace Relib {
 
 //////////////////////////////////////////////////////////////////////////
@@ -21,3 +23,4 @@ void REAPI InitializeCurl();
 
 }	// namespace Relib.
 
+#endif	// RELIB_NO_INTERNET

@@ -1,3 +1,7 @@
+#include <Redefs.h>
+
+#ifndef RELIB_NO_INTERNET
+
 #include <InternetFile.h>
 #include <BaseStringPart.h>
 #include <StringData.h>
@@ -206,3 +210,5 @@ void CInternetFile::checkCurlError( bool condition )
 //////////////////////////////////////////////////////////////////////////
 
 }	// namespace Relib.
+
+#endif	// RELIB_NO_INTERNET

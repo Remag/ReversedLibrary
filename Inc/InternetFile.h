@@ -1,5 +1,8 @@
 #pragma once
 #include <Redefs.h>
+
+#ifndef RELIB_NO_INTERNET
+
 #include <ActionOwner.h>
 #include <Array.h>
 #include <ArrayBuffer.h>
@@ -82,4 +85,6 @@ private:
 //////////////////////////////////////////////////////////////////////////
 
 }	// namespace Relib.
+
+#endif	// RELIB_NO_INTERNET
 

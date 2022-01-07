@@ -1,5 +1,8 @@
 #pragma once
 #include <Redefs.h>
+
+#ifndef RELIB_NO_IMAGELIB
+
 #include <ImageFileUtils.h>
 #include <Errors.h>
 
@@ -61,3 +64,4 @@ private:
 
 }	// namespace Relib.
 
+#endif // RELIB_NO_IMAGELIB

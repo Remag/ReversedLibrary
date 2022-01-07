@@ -609,9 +609,6 @@
     <ClInclude Include="Inc\InternetFileBatch.h">
       <Filter>Header Files\Internet</Filter>
     </ClInclude>
-    <ClInclude Include="Inc\CurlEasyHandle.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Inc\JpgFile.h">
       <Filter>Header Files\Files\Images</Filter>
     </ClInclude>
@@ -626,6 +623,9 @@
     </ClInclude>
     <ClInclude Include="Inc\gifdec.h">
       <Filter>Header Files\Files\Images</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\CurlEasyHandle.h">
+      <Filter>Header Files\Internet</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

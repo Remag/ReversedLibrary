@@ -1,4 +1,7 @@
 // Based heavily on GifDecoder - a public domain gif file reader.
+#include <Redefs.h>
+
+#ifndef RELIB_NO_IMAGELIB
 
 #include <gifdec.h>
 
@@ -500,3 +503,5 @@ void gd_rewind( CGiffDecodeData* gif )
 }	// namespace RelibInternal.
 
 }	// namespace Relib.
+
+#endif // RELIB_NO_IMAGELIB

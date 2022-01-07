@@ -1,3 +1,7 @@
+#include <Redefs.h>
+
+#ifndef RELIB_NO_INTERNET
+
 #include <WebConnectionScheduler.h>
 #include <LibCurl\curl.h>
 
@@ -94,3 +98,5 @@ int CWebConnectionScheduler::findConnectionIndex( CCurlEasyHandle handle )
 //////////////////////////////////////////////////////////////////////////
 
 }	// namespace Relib.
+
+#endif	// RELIB_NO_INTERNET

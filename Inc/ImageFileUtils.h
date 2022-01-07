@@ -1,5 +1,8 @@
 #pragma once
 #include <Redefs.h>
+
+#ifndef RELIB_NO_IMAGELIB
+
 #include <Color.h>
 #include <Array.h>
 
@@ -29,3 +32,5 @@ struct CAnimatedImageData {
 //////////////////////////////////////////////////////////////////////////
 
 } // namespace Relib.
+
+#endif // RELIB_NO_IMAGELIB

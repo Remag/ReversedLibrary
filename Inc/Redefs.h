@@ -14,6 +14,11 @@
 #include <float.h>
 #include <initializer_list>
 
+#ifdef RELIB_MINIMAL
+#define RELIB_NO_INTERNET
+#define RELIB_NO_IMAGELIB
+#endif
+
 // Disable the CRT provided assertion.
 #define NDEBUG
 #include <atomic>
@@ -52,21 +57,27 @@
 #if defined( REBUILD ) || defined( USE_STATIC_RELIB )
 // Relib depends on a number of external libraries.
 #pragma comment( lib, "FreeType.lib" )
+
+#ifndef RELIB_NO_IMAGELIB
+#pragma comment( lib, "jpeg.lib" )
+#pragma comment( lib, "libpng16.lib" )
+#pragma comment( lib, "zlib.lib" )
+#endif
+
+#ifndef RELIB_NO_INTERNET
 #pragma comment( lib, "libcurl.lib" )
 #pragma comment( lib, "zlib.lib" )
-#pragma comment( lib, "libpng16.lib" )
-
-#ifndef RELIB_NO_JPEG
-#pragma comment( lib, "jpeg.lib" )
 #endif
 
 #endif
 
 // Some dependencies come from a static build of curl and are only required for static builds.
 #ifdef USE_STATIC_RELIB
+#ifndef RELIB_NO_INTERNET
 #pragma comment( lib, "Ws2_32.lib" )
 #pragma comment( lib, "wldap32.lib" )
 #pragma comment( lib, "crypt32.lib" )
+#endif
 #endif
 
 namespace Relib {

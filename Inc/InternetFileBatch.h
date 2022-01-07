@@ -1,5 +1,7 @@
 #pragma once
 #include <Redefs.h>
+
+#ifndef RELIB_NO_INTERNET
 #include <CurlEasyHandle.h>
 
 namespace Relib {
@@ -77,3 +79,5 @@ private:
 //////////////////////////////////////////////////////////////////////////
 
 }	// namespace Relib.
+
+#endif	// RELIB_NO_INTERNET
