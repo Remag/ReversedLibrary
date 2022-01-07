@@ -45,14 +45,9 @@
 #include <FileCollection.h>
 #include <FileMapping.h>
 #include <FileSystem.h>
-#include <Font.h>
-#include <FontListGlyphProvider.h>
-#include <FontSize.h>
-#include <FreeTypeGlyphProvider.h>
 #include <Future.h>
 #include <GeneralBlockAllocator.h>
 #include <GifFile.h>
-#include <Glyph.h>
 #include <HashTable.h>
 #include <Hitbox.h>
 #include <IniFile.h>
