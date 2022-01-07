@@ -12,7 +12,6 @@ public:
 	~CRelibInitializer();
 
 private:
-	void initFreeType();
 	void initAppDataPath();
 };
 

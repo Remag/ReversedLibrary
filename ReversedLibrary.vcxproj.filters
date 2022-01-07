@@ -31,9 +31,6 @@
     <Filter Include="Header Files\Functions">
       <UniqueIdentifier>{7aa77de0-0c5f-44d1-970d-42a0e4ed7fd2}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files\Fonts">
-      <UniqueIdentifier>{7b7ced87-3642-4cd8-94c5-06ad2fa82381}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Header Files\Internet">
       <UniqueIdentifier>{1d410afc-2ab8-462f-b1ab-5f2e6f433c45}</UniqueIdentifier>
     </Filter>
@@ -270,20 +267,8 @@
     <ClInclude Include="Inc\FileViews.h">
       <Filter>Header Files\Files</Filter>
     </ClInclude>
-    <ClInclude Include="Inc\Font.h">
-      <Filter>Header Files\Fonts</Filter>
-    </ClInclude>
-    <ClInclude Include="Inc\FontSize.h">
-      <Filter>Header Files\Fonts</Filter>
-    </ClInclude>
-    <ClInclude Include="Inc\FreeTypeException.h">
-      <Filter>Header Files\Fonts</Filter>
-    </ClInclude>
     <ClInclude Include="Inc\GeneralBlockAllocator.h">
       <Filter>Header Files\MemoryManagement</Filter>
-    </ClInclude>
-    <ClInclude Include="Inc\Glyph.h">
-      <Filter>Header Files\Fonts</Filter>
     </ClInclude>
     <ClInclude Include="Inc\GrowStrategy.h">
       <Filter>Header Files\Containers\Arrays</Filter>
@@ -567,23 +552,11 @@
     <ClInclude Include="Inc\Reassert.h">
       <Filter>Header Files\Messages</Filter>
     </ClInclude>
-    <ClInclude Include="Inc\GlyphInc.h">
-      <Filter>Header Files\Fonts</Filter>
-    </ClInclude>
-    <ClInclude Include="Inc\FreeTypeGlyphProvider.h">
-      <Filter>Header Files\Fonts</Filter>
-    </ClInclude>
-    <ClInclude Include="Inc\GlyphProvider.h">
-      <Filter>Header Files\Fonts</Filter>
-    </ClInclude>
     <ClInclude Include="Inc\CommonStringOperationsInline.h">
       <Filter>Header Files\Strings</Filter>
     </ClInclude>
     <ClInclude Include="Inc\CommonStringOperationsDefs.h">
       <Filter>Header Files\Strings</Filter>
-    </ClInclude>
-    <ClInclude Include="Inc\FontListGlyphProvider.h">
-      <Filter>Header Files\Fonts</Filter>
     </ClInclude>
     <ClInclude Include="Inc\DateTime.h">
       <Filter>Header Files</Filter>
@@ -674,19 +647,7 @@
     <ClCompile Include="Src\FileSystem.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Src\Font.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Src\FontSize.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Src\FreeTypeException.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Src\GlobalData.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Src\Glyph.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Src\HashUtils.cpp">
@@ -771,12 +732,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Src\CurlException.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Src\FreeTypeGlyphProvider.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Src\FontListGlyphProvider.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Src\DateTime.cpp">

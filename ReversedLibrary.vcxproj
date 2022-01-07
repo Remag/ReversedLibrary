@@ -185,7 +185,7 @@
       <SDLCheck>
       </SDLCheck>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>.\Inc;.\Src;.\Ext\Inc;.\Ext\Inc\FreeType</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.\Inc;.\Src;.\Ext\Inc;</AdditionalIncludeDirectories>
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <OmitFramePointers>true</OmitFramePointers>
@@ -310,19 +310,11 @@
     <ClInclude Include="Inc\FileOwners.h" />
     <ClInclude Include="Inc\FileSystem.h" />
     <ClInclude Include="Inc\FileViews.h" />
-    <ClInclude Include="Inc\Font.h" />
-    <ClInclude Include="Inc\FontListGlyphProvider.h" />
-    <ClInclude Include="Inc\FontSize.h" />
-    <ClInclude Include="Inc\FreeTypeException.h" />
-    <ClInclude Include="Inc\FreeTypeGlyphProvider.h" />
     <ClInclude Include="Inc\Future.h" />
     <ClInclude Include="Inc\FutureSharedState.h" />
     <ClInclude Include="Inc\GeneralBlockAllocator.h" />
     <ClInclude Include="Inc\gifdec.h" />
     <ClInclude Include="Inc\GifFile.h" />
-    <ClInclude Include="Inc\Glyph.h" />
-    <ClInclude Include="Inc\GlyphInc.h" />
-    <ClInclude Include="Inc\GlyphProvider.h" />
     <ClInclude Include="Inc\GrowStrategy.h" />
     <ClInclude Include="Inc\HashTable.h" />
     <ClInclude Include="Inc\HashTableBase.h" />
@@ -459,15 +451,9 @@
     <ClCompile Include="Src\FileMapping.cpp" />
     <ClCompile Include="Src\FileOperations.cpp" />
     <ClCompile Include="Src\FileSystem.cpp" />
-    <ClCompile Include="Src\Font.cpp" />
-    <ClCompile Include="Src\FontListGlyphProvider.cpp" />
-    <ClCompile Include="Src\FontSize.cpp" />
-    <ClCompile Include="Src\FreeTypeException.cpp" />
-    <ClCompile Include="Src\FreeTypeGlyphProvider.cpp" />
     <ClCompile Include="Src\gifdec.cpp" />
     <ClCompile Include="Src\GifFile.cpp" />
     <ClCompile Include="Src\GlobalData.cpp" />
-    <ClCompile Include="Src\Glyph.cpp" />
     <ClCompile Include="Src\HashUtils.cpp" />
     <ClCompile Include="Src\IniFile.cpp" />
     <ClCompile Include="Src\InternetFile.cpp" />

@@ -56,7 +56,6 @@
 
 #if defined( REBUILD ) || defined( USE_STATIC_RELIB )
 // Relib depends on a number of external libraries.
-#pragma comment( lib, "FreeType.lib" )
 
 #ifndef RELIB_NO_IMAGELIB
 #pragma comment( lib, "jpeg.lib" )
@@ -144,12 +143,6 @@ namespace RelibInternal {
 	class CXmlElement;
 	class CXmlAttribute;
 	class CCriticalSection;
-	class CFontView;
-	class CFontEdit;
-	class CFontOwner;
-	class CFontSizeView;
-	class CFontSizeOwner;
-	class CGlyph;
 	class CRawBuffer;
 	class CExplicitCopyTag;
 	class CMessageSource;

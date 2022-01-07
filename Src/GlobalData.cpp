@@ -8,7 +8,6 @@
 #include <MessageLogImpls.h>
 #include <UnicodeSet.h>
 #include <RandomGenerator.h>
-#include <Font.h>
 #include <NamedInlineComponent.h>
 #include <StrConversions.h>
 #include <ActionOwner.h>
@@ -19,9 +18,6 @@
 #include <ObjectCreationUtils.h>
 #include <Mutex.h>
 #include <RapidXml\rapidxml.hpp>
-
-#include <FreeType\ft2build.h>
-#include FT_FREETYPE_H
 
 #pragma warning( disable : 4074 )
 // Global data should be initialized as fast as possible. Next directive sets the highest priority to the current translation unit.
@@ -103,7 +99,6 @@ extern const CUnicodeView XmlParsingError = L"XML parsing error at position %0:\
 extern const CUnicodeView JsonParsingError = L"JSON parsing error at line %0, position %1.";
 extern const CUnicodeView JsonConversionError = L"JSON value was expected to be %0, the actual value was %1.";
 extern const CUnicodeView JsonMissingKeyError = L"JSON object is missing a key: \"%0\"";
-extern const CUnicodeView GeneralFreeTypeError = L"FreeType error. Error code: %0.\nFreeType module name: %1.";
 extern const CUnicodeView GeneralCurlError = L"Curl error. Error string buffer: %0.";
 extern const CUnicodeView GeneralPngFileError = L"JPEG parsing error: %1.\nFile name: %0";
 extern const CUnicodeView GeneralGifFileError = L"GIF parsing error: %1.\nFile name: %0";
@@ -167,9 +162,6 @@ namespace RelibInternal {
 	const CUnicodeView CStrConversionFunctions<wchar_t>::trueUnicodeStrings[2] = { L"true", L"1" };
 	const CUnicodeView CStrConversionFunctions<wchar_t>::falseUnicodeStrings[2] = { L"false", L"0" };
 }
-
-// FreeType library structure.
-FT_Library CFontOwner::freeTypeLib = 0;
 
 CArray<CUnicodeString, CProcessHeap> TempFileNames;
 CRandomGenerator TempFileSuffixGenerator;
