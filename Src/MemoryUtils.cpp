@@ -166,7 +166,7 @@ CDebugMemoryBlock* CDebugMemoryBlock::CreateFromData( void* ptr )
 	return reinterpret_cast<CDebugMemoryBlock*>( reinterpret_cast<BYTE*>( ptr ) - offsetof( CDebugMemoryBlock, data ) );
 }
 
-void CDebugMemoryBlock::CheckRegion( const wchar_t* allocatorName, const BYTE* startPtr, int size )
+void CDebugMemoryBlock::CheckRegion( const wchar_t* allocatorName, const BYTE* startPtr, long long size )
 {
 	for( const BYTE* ptr = startPtr; ptr - startPtr < size; ) {
 		const CDebugMemoryBlock* debugBlock = reinterpret_cast<const CDebugMemoryBlock*>( ptr );

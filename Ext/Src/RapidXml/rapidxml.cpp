@@ -167,7 +167,8 @@ void xml_document::parse_and_append_data( CXmlElement& element, const wchar_t*& 
 	// Add data to parent node if no data exists yet.
 	if ( !(flags & parse_no_element_values) && element.GetText().IsEmpty() ) {
 		// Get rid of the trailing whitespace.
-		const CUnicodePart elementText( CUnicodePart( value, text - value ).TrimSpaces() );
+		const auto strLen = static_cast<int>( text - value );
+		const CUnicodePart elementText( CUnicodePart( value, strLen ).TrimSpaces() );
 		element.text = elementText;
 	}
 }
@@ -193,7 +194,7 @@ CXmlElement* xml_document::parse_element( const wchar_t*& text )
 		throw CXmlException( L"expected element name", text - textStart );
 	}
 
-	const CUnicodePart elemName = CUnicodePart( name, text - name );
+	const CUnicodePart elemName = CUnicodePart( name, static_cast<int>( text - name ) );
 	// Create element node
 	CXmlElement* element = &elementStorage.Add( elemName, owner, CElementCreationKey() );
 
@@ -365,7 +366,7 @@ void xml_document::parse_node_attributes( const wchar_t*& text, CXmlElement& ele
 		}
 
 		// Create new attribute.
-		const CUnicodePart attrName{ name, text - name };
+		const CUnicodePart attrName{ name, static_cast<int>( text - name ) };
 
 		// Skip whitespace after attribute name.
 		skip<whitespace_pred>(text);
@@ -393,7 +394,7 @@ void xml_document::parse_node_attributes( const wchar_t*& text, CXmlElement& ele
 			skip<attribute_value_pred_double>( text );
 		}
 		// Set attribute value.
-		const CUnicodePart attrValue{ value, text - value };
+		const CUnicodePart attrValue{ value, static_cast<int>( text - value ) };
 		elem.attributes.Add( attrName, attrValue );
 				
 		// Make sure that end quote is present.

@@ -144,7 +144,7 @@ namespace RelibInternal {
 	REAPI CMap<CString, CNamedInlineComponent, CDefaultHash<CString>, CProcessHeap> NamedInlineComponents;
 	REAPI CMap<CPair<int>, CNamedInlineComponent, CDefaultHash<CPair<int>>, CProcessHeap> NamedInlineComponentIds;
 
-	REAPI CEnumDictionary<TNamedComponentType, NCT_EnumCount, CPair<unsigned>> NamedComponentSizeDict {
+	REAPI CEnumDictionary<TNamedComponentType, NCT_EnumCount, CPair<size_t>> NamedComponentSizeDict {
 		{ NCT_Bool, CreatePair( sizeof( bool ), alignof( bool ) ) },
 		{ NCT_Int, CreatePair( sizeof( int ), alignof( int ) ) },
 		{ NCT_Float, CreatePair( sizeof( float ), alignof( float ) ) },

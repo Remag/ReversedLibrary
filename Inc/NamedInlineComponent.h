@@ -88,7 +88,7 @@ namespace RelibInternal {
 	// Named component database keyed by a class id and component id pair.
 	extern REAPI CMap<CPair<int>, CNamedInlineComponent, CDefaultHash<CPair<int>>, CProcessHeap> NamedInlineComponentIds;
 	// Component size and alignment dictionary.
-	extern REAPI CEnumDictionary<TNamedComponentType, NCT_EnumCount, CPair<unsigned>> NamedComponentSizeDict;
+	extern REAPI CEnumDictionary<TNamedComponentType, NCT_EnumCount, CPair<size_t>> NamedComponentSizeDict;
 }
 
 //////////////////////////////////////////////////////////////////////////

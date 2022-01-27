@@ -1,6 +1,8 @@
 #pragma once
 #include <Redefs.h>
 
+#ifndef RELIB_NO_IMAGELIB
+
 namespace Relib {
 
 //////////////////////////////////////////////////////////////////////////
@@ -12,7 +14,7 @@ public:
 	void UnzipData( CArrayView<BYTE> data, CArray<BYTE>& result );
 
 private:
-	static void* allocationFunction( void* opaque, size_t itemCoun, size_t itemSize );
+	static void* allocationFunction( void* opaque, unsigned itemCoun, unsigned itemSize );
 	static void freeFunction( void* opaque, void* ptr );
 };
 
@@ -20,3 +22,4 @@ private:
 
 }	// namespace Relib.
 
+#endif // RELIB_NO_IMAGELIB

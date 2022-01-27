@@ -1,4 +1,7 @@
 #include <ZipConverter.h>
+
+#ifndef RELIB_NO_IMAGELIB
+
 #include <LibPng\zlib.h>
 
 #include <ArrayBuffer.h>
@@ -74,7 +77,7 @@ void CZipConverter::UnzipData( CArrayView<BYTE> data, CArray<BYTE>& result )
 	inflateEnd( &zStream );
 }
 
-void* CZipConverter::allocationFunction( void*, size_t itemCount, size_t itemSize )
+void* CZipConverter::allocationFunction( void*, unsigned itemCount, unsigned itemSize )
 {
 	const auto byteCount = itemSize * itemCount;
 	return CRuntimeHeap::Allocate( byteCount );
@@ -88,3 +91,5 @@ void CZipConverter::freeFunction( void*, void* ptr )
 //////////////////////////////////////////////////////////////////////////
 
 }	// namespace Relib.
+
+#endif // RELIB_NO_IMAGELIB

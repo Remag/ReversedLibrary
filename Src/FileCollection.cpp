@@ -57,15 +57,15 @@ void CFileCollection::writeIntToData( int value )
 {
 	const int offset = fileData.Size();
 	fileData.IncreaseSize( offset + sizeof( int ) );
-	memcpy( fileData.Ptr() + offset, &value, sizeof( int ) );
+	::memcpy( fileData.Ptr() + offset, &value, sizeof( int ) );
 }
 
 void CFileCollection::writeStringToData( CUnicodeView str )
 {
 	const int fileNameOffset = fileData.Size();
-	const auto relNameByteSize = ( str.Length() + 1 ) * sizeof( wchar_t );
+	const int relNameByteSize = ( str.Length() + 1 ) * sizeof( wchar_t );
 	fileData.IncreaseSize( fileNameOffset + relNameByteSize );
-	memcpy( fileData.Ptr() + fileNameOffset, str.Ptr(), relNameByteSize );
+	::memcpy( fileData.Ptr() + fileNameOffset, str.Ptr(), relNameByteSize );
 }
 
 CFileCollection::CFileCollection( CArray<BYTE> binaryData ) :

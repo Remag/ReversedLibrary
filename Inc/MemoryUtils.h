@@ -46,7 +46,7 @@ public:
 	static constexpr int GetDataOffset();
 	static CDebugMemoryBlock* CreateFromData( void* ptr );
 	// Check if the region has been freed correctly.
-	static void CheckRegion( const wchar_t* allocatorName, const BYTE* startPtr, int size );
+	static void CheckRegion( const wchar_t* allocatorName, const BYTE* startPtr, long long size );
 
 	// Class needs access to data to get its offset in constexpr-usable format.
 	friend struct CDebugMemoryBlockOffsetOf;

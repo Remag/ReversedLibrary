@@ -6,7 +6,7 @@
 namespace Relib {
 
 extern const CUnicodeView XmlParsingError;
-CXmlException::CXmlException( CUnicodePart _description, int _symbolPos ) :
+CXmlException::CXmlException( CUnicodePart _description, long long _symbolPos ) :
 	description( _description ),
 	symbolPos( _symbolPos )
 {

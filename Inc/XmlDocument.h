@@ -10,14 +10,14 @@ namespace Relib {
 // Exception thrown when a parsing error occurs.
 class REAPI CXmlException : public CException {
 public:
-	CXmlException( CUnicodePart description, int symbolPos );
+	CXmlException( CUnicodePart description, long long symbolPos );
 	CXmlException( const CXmlException& other ) : description( copy( other.description ) ), symbolPos( other.symbolPos ) {}
 
-	virtual CUnicodeString GetMessageText() const override;
+	virtual CUnicodeString GetMessageText() const override final;
 
 private:
-	const CUnicodeString description;
-	const int symbolPos;
+	CUnicodeString description;
+	long long symbolPos;
 };
 
 //////////////////////////////////////////////////////////////////////////
