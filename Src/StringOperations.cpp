@@ -16,7 +16,7 @@ namespace RelibInternal {
 
 int CStringOperations<char>::Length( const char* str )
 {
-	return ::strlen( str );
+	return static_cast<int>( ::strlen( str ) );
 }
 
 int CStringOperations<char>::CompareNoCase( CStringData<char> left, CStringData<char> right )
@@ -106,7 +106,7 @@ DWORD CStringOperations<char>::convertCodePageToFlags( unsigned codePage )
 
 int CStringOperations<wchar_t>::Length( const wchar_t* str )
 {
-	return ::wcslen( str );
+	return static_cast<int>( ::wcslen( str ) );
 }
 
 int CStringOperations<wchar_t>::CompareNoCase( CStringData<wchar_t> left, CStringData<wchar_t> right )
