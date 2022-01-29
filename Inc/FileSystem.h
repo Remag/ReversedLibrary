@@ -41,9 +41,9 @@ CUnicodeString REAPI MergeName( CUnicodeView drive, CUnicodeView dir, CUnicodeVi
 // Combines a full path from the base dir and a relative path.
 CUnicodeString REAPI MergePath( CUnicodePart dir, CUnicodePart relativePath );
 // Add the extension if necessary. Extention is provided without the leading period.
-void REAPI AddExtIfNone( CUnicodeString& name, CUnicodeView ext );
+void REAPI AddExtIfNone( CUnicodeString& name, CUnicodeView extNoPeriod );
 // Replace the extension.
-void REAPI ReplaceExt( CUnicodeString& name, CUnicodeView ext );
+void REAPI ReplaceExt( CUnicodeString& name, CUnicodeView extNoPeriod );
 // Create a full path assuming that the given relative path starts from the same catalog as the current process.
 CUnicodeString REAPI CreateFullPath( CUnicodeView path );
 // Merge dir and relativePath and create a full path from the result.

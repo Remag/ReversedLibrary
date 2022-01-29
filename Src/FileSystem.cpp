@@ -260,7 +260,7 @@ CUnicodeString MergePath( CUnicodePart dir, CUnicodePart relativePath )
 	}
 }
 
-void AddExtIfNone( CUnicodeString& fullName, CUnicodeView ext )
+void AddExtIfNone( CUnicodeString& fullName, CUnicodeView extNoPeriod )
 {
 	CUnicodeString drive;
 	CUnicodeString dir;
@@ -268,18 +268,18 @@ void AddExtIfNone( CUnicodeString& fullName, CUnicodeView ext )
 	CUnicodeString oldExt;
 	SplitName( fullName, drive, dir, name, oldExt );
 	if( oldExt.IsEmpty() ) {
-		fullName = MergeName( drive, dir, name, ext );
+		fullName = MergeName( drive, dir, name, extNoPeriod );
 	}
 }
 
-void ReplaceExt( CUnicodeString& fullName, CUnicodeView ext )
+void ReplaceExt( CUnicodeString& fullName, CUnicodeView extNoPeriod )
 {
 	CUnicodeString drive;
 	CUnicodeString dir;
 	CUnicodeString name;
 	CUnicodeString oldExt;
 	SplitName( fullName, drive, dir, name, oldExt );
-	fullName = MergeName( drive, dir, name, ext );
+	fullName = MergeName( drive, dir, name, extNoPeriod );
 }
 
 CUnicodeString CreateFullPath( CUnicodeView path )
