@@ -57,10 +57,13 @@
 #if defined( REBUILD ) || defined( USE_STATIC_RELIB )
 // Relib depends on a number of external libraries.
 
+#ifndef RELIB_NO_ZLIB
+#pragma comment( lib, "zlib.lib" )
+#endif
+
 #ifndef RELIB_NO_IMAGELIB
 #pragma comment( lib, "jpeg.lib" )
 #pragma comment( lib, "libpng16.lib" )
-#pragma comment( lib, "zlib.lib" )
 #endif
 
 #ifndef RELIB_NO_INTERNET

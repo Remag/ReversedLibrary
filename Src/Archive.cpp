@@ -3,6 +3,10 @@
 #include <BaseString.h>
 #include <StrConversions.h>
 #include <FileViews.h>
+#include <FileOwners.h>
+#include <MessageLog.h>
+#include <MessageUtils.h>
+#include <ZipConverter.h>
 
 namespace Relib {
 
@@ -12,219 +16,86 @@ namespace RelibInternal {
 
 //////////////////////////////////////////////////////////////////////////
 	
-CArchive::CArchive( int _bufferSize /*= minArchiveSize */ ) :
-	bufferSize( max( _bufferSize, minArchiveSize ) ),
-	archiveStartPos( 0 ),
-	filePos( 0 ),
-	fileLength( 0 ),
-	arePosAndLengthActual( false ),
-	currentBufferPos( 0 ),
-	bufferLeftoverCount( 0 )
+CArchive::CArchive() :
+	currentBufferPos( 0 )
 {
-	buffer.ReserveBuffer( bufferSize );
-	buffer.IncreaseSize( bufferSize );
 }
 
-void CArchive::flushReading( CFileReadView file )
+void CArchive::increaseBuffer( int bufferSize )
 {
-	if( bufferLeftoverCount > 0 ) {
-		// Synchronize current buffer position and current file position.
-		const __int64 bufferLeftover64 = numeric_cast<__int64>( bufferLeftoverCount );
-		file.Seek( -bufferLeftover64, FSP_Current );
-		filePos -= bufferLeftover64;
-	}
+	buffer.IncreaseSizeNoInitialize( bufferSize );
+}
+
+void CArchive::attachBuffer( CArray<BYTE> newBuffer )
+{
 	currentBufferPos = 0;
-	bufferLeftoverCount = 0;
+	buffer = move( newBuffer );
 }
 
-void CArchive::flushWriting( CFileWriteView file  )
+CArray<BYTE> CArchive::detachBuffer()
 {
-	if( currentBufferPos + bufferLeftoverCount > 0 ) {
-		// Write the buffer in file.	
-		file.Write( buffer.Ptr(), currentBufferPos + bufferLeftoverCount );
-		// File length has increased unless we were writing in the middle of a file.
-		fileLength = max( fileLength, filePos + currentBufferPos + bufferLeftoverCount );
-		if( bufferLeftoverCount != 0 ) {
-			// Synchronize file position and buffer position.
-			file.Seek( -numeric_cast<__int64>( bufferLeftoverCount ), FSP_Current );
-		}
-		filePos += currentBufferPos;
-	}
 	currentBufferPos = 0;
-	bufferLeftoverCount = 0;
+	return move( buffer );
 }
 
-void CArchive::skipReading( CFileReadView file, int byteCount )
+void CArchive::skip( int byteCount )
 {
 	assert( byteCount >= 0 );
-	if( byteCount == 0 ) {
-		return;
-	}
-
-	if( byteCount < bufferLeftoverCount ) {
-		// We will still be within the buffer after the skip.
-		currentBufferPos += byteCount;
-		bufferLeftoverCount -= byteCount;
-	} else {
-		file.Seek( numeric_cast<__int64>( byteCount - bufferLeftoverCount ), FSP_Current );
-		filePos += byteCount - bufferLeftoverCount;
-		currentBufferPos = 0;
-		bufferLeftoverCount = 0;
-	}
+	currentBufferPos += byteCount;
 }
 
-void CArchive::skipWriting( CFileWriteView file, int byteCount )
-{
-	assert( byteCount >= 0 );
-	if( byteCount == 0 ) {
-		return;
-	}
-
-	if( byteCount < bufferSize - currentBufferPos ) {
-		currentBufferPos += byteCount;
-		bufferLeftoverCount = max( bufferLeftoverCount - byteCount, 0 );
-	} else {
-		flushWriting( file );
-		file.Seek( numeric_cast<__int64>( byteCount ), FSP_Current );
-		filePos += byteCount;
-		if( filePos > fileLength ) {
-			fileLength = filePos;
-			if( !arePosAndLengthActual ) {
-				calcActualFilePos( file );
-			}
-			file.SetLength( fileLength );
-		}
-	}
-}
-
-void CArchive::abort()
-{
-	objectNamesDictionary.FreeBuffer();
-	creationFunctionsBuffer.FreeBuffer();
-}
-
-int CArchive::readSmallValue( CFileReadView file )
+int CArchive::readSmallValue()
 {
 	BYTE first;
-	read( file, &first, sizeof( first ) );
+	read( &first, sizeof( first ) );
 
 	if( first != UCHAR_MAX ) {
 		return first;
 	} else {
 		int result;
-		read( file, &result, sizeof( result ) );
+		read( &result, sizeof( result ) );
 		return result;
 	}
 }
 
-void CArchive::writeSmallValue( CFileWriteView file, int var )
+void CArchive::writeSmallValue( int var )
 {
 	if( var >= 0 && var < UCHAR_MAX ) {
-		const BYTE writeResult = numeric_cast<BYTE>( var );
-		write( file, &writeResult, sizeof( writeResult ) );
+		const auto writeResult = numeric_cast<BYTE>( var );
+		write( &writeResult, sizeof( writeResult ) );
 	} else {
-		const BYTE writePrefix = numeric_cast<BYTE>( UCHAR_MAX );
-		const int writeResult = numeric_cast<int>( var );
-		write( file, &writePrefix, sizeof( writePrefix ) );
-		write( file, &writeResult, sizeof( writeResult ) );
+		const auto writePrefix = numeric_cast<BYTE>( UCHAR_MAX );
+		const auto writeResult = numeric_cast<int>( var );
+		write( &writePrefix, sizeof( writePrefix ) );
+		write( &writeResult, sizeof( writeResult ) );
 	}
 }
 
-int CArchive::readVersion( CFileReadView file, int currentVersion )
+int CArchive::readVersion( int currentVersion )
 {
-	const int version = readSmallValue( file );
-	check( version <= currentVersion, Err_BadArchiveVersion, file.GetFileName() );
+	const auto version = readSmallValue();
+	check( version <= currentVersion, Err_BadArchiveVersion );
 	return version;
 }
 
-int CArchive::writeVersion( CFileWriteView file, int currentVersion )
+int CArchive::writeVersion( int currentVersion )
 {
-	writeSmallValue( file, currentVersion );
+	writeSmallValue( currentVersion );
 	return currentVersion;
 }
 
-void CArchive::readOverBuffer( CFileReadView file, void* ptr, int size )
-{
-	BYTE* readPtr = reinterpret_cast<BYTE*>( ptr );
-	if( bufferLeftoverCount > 0 ) {
-		// Buffer is not empty, read from there first.
-		memcpy( readPtr, buffer.Ptr() + currentBufferPos, bufferLeftoverCount );
-		readPtr += bufferLeftoverCount;
-		size -= bufferLeftoverCount;
-		bufferLeftoverCount = 0;
-	}
-	currentBufferPos = 0;
-	if( bufferSize <= size ) {
-		// Size is bigger than buffer, read directly from file.
-		const int readCount = file.Read( readPtr, size );
-		if( readCount != size ) {
-			ThrowFileException( CFileException::FET_EarlyEnd, file.GetFileName() );
-		}
-		filePos += readCount;
-	} else {
-		bufferLeftoverCount = file.Read( buffer.Ptr(), bufferSize );
-		if( bufferLeftoverCount < size ) {
-			ThrowFileException( CFileException::FET_EarlyEnd, file.GetFileName() );
-		}
-		filePos += bufferLeftoverCount;
-		memcpy( readPtr, buffer.Ptr(), size );
-		currentBufferPos += size;
-		bufferLeftoverCount -= size;
-	}
-}
-
-void CArchive::writeOverBuffer( CFileWriteView file, const void* ptr, int size )
-{
-	const BYTE* writePtr = reinterpret_cast<const BYTE*>( ptr );
-	if( currentBufferPos > 0 ) {
-		// Buffer is not empty, write as much as it can fit and flush.
-		const int writeCount = bufferSize - currentBufferPos;
-		memcpy( buffer.Ptr() + currentBufferPos, writePtr, writeCount );
-		bufferLeftoverCount = 0;
-		currentBufferPos = bufferSize;
-		writePtr += writeCount;
-		size -= writeCount;
-		flushWriting( file );
-	}
-	if( bufferSize <= size ) {
-		// Size is bigger than buffer, write directly to file.
-		file.Write( writePtr, size );
-		filePos += size;
-	} else {
-		memcpy( buffer.Ptr(), writePtr, size );
-		currentBufferPos = size;
-	}
-	fileLength = max( fileLength, filePos );
-	bufferLeftoverCount = 0;
-}
-
-// Archive can be created on the base of a file that is not empty.
-// Usually this information is not important, but for some operations an actual length and position in the file are needed.
-// In this case we perform these calculations.
-void CArchive::calcActualFilePos( CFileWriteView file ) const
-{
-	assert( !arePosAndLengthActual );
-	archiveStartPos = file.GetPosition() - filePos;
-	assert( archiveStartPos >= 0 );
-	filePos += archiveStartPos;
-	fileLength = max( file.GetLength(), archiveStartPos + fileLength );
-	arePosAndLengthActual = true;
-}
-
 // Write object's external name.
-void CArchive::writeExternalName( CFileWriteView file, CUnicodeView name )
+void CArchive::writeExternalName( CUnicodeView name )
 {
-	const int nextIndex = objectNamesDictionary.Size() + 1;
-	int index = objectNamesDictionary.GetOrCreate( name, nextIndex ).Value();
+	const auto nextIndex = objectNamesDictionary.Size() + 1;
+	const auto index = objectNamesDictionary.GetOrCreate( name, nextIndex ).Value();
 	if( index == nextIndex ) {
 		// Encountered a new name, write the name itself.
-		writeSmallValue( file, index << 1 );
+		writeSmallValue( index << 1 );
 		static_cast<CArchiveWriter&>( *this ) << Str( name );
 	} else {
 		// Name was previously written, simply write its index with a marked first bit.
-		index <<= 1;
-		index |= 1;
-		writeSmallValue( file, index );
+		writeSmallValue( ( index << 1 ) | 1 );
 	}
 }
 
@@ -235,7 +106,7 @@ const CBaseObjectCreationFunction* CArchive::readCreationFunctionPtr( int create
 		return 0;
 	} else if( HasFlag( createIndex, 1 ) ) {
 		// The first bit of createIndex is a flag that the class has been written before.
-		const int objectIndex = createIndex >> 1;
+		const auto objectIndex = createIndex >> 1;
 		check( objectIndex > 0 && objectIndex <= creationFunctionsBuffer.Size(), Err_BadArchive );
 		return creationFunctionsBuffer[objectIndex - 1];
 	} else {
@@ -249,9 +120,9 @@ const CBaseObjectCreationFunction* CArchive::readCreationFunctionPtr( int create
 	}
 }
 
-CSharedPtr<ISerializable> CArchive::readObject( CFileReadView file )
+CSharedPtr<ISerializable> CArchive::readObject()
 {
-	const int createIndex = readSmallValue( file );
+	const int createIndex = readSmallValue();
 	const CBaseObjectCreationFunction* createFunction = readCreationFunctionPtr( createIndex );
 	if( createFunction == nullptr ) {
 		return nullptr;
@@ -262,20 +133,20 @@ CSharedPtr<ISerializable> CArchive::readObject( CFileReadView file )
 	}
 }
 
-void CArchive::writeObject( CFileWriteView file, const ISerializable* object )
+void CArchive::writeObject( const ISerializable* object )
 {
 	if( object == nullptr ) {
-		writeSmallValue( file, 0 );
+		writeSmallValue( 0 );
 	} else {
 		const auto objectName = GetExternalName( *object );
-		writeExternalName( file, objectName );
+		writeExternalName( objectName );
 		object->Serialize( static_cast<CArchiveWriter&>( *this ) );
 	}
 }
 
 CPtrOwner<ISerializable> CArchive::readUniqueObject( CFileReadView file )
 {
-	const int createIndex = readSmallValue( file );
+	const int createIndex = readSmallValue();
 	const CBaseObjectCreationFunction* createFunction = readCreationFunctionPtr( createIndex );
 	if( createFunction == 0 ) {
 		return CPtrOwner<ISerializable>( nullptr );
@@ -290,19 +161,97 @@ CPtrOwner<ISerializable> CArchive::readUniqueObject( CFileReadView file )
 
 }	// namespace RelibInternal.
 
+
 //////////////////////////////////////////////////////////////////////////
 
- CArchiveReader::~CArchiveReader()
+static const BYTE fileArchivePrefix = 0xFA;
+static const BYTE binaryArchivePrefix = 0xBA;
+static const BYTE compressedArchivePrefix = 0xCA;
+CArchiveReader::CArchiveReader( CUnicodeView fileName ) :
+	CArchiveReader( CFileReader( fileName, FCM_OpenExisting ) )
 {
-	 flushReading( file );
 }
 
- //////////////////////////////////////////////////////////////////////////
-
- CArchiveWriter::~CArchiveWriter()
+CArchiveReader::CArchiveReader( CFileReadView file )
 {
-	 flushWriting( file );
+	const auto length = file.GetLength32();
+	auto& buffer = getBuffer();
+	buffer.IncreaseSizeNoInitialize( length );
+	file.Read( buffer.Ptr(), length );
+
+	handleArchiveFlags();
 }
+
+CArchiveReader::CArchiveReader( CArray<BYTE> fileData )
+{
+	attachBuffer( move( fileData ) );
+	handleArchiveFlags();
+}
+
+void CArchiveReader::handleArchiveFlags()
+{
+	BYTE archiveFlag;
+	( *this ) >> archiveFlag;
+	if( archiveFlag == compressedArchivePrefix ) {
+		CZipConverter zipper;
+		CArray<BYTE> unzippedData;
+		const auto zippedData = getBuffer().Mid( sizeof( archiveFlag ) );
+		zipper.UnzipData( zippedData, unzippedData );
+		attachBuffer( move( unzippedData ) );
+	} else {
+		check( archiveFlag == fileArchivePrefix || archiveFlag == binaryArchivePrefix, Err_BadArchive );
+	}
+}
+
+//////////////////////////////////////////////////////////////////////////
+
+CArchiveWriter::CArchiveWriter( int bufferSize )
+{
+	const auto flagByteSize = sizeof( fileArchivePrefix );
+	increaseBuffer( bufferSize + flagByteSize );
+	skip( flagByteSize );
+}
+
+extern const CUnicodeView UncommitedArchiveError;
+CArchiveWriter::~CArchiveWriter()
+{
+	 if( getBufferSize() > 0 ) {
+		 Log::Error( UncommitedArchiveError, this );
+	 }
+}
+
+ void CArchiveWriter::FlushToFile( CUnicodeView fileName )
+ {
+	 CFileWriter file( fileName, FCM_CreateAlways );
+	 auto buffer = detachBuffer();
+	 writeArchiveFlag( fileArchivePrefix, buffer );
+	 file.Write( buffer.Ptr(), buffer.Size() );
+ }
+
+ void CArchiveWriter::FlushToCompressedFile( CUnicodeView fileName )
+ {
+	 const auto flagSize = sizeof( compressedArchivePrefix );
+	 CFileWriter file( fileName, FCM_CreateAlways );
+	 CZipConverter zipper;
+	 auto buffer = detachBuffer();
+	 CArray<BYTE> zippedBuffer;
+	 zippedBuffer.IncreaseSizeNoInitialize( flagSize );
+	 writeArchiveFlag( compressedArchivePrefix, zippedBuffer );
+	 zipper.ZipData( buffer.Mid( flagSize ), zippedBuffer );
+	 file.Write( zippedBuffer.Ptr(), zippedBuffer.Size() );
+ }
+
+ CArray<BYTE> CArchiveWriter::FlushToByteString()
+ {
+	 auto buffer = detachBuffer();
+	 writeArchiveFlag( binaryArchivePrefix, buffer );
+	 return buffer;
+ }
+
+ void CArchiveWriter::writeArchiveFlag( BYTE flagValue, CArray<BYTE>& dest ) const
+ {
+	 ::memcpy( dest.Ptr(), &flagValue, sizeof( flagValue ) );
+ }
 
  //////////////////////////////////////////////////////////////////////////
 

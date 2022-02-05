@@ -14,151 +14,126 @@
 
 namespace Relib {
 
+extern const REAPI CError Err_SmallArchive;
+
 namespace RelibInternal {
 
 // Class for data serialization.
 class REAPI CArchive {
 public:
-	explicit CArchive( int bufferSize );
+	CArchive();
 
 protected:
-	static const int minArchiveSize = 4096;
-
 	// Read/Write methods for arbitrary data.
-	void read( CFileReadView file, void* ptr, int size );
-	void write( CFileWriteView file, const void* ptr, int size );
-	bool isEndOfReading( CFileReadView file ) const;
+	void read( void* ptr, int size );
+	void write( const void* ptr, int size );
+	bool isEndOfReading() const;
 
-	void flushReading( CFileReadView file  );
-	void flushWriting( CFileWriteView file  );
+	CArray<BYTE>& getBuffer()
+		{ return buffer; }
+	int getBufferSize() const
+		{ return buffer.Size(); }
 
-	void skipReading( CFileReadView file, int byteCount );
-	void skipWriting( CFileWriteView file, int byteCount );
+	void increaseBuffer( int bufferSize );
+	void attachBuffer( CArray<BYTE> newBuffer );
+	CArray<BYTE> detachBuffer();
+
+	void skip( int byteCount );
 
 	// Serialization for small values.
 	// Integers from 0 to 254 are stored in 1 byte.
 	// Other integers are stored in 5 bytes.
-	int readSmallValue( CFileReadView file );
-	void writeSmallValue( CFileWriteView file, int value );
+	int readSmallValue();
+	void writeSmallValue( int value );
 
 	// Custom serializable read/write.
-	CSharedPtr<ISerializable> readObject( CFileReadView file );
-	void writeObject( CFileWriteView file, const ISerializable* object );
+	CSharedPtr<ISerializable> readObject();
+	void writeObject( const ISerializable* object );
 
 	// Enumeration type read/write.
 	template<class Type>
-	Type readEnum( CFileReadView file );
+	Type readEnum();
 	template<class Type>
-	void writeEnum( CFileWriteView file, Type enumValue );
+	void writeEnum( Type enumValue );
 
 	template<class Type>
-	void readSimpleType( CFileReadView file, Type& var );
+	void readSimpleType( Type& var );
 	template<class Type>
-	void writeSimpleType( CFileWriteView file, Type var );
+	void writeSimpleType( Type var );
 
 	// Serializes a version of an archive.
 	// If the version in the archive is bigger than currentVersion. The archive is incompatible with the program and an exception is thrown.
-	int readVersion( CFileReadView file, int currentVersion );
-	int writeVersion( CFileWriteView file, int currentVersion );
-
-	void abort();
+	int readVersion( int currentVersion );
+	int writeVersion( int currentVersion );
 	
 private:
 	// Buffer to be written to the file.
-	CArray<BYTE, CRuntimeHeap> buffer;
-	const int bufferSize;
-
-	// Buffered parameters for speedy Seek.
-	mutable __int64 archiveStartPos;
-	mutable __int64 filePos;
-	mutable __int64 fileLength;
-	mutable bool arePosAndLengthActual;
-
+	CArray<BYTE> buffer;
 	// Current buffer position.
 	int currentBufferPos;
-	// The count of meaningful information that is situated after currentBufferPos.
-	// For archive readers this corresponds to the amount of unread data in the buffer.
-	// For archive writers this value is non-zero only if we decided to change archive position and rewrite some previously written data.
-	int bufferLeftoverCount;
 
 	// Map that returns creationFunctionsBuffer's index for an object's name.
-	CMap<CUnicodeString, int, CDefaultHash<CUnicodeString>, CRuntimeHeap> objectNamesDictionary;
+	CMap<CUnicodeString, int> objectNamesDictionary;
 	// Buffer for quick access to object's creation functions. Filled only in reading mode.
-	CArray<const CBaseObjectCreationFunction*, CRuntimeHeap> creationFunctionsBuffer;
-
-	void readOverBuffer( CFileReadView file, void* ptr, int size );
-	void writeOverBuffer( CFileWriteView file, const void* ptr, int size );
-	void calcActualFilePos( CFileWriteView file ) const;
+	CArray<const CBaseObjectCreationFunction*> creationFunctionsBuffer;
 
 	CPtrOwner<ISerializable> readUniqueObject( CFileReadView file );
 
-	void writeExternalName( CFileWriteView file, CUnicodeView name );
+	void writeExternalName( CUnicodeView name );
 	const CBaseObjectCreationFunction* readCreationFunctionPtr( int objectId );
 };
 
 //////////////////////////////////////////////////////////////////////////
 
-inline void CArchive::read( CFileReadView file, void* ptr, int size )
+inline void CArchive::read( void* ptr, int size )
 {
 	assert( size >= 0 );
-
-	if( size == 0 ) {
-		return;
-	} else if( size <= bufferLeftoverCount ) {
-		memcpy( ptr, buffer.Ptr() + currentBufferPos, size );
+	check( size < buffer.Size(), Err_SmallArchive );
+	if( size > 0 ) {
+		::memcpy( ptr, buffer.Ptr() + currentBufferPos, size );
 		currentBufferPos += size;
-		bufferLeftoverCount -= size;
-	} else {
-		// Not enough data left in buffer.
-		readOverBuffer( file, ptr, size );
 	}
 }
 
-inline void CArchive::write( CFileWriteView file, const void* ptr, int size )
+inline void CArchive::write( const void* ptr, int size )
 {
 	assert( size >= 0 );
-
-	if( size == 0 ) {
-		return;
-	} else if( size + currentBufferPos < bufferSize ) {
-		memcpy( buffer.Ptr() + currentBufferPos, ptr, size );
-		currentBufferPos += size;
-		bufferLeftoverCount = max( bufferLeftoverCount - size, 0 );
-	} else {
-		// Note enough space left in buffer.
-		writeOverBuffer( file, ptr, size );
+	if( size + currentBufferPos >= buffer.Size() ) {
+		buffer.IncreaseSizeNoInitialize( size + currentBufferPos + 1 );
 	}
+	::memcpy( buffer.Ptr() + currentBufferPos, ptr, size );
+	currentBufferPos += size;
 }
 
-inline bool CArchive::isEndOfReading( CFileReadView file ) const
+inline bool CArchive::isEndOfReading() const
 {
-	return bufferLeftoverCount == 0 && file.IsEndOfFile();
+	return currentBufferPos == buffer.Size();
 }
 
 template<class Type>
-Type CArchive::readEnum( CFileReadView file )
+Type CArchive::readEnum()
 {
 	staticAssert( Types::IsEnum<Type>::Result );
-	return Type( readSmallValue( file ) );
+	return Type( readSmallValue() );
 }
 
 template<class Type>
-void CArchive::writeEnum( CFileWriteView file, Type enumValue )
+void CArchive::writeEnum( Type enumValue )
 {
 	staticAssert( Types::IsEnum<Type>::Result );
-	writeSmallValue( file, enumValue );
+	writeSmallValue( enumValue );
 }
 
 template<class Type>
-inline void CArchive::readSimpleType( CFileReadView file, Type& var )
+inline void CArchive::readSimpleType( Type& var )
 {
-	read( file, &var, sizeof( Type ) );
+	read( &var, sizeof( Type ) );
 }
 
 template<class Type>
-inline void CArchive::writeSimpleType( CFileWriteView file, Type var )
+inline void CArchive::writeSimpleType( Type var )
 {
-	write( file, &var, sizeof( Type ) );
+	write( &var, sizeof( Type ) );
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -170,25 +145,22 @@ inline void CArchive::writeSimpleType( CFileWriteView file, Type var )
 // Class that reads and serializes data from a given file into the data structures.
 class REAPI CArchiveReader : public RelibInternal::CArchive {
 public:
-	CArchiveReader( CFileReadView _file, int bufferSize = minArchiveSize ) : RelibInternal::CArchive( bufferSize ), file( _file ) {}
+	explicit CArchiveReader( CUnicodeView fileName );
+	explicit CArchiveReader( CFileReadView _file );
+	explicit CArchiveReader( CArray<BYTE> _fileData );
 
-	~CArchiveReader();
-
-	CUnicodeString GetName() const
-		{ return file.GetFileName(); }
-
-	void Flush()
-		{ flushReading( file ); }
 	void Skip( int byteCount )
-		{ skipReading( file, byteCount ); }
+		{ skip( byteCount ); }
 
 	bool IsEndOfArchive() const
-		{ return isEndOfReading( file ); }
+		{ return isEndOfReading(); }
 	
 	int ReadSmallValue()
-		{ return readSmallValue( file ); }
+		{ return readSmallValue(); }
+	int ReadVersion( int currentVersion )
+		{ return readVersion( currentVersion ); }
 	void Read( void* ptr, int size )
-		{ read( file, ptr, size ); }
+		{ read( ptr, size ); }
 
 	template <class Enum>
 	Enum ReadEnum()
@@ -216,101 +188,102 @@ public:
 	friend CArchiveReader& operator>>( CArchiveReader& archive, CPtrOwner<ObjectType>& object );
 
 private:
-	CFileReadView file;
+	void handleArchiveFlags();
 };
 
 //////////////////////////////////////////////////////////////////////////
 
+extern const REAPI CError Err_BadArchive;
 inline CArchiveReader& operator>>( CArchiveReader& archive, bool& var )
 {
 	BYTE byte;
-	archive.readSimpleType( archive.file, byte );
-	check( byte == 0 || byte == 1, Err_BadArchive, archive.file.GetFileName() );
+	archive.readSimpleType( byte );
+	check( byte == 0 || byte == 1, Err_BadArchive );
 	var = byte == 1;
 	return archive;
 }
 
 inline CArchiveReader& operator>>( CArchiveReader& archive, char& var )
 {
-	archive.readSimpleType( archive.file, var );
+	archive.readSimpleType( var );
 	return archive;
 }
 
 inline CArchiveReader& operator>>( CArchiveReader& archive, signed char& var )
 {
-	archive.readSimpleType( archive.file, var );
+	archive.readSimpleType( var );
 	return archive;
 }
 
 inline CArchiveReader& operator>>( CArchiveReader& archive, unsigned char& var )
 {
-	archive.readSimpleType( archive.file, var );
+	archive.readSimpleType( var );
 	return archive;
 }
 
 inline CArchiveReader& operator>>( CArchiveReader& archive, wchar_t& var )
 {
-	archive.readSimpleType( archive.file, var );
+	archive.readSimpleType( var );
 	return archive;
 }
 
 inline CArchiveReader& operator>>( CArchiveReader& archive, short& var )
 {
-	archive.readSimpleType( archive.file, var );
+	archive.readSimpleType( var );
 	return archive;
 }
 
 inline CArchiveReader& operator>>( CArchiveReader& archive, unsigned short& var )
 {
-	archive.readSimpleType( archive.file, var );
+	archive.readSimpleType( var );
 	return archive;
 }
 
 inline CArchiveReader& operator>>( CArchiveReader& archive, int& var )
 {
-	archive.readSimpleType( archive.file, var );
+	archive.readSimpleType( var );
 	return archive;
 }
 
 inline CArchiveReader& operator>>( CArchiveReader& archive, unsigned int& var )
 {
-	archive.readSimpleType( archive.file, var );
+	archive.readSimpleType( var );
 	return archive;
 }
 
 inline CArchiveReader& operator>>( CArchiveReader& archive, long& var )
 {
-	archive.readSimpleType( archive.file, var );
+	archive.readSimpleType( var );
 	return archive;
 }
 
 inline CArchiveReader& operator>>( CArchiveReader& archive, unsigned long& var )
 {
-	archive.readSimpleType( archive.file, var );
+	archive.readSimpleType( var );
 	return archive;
 }
 
 inline CArchiveReader& operator>>( CArchiveReader& archive, __int64& var )
 {
-	archive.readSimpleType( archive.file, var );
+	archive.readSimpleType( var );
 	return archive;
 }
 
 inline CArchiveReader& operator>>( CArchiveReader& archive, unsigned __int64& var )
 {
-	archive.readSimpleType( archive.file, var );
+	archive.readSimpleType( var );
 	return archive;
 }
 
 inline CArchiveReader& operator>>( CArchiveReader& archive, float& var )
 {
-	archive.readSimpleType( archive.file, var );
+	archive.readSimpleType( var );
 	return archive;
 }
 
 inline CArchiveReader& operator>>( CArchiveReader& archive, double& var )
 {
-	archive.readSimpleType( archive.file, var );
+	archive.readSimpleType( var );
 	return archive;
 }
 
@@ -330,29 +303,30 @@ inline CArchiveReader& operator>>( CArchiveReader& archive, CPtrOwner<ObjectType
 
 //////////////////////////////////////////////////////////////////////////
 
-// Class that writes data to a given file from the data structures.
+// Class that binarizes the data. It must be flushed to a valid source before it's destroyed. 
 class REAPI CArchiveWriter : public RelibInternal::CArchive {
 public:
-	CArchiveWriter( CFileWriteView _file, int bufferSize = minArchiveSize ) : RelibInternal::CArchive( bufferSize ), file( _file ) {}
+	explicit CArchiveWriter( int bufferSize = 0 );
 
 	~CArchiveWriter();
 
-	CUnicodeString GetName() const
-		{ return file.GetFileName(); }
+	void FlushToFile( CUnicodeView fileName );
+	void FlushToCompressedFile( CUnicodeView fileName );
+	CArray<BYTE> FlushToByteString();
 
-	void Flush()
-		{ flushWriting( file ); }
 	void Skip( int byteCount )
-		{ skipWriting( file, byteCount ); }
+		{ skip( byteCount ); }
 
 	void WriteSmallValue( int value )
-		{ writeSmallValue( file, value ); }
+		{ writeSmallValue( value ); }
+	int WriteVersion( int currentVersion )
+		{ return writeVersion( currentVersion ); }
 	void Write( const void* ptr, int size )
-		{ write( file, ptr, size ); }
+		{ write( ptr, size ); }
 
 	template <class Enum>
 	void WriteEnum( Enum value )
-		{ writeEnum( file, value ); }
+		{ writeEnum( value ); }
 
 	friend CArchiveWriter& operator<<( CArchiveWriter& archive, bool var );
 	friend CArchiveWriter& operator<<( CArchiveWriter& archive, char var );
@@ -374,7 +348,7 @@ public:
 	friend CArchiveWriter& operator<<( CArchiveWriter& archive, const CPtrOwner<ObjectType>& object );
 
 private:
-	CFileWriteView file;
+	void writeArchiveFlag( BYTE flagValue, CArray<BYTE>& dest ) const;
 };
 
 //////////////////////////////////////////////////////////////////////////
@@ -384,91 +358,91 @@ inline CArchiveWriter& operator<<( CArchiveWriter& archive, bool var )
 	BYTE byte = numeric_cast<BYTE>( var );
 	// var should be initialized.
 	assert( byte == 0 || byte == 1 );
-	archive.writeSimpleType( archive.file, byte );
+	archive.writeSimpleType( byte );
 	return archive;
 }
 
 inline CArchiveWriter& operator<<( CArchiveWriter& archive, char var )
 {
-	archive.writeSimpleType( archive.file, var );
+	archive.writeSimpleType( var );
 	return archive;
 }
 
 inline CArchiveWriter& operator<<( CArchiveWriter& archive, signed char var )
 {
-	archive.writeSimpleType( archive.file, var );
+	archive.writeSimpleType( var );
 	return archive;
 }
 
 inline CArchiveWriter& operator<<( CArchiveWriter& archive, unsigned char var )
 {
-	archive.writeSimpleType( archive.file, var );
+	archive.writeSimpleType( var );
 	return archive;
 }
 
 inline CArchiveWriter& operator<<( CArchiveWriter& archive, wchar_t var )
 {
-	archive.writeSimpleType( archive.file, var );
+	archive.writeSimpleType( var );
 	return archive;
 }
 
 inline CArchiveWriter& operator<<( CArchiveWriter& archive, short var )
 {
-	archive.writeSimpleType( archive.file, var );
+	archive.writeSimpleType( var );
 	return archive;
 }
 
 inline CArchiveWriter& operator<<( CArchiveWriter& archive, unsigned short var )
 {
-	archive.writeSimpleType( archive.file, var );
+	archive.writeSimpleType( var );
 	return archive;
 }
 
 inline CArchiveWriter& operator<<( CArchiveWriter& archive, int var )
 {
-	archive.writeSimpleType( archive.file, var );
+	archive.writeSimpleType( var );
 	return archive;
 }
 
 inline CArchiveWriter& operator<<( CArchiveWriter& archive, unsigned int var )
 {
-	archive.writeSimpleType( archive.file, var );
+	archive.writeSimpleType( var );
 	return archive;
 }
 
 inline CArchiveWriter& operator<<( CArchiveWriter& archive, long var )
 {
-	archive.writeSimpleType( archive.file, var );
+	archive.writeSimpleType( var );
 	return archive;
 }
 
 inline CArchiveWriter& operator<<( CArchiveWriter& archive, unsigned long var )
 {
-	archive.writeSimpleType( archive.file, var );
+	archive.writeSimpleType( var );
 	return archive;
 }
 
 inline CArchiveWriter& operator<<( CArchiveWriter& archive, __int64 var )
 {
-	archive.writeSimpleType( archive.file, var );
+	archive.writeSimpleType( var );
 	return archive;
 }
 
 inline CArchiveWriter& operator<<( CArchiveWriter& archive, unsigned __int64 var )
 {
-	archive.writeSimpleType( archive.file, var );
+	archive.writeSimpleType( var );
 	return archive;
 }
 
 inline CArchiveWriter& operator<<( CArchiveWriter& archive, float var )
 {
-	archive.writeSimpleType( archive.file, var );
+	archive.writeSimpleType( var );
 	return archive;
 }
 
 inline CArchiveWriter& operator<<( CArchiveWriter& archive, double var )
 {
-	archive.writeSimpleType( archive.file, var );
+	archive.writeSimpleType( var );
 	return archive;
 }
 
@@ -512,14 +486,13 @@ CArchiveWriter& operator<<( CArchiveWriter& archive, const CArray<Elem, Allocato
 	return archive;
 }
 
-extern const REAPI CError Err_BadArchive;
 template <class Elem, class Allocator /*= CRuntimeHeap*/, class GrowStrategy /*= CDefaultGrowStrategy<8>*/>
 CArchiveReader& operator>>( CArchiveReader& archive, CArray<Elem, Allocator, GrowStrategy>& arr )
 {
 	arr.Empty();
 	int size;
 	archive >> size;
-	check( size >= 0, Err_BadArchive, archive.GetName() );
+	check( size >= 0, Err_BadArchive );
 	arr.IncreaseSize( size );
 	for( int i = 0; i < size; i++ ) {
 		archive >> arr[i];
@@ -546,7 +519,7 @@ CArchiveReader& operator>>( CArchiveReader& archive, CStaticArray<Elem, Allocato
 	arr.Empty();
 	int size;
 	archive >> size;
-	check( size >= 0, Err_BadArchive, archive.GetName() );
+	check( size >= 0, Err_BadArchive );
 	arr.ResetSize( size );
 	for( int i = 0; i < size; i++ ) {
 		archive >> arr[i];
@@ -573,7 +546,7 @@ CArchiveReader& operator>>( CArchiveReader& archive, CPersistentStorage<Elem, gr
 	arr.Empty();
 	int size;
 	archive >> size;
-	check( size >= 0, Err_BadArchive, archive.GetName() );
+	check( size >= 0, Err_BadArchive );
 	arr.IncreaseSize( size );
 	for( int i = 0; i < size; i++ ) {
 		archive >> arr[i];
@@ -600,7 +573,7 @@ CArchiveReader& operator>>( CArchiveReader& archive, RelibInternal::CBaseString<
 	str.Empty();
 	const int length = archive.ReadSmallValue();
 	if( length < 0 ) {
-		check( false, Err_BadArchive, archive.GetName() );
+		check( false, Err_BadArchive );
 	}
 	if( length == 0 ) {
 		return archive;

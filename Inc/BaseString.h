@@ -8,8 +8,6 @@
 
 namespace Relib {
 
-extern const REAPI CError Err_BadArchive;
-
 namespace RelibInternal {
 
 // An opposite character type. Returns char for wchar_t parameters and wchar_t for char parameters.

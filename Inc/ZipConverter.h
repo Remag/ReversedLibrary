@@ -1,7 +1,7 @@
 #pragma once
 #include <Redefs.h>
 
-#ifndef RELIB_NO_IMAGELIB
+#ifndef RELIB_NO_ZLIB
 
 namespace Relib {
 
@@ -22,4 +22,4 @@ private:
 
 }	// namespace Relib.
 
-#endif // RELIB_NO_IMAGELIB
+#endif // RELIB_NO_ZLIB

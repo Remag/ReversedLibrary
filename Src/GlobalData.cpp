@@ -103,6 +103,7 @@ extern const CUnicodeView GeneralCurlError = L"Curl error. Error string buffer: 
 extern const CUnicodeView GeneralPngFileError = L"JPEG parsing error: %1.\nFile name: %0";
 extern const CUnicodeView GeneralGifFileError = L"GIF parsing error: %1.\nFile name: %0";
 extern const CUnicodeView GeneralJpgFileError = L"PNG parsing error: %1.\nFile name: %0";
+extern const CUnicodeView UncommitedArchiveError = L"Archive was written to but never flushed to a file or buffer.";
 
 // Symbol sets.
 extern const CUnicodeSet InvalidFileNameSymbols{
@@ -114,8 +115,9 @@ extern const CUnicodeSet InvalidFileNameSymbols{
 };
 
 // Errors.
-extern const CError REAPI Err_BadArchive( L"Unable to serialize with the given archive.\nArchive file name: %0." );
-extern const CError REAPI Err_BadArchiveVersion( L"Archive version is incompatible with the current program.\nArchive file name: %0." );
+extern const CError REAPI Err_SmallArchive( L"Trying to read an archive value after its end." );
+extern const CError REAPI Err_BadArchive( L"Unable to serialize with the given archive." );
+extern const CError REAPI Err_BadArchiveVersion( L"Archive version is incompatible with the current program." );
 extern const CError Err_BadIniFile( L"INI contains an invalid string.\nFile name: %0. String position: %1." );
 extern const CError Err_DuplicateIniKey( L"INI file contains a duplicate key.\nFile name: %0. Key name: %1." );
 extern const CError Err_RegistryOpenError{ L"Failed to open a registry key. Key name: %0.  Error code: %1." };
