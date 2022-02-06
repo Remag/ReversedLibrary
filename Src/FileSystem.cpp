@@ -22,14 +22,14 @@ namespace FileSystem {
 
 //////////////////////////////////////////////////////////////////////////
 	
-static bool isLetterLatin( wchar_t letter )
+static bool isLetterLatin( char letter )
 {
-	return ( letter >= L'A' && letter <= L'Z' ) || ( letter >= L'a' && letter <= L'z' );
+	return ( letter >= 'A' && letter <= 'Z' ) || ( letter >= 'a' && letter <= 'z' );
 }
 
-static bool checkDrive( CUnicodePart drive )
+static bool checkDrive( CStringPart drive )
 {
-	return drive.Length() == 2 && isLetterLatin( drive[0] ) && drive[1] == L':';
+	return drive.Length() == 2 && isLetterLatin( drive[0] ) && drive[1] == ':';
 }
 
 static bool isValidSymbol( wchar_t symbol )
@@ -37,17 +37,17 @@ static bool isValidSymbol( wchar_t symbol )
 	return !InvalidFileNameSymbols.Has( symbol );
 }
 
-static bool checkComponent( CUnicodePart str )
+static bool checkComponent( CStringPart str )
 {
 	if( str.IsEmpty() ) {
 		return false;
 	}
 	bool nonSpaceSymbolFound = false;
-	for( wchar_t c : str ) {
+	for( auto c : str ) {
 		if( !isValidSymbol( c ) ) {
 			return false;
 		}
-		if( !CUnicodeString::IsCharWhiteSpace( c ) ) {
+		if( !CString::IsCharWhiteSpace( c ) ) {
 			nonSpaceSymbolFound = true;
 		}
 	}
@@ -55,9 +55,9 @@ static bool checkComponent( CUnicodePart str )
 	return nonSpaceSymbolFound;
 }
 
-bool IsNameValid( CUnicodePart name )
+bool IsNameValid( CStringPart name )
 {
-	CArray<CUnicodePart> components;
+	CArray<CStringPart> components;
 	const TPathType type = SplitName( name, components );
 	if( components.IsEmpty() ) {
 		return false;
@@ -79,17 +79,17 @@ bool IsNameValid( CUnicodePart name )
 	return true;
 }
 
-static wchar_t getNameSeparator()
+static char getNameSeparator()
 {
-	return L'\\';
+	return '\\';
 }
 
-static bool isNameSeparator( wchar_t symbol )
+static bool isNameSeparator( char symbol )
 {
-	return symbol == L'\\' || symbol == L'/';
+	return symbol == '\\' || symbol == '/';
 }
 
-int CompareNames( CUnicodePart leftName, CUnicodePart rightName )
+int CompareNames( CStringPart leftName, CStringPart rightName )
 {
 	const int leftLength = leftName.Length();
 	const int rightLength = rightName.Length();
@@ -124,12 +124,12 @@ int CompareNames( CUnicodePart leftName, CUnicodePart rightName )
 	}
 }
 
-bool NamesEqual( CUnicodePart leftName, CUnicodePart rightName )
+bool NamesEqual( CStringPart leftName, CStringPart rightName )
 {
 	return CompareNames( leftName, rightName ) == 0;
 }
 
-TPathType GetPathType( CUnicodePart path )
+TPathType GetPathType( CStringPart path )
 {
 	const int length = path.Length();
 	if( length >= 2 && isNameSeparator( path[0] ) && path[0] == path[1] ) {
@@ -142,7 +142,7 @@ TPathType GetPathType( CUnicodePart path )
 	return PT_Relative;
 }
 
-static int findLastSeparator( CUnicodePart path )
+static int findLastSeparator( CStringPart path )
 {
 	for( int i = path.Length() - 1; i >= 0; i-- ) {
 		if( isNameSeparator( path[i] ) ) {
@@ -152,24 +152,24 @@ static int findLastSeparator( CUnicodePart path )
 	return NotFound;
 }
 
-void SplitName( CUnicodeView fullName, CUnicodeString& drive, CUnicodeString& dir, CUnicodeString& name, CUnicodeString& ext )
+void SplitName( CStringView fullName, CString& drive, CString& dir, CString& name, CString& ext )
 {
 	const int length = fullName.Length();
-	_wsplitpath_s( fullName.Ptr(), drive.CreateRawBuffer( _MAX_DRIVE ), _MAX_DRIVE + 1, dir.CreateRawBuffer( length ), length + 1, 
+	_splitpath_s( fullName.Ptr(), drive.CreateRawBuffer( _MAX_DRIVE ), _MAX_DRIVE + 1, dir.CreateRawBuffer( length ), length + 1, 
 		name.CreateRawBuffer( length ), length + 1, ext.CreateRawBuffer( length ), length + 1 );
 }
 
-TPathType SplitName( CUnicodePart path, CArray<CUnicodePart>& components )
+TPathType SplitName( CStringPart path, CArray<CStringPart>& components )
 {
 	const TPathType pathType = GetPathType( path );
 	components.Empty();
 	
 	while( !path.IsEmpty() ) {
 		const int pos = findLastSeparator( path );
-		CUnicodePart newComponent;
+		CStringPart newComponent;
 		if( pos == NotFound ) {
 			newComponent = path;
-			path = CUnicodePart();
+			path = CStringPart();
 		} else {
 			newComponent = path.Mid( pos + 1 );
 			path = path.Left( pos );
@@ -190,32 +190,32 @@ TPathType SplitName( CUnicodePart path, CArray<CUnicodePart>& components )
 	return pathType;
 }
 
-CUnicodeString MergeName( CUnicodePart driveDir, CUnicodePart nameExt )
+CString MergeName( CStringPart driveDir, CStringPart nameExt )
 {
 	return MergeName( driveDir, GetName( nameExt ), GetExt( nameExt ) );
 }
 
-CUnicodeString MergeName( CUnicodePart driveDir, CUnicodeView name, CUnicodeView ext )
+CString MergeName( CStringPart driveDir, CStringView name, CStringView ext )
 {
-	CUnicodeString rawDriveDir = UnicodeStr( driveDir );
+	CString rawDriveDir = Str( driveDir );
 	if( !rawDriveDir.IsEmpty() ) {
 		AddPathSeparator( rawDriveDir );
 	}
 	return MergeName( GetDrive( rawDriveDir ), GetPath( rawDriveDir ), name, ext );
 }
 
-CUnicodeString MergeName( CUnicodeView drive, CUnicodeView dir, CUnicodeView name, CUnicodeView ext )
+CString MergeName( CStringView drive, CStringView dir, CStringView name, CStringView ext )
 {
-	CUnicodeString result;
+	CString result;
 	const int bufferSize = max( MAX_PATH, drive.Length() + dir.Length() + name.Length() + ext.Length() + 3 );
-	_wmakepath_s( result.CreateRawBuffer( bufferSize ), bufferSize + 1, drive.Ptr(), dir.Ptr(), name.Ptr(), ext.Ptr() );
+	_makepath_s( result.CreateRawBuffer( bufferSize ), bufferSize + 1, drive.Ptr(), dir.Ptr(), name.Ptr(), ext.Ptr() );
 	return result;
 }
 
-static CUnicodeString mergePath( CUnicodePart dir, CUnicodePart relativePath )
+static CString mergePath( CStringPart dir, CStringPart relativePath )
 {
 	if( dir.IsEmpty() ) {
-		return UnicodeStr( relativePath );
+		return Str( relativePath );
 	}
 	int separatorCount = 0;
 	if( isNameSeparator( dir.Last() ) ) {
@@ -226,7 +226,7 @@ static CUnicodeString mergePath( CUnicodePart dir, CUnicodePart relativePath )
 	}
 	switch( separatorCount ) {
 		case 0: {
-			CUnicodeString dirCopy = UnicodeStr( dir );
+			auto dirCopy = Str( dir );
 			AddPathSeparator( dirCopy );
 			return move( dirCopy ) + relativePath;
 		}
@@ -236,172 +236,183 @@ static CUnicodeString mergePath( CUnicodePart dir, CUnicodePart relativePath )
 			return dir.Left( dir.Length() - 1 ) + relativePath;
 		default:
 			assert( false );
-			return CUnicodeString();
+			return CString();
 	}
 }
 
-CUnicodeString MergePath( CUnicodePart dir, CUnicodePart relativePath )
+CString MergePath( CStringPart dir, CStringPart relativePath )
 {
 	switch( GetPathType( relativePath ) ) {
 		case PT_UNC:
 		case PT_Absolute:
 			// RelativePath is already absolute.
-			return UnicodeStr( relativePath );
+			return Str( relativePath );
 		case PT_Relative:
 			return mergePath( dir, relativePath );
 		case PT_RelativeFromRoot:
 			return mergePath( GetDrive( dir ), relativePath );
 		case PT_RelativeWithDrive:
-			// Extremely rare case, not worth it to demand null termination from relative path, just make a copy here.
-			return CreateFullPath( UnicodeStr( relativePath ) );
+			return CreateFullPath( relativePath );
 		default:
 			assert( false );
-			return CUnicodeString();
+			return CString();
 	}
 }
 
-void AddExtIfNone( CUnicodeString& fullName, CUnicodeView extNoPeriod )
+void AddExtIfNone( CString& fullName, CStringView extNoPeriod )
 {
-	CUnicodeString drive;
-	CUnicodeString dir;
-	CUnicodeString name;
-	CUnicodeString oldExt;
+	CString drive;
+	CString dir;
+	CString name;
+	CString oldExt;
 	SplitName( fullName, drive, dir, name, oldExt );
 	if( oldExt.IsEmpty() ) {
 		fullName = MergeName( drive, dir, name, extNoPeriod );
 	}
 }
 
-void ReplaceExt( CUnicodeString& fullName, CUnicodeView extNoPeriod )
+void ReplaceExt( CString& fullName, CStringView extNoPeriod )
 {
-	CUnicodeString drive;
-	CUnicodeString dir;
-	CUnicodeString name;
-	CUnicodeString oldExt;
+	CString drive;
+	CString dir;
+	CString name;
+	CString oldExt;
 	SplitName( fullName, drive, dir, name, oldExt );
 	fullName = MergeName( drive, dir, name, extNoPeriod );
 }
 
-CUnicodeString CreateFullPath( CUnicodeView path )
+CUnicodeString CreateFullUnicodePath( CUnicodeView path )
 {
 	CUnicodeString result;
 	int bufferLength = MAX_PATH + 1;
 	auto resPtr = result.CreateRawBuffer( bufferLength - 1 );
-	int length = ::GetFullPathNameW( path.Ptr(), bufferLength, resPtr, nullptr );
+	int length = ::GetFullPathName( path.Ptr(), bufferLength, resPtr, nullptr );
 	if( length > bufferLength ) {
 		bufferLength = length;
 		resPtr.Release( 0 );
 		resPtr = result.CreateRawBuffer( bufferLength - 1 );
-		length = ::GetFullPathNameW( path.Ptr(), bufferLength, resPtr, nullptr );
+		length = ::GetFullPathName( path.Ptr(), bufferLength, resPtr, nullptr );
 	}
 	assert( length < bufferLength );
 	resPtr.Release( length );
 	return result;
 }
 
-CUnicodeString CreateFullPath( CUnicodeView dir, CUnicodeView relativePath )
+CString CreateFullPath( CStringPart path )
+{
+	CUnicodeString unicodePath = UnicodeStr( path );
+	return Str( CreateFullUnicodePath( unicodePath ) );
+}
+
+CString CreateFullPath( CStringPart dir, CStringPart relativePath )
 {
 	return CreateFullPath( MergePath( dir, relativePath ) );
 }
 
 // Generate an exception from the fileName if condition is false.
-static void checkLastFileError( bool condition, CUnicodePart fileName )
+static void checkLastFileError( bool condition, CStringPart fileName )
 {
 	if( !condition ) {
 		ThrowFileException( GetLastError(), fileName );
 	}
 }
 
-CUnicodeString CreateLongPath( CUnicodeView path )
+static CUnicodeString createLongUnicodePath( CUnicodeView path )
 {
 	CUnicodeString result;
 	int bufferLength = MAX_PATH + 1;
 	auto resPtr = result.CreateRawBuffer( bufferLength - 1 );
-	int length = ::GetLongPathNameW( path.Ptr(), resPtr, bufferLength );
+	int length = ::GetLongPathName( path.Ptr(), resPtr, bufferLength );
 	if( length > bufferLength ) {
 		bufferLength = length;
 		resPtr.Release( 0 );
 		resPtr = result.CreateRawBuffer( bufferLength - 1 );
-		length = ::GetLongPathNameW( path.Ptr(), resPtr, bufferLength );
+		length = ::GetLongPathName( path.Ptr(), resPtr, bufferLength );
 	}
 	assert( length < bufferLength );
 	resPtr.Release( length );
 	return result;
 }
 
-static const wchar_t* unicodePathSeparators = L"\\/";
-CUnicodeString GetRoot( CUnicodePart path )
+CString CreateLongPath( CStringPart path )
 {
-	CUnicodeString rawPath = UnicodeStr( path );
+	const auto unicodePath = UnicodeStr( path );
+	return Str( createLongUnicodePath( unicodePath ) );
+}
+
+static const char* pathSeparators = "\\/";
+CString GetRoot( CStringPart path )
+{
+	CString rawPath = Str( path );
 	if( GetPathType( rawPath ) == PT_UNC ) {
-		int pos = rawPath.FindOneOf( unicodePathSeparators, 2 );
+		int pos = rawPath.FindOneOf( pathSeparators, 2 );
 		if( pos == NotFound ) {
 			AddPathSeparator( rawPath );
 			return rawPath;
 		}
-		pos = rawPath.ReverseFindOneOf( unicodePathSeparators, pos + 1 );
+		pos = rawPath.ReverseFindOneOf( pathSeparators, pos + 1 );
 		if( pos == NotFound ) {
 			AddPathSeparator( rawPath );
 			return rawPath;
 		}
-		return UnicodeStr( rawPath.Left( pos + 1 ) );
+		return Str( rawPath.Left( pos + 1 ) );
 	}
-	CUnicodeString result = GetDrive( rawPath );
+	CString result = GetDrive( rawPath );
 	AddPathSeparator( result );
 	return result;
 }
 
-CUnicodeString GetDrive( CUnicodePart name )
+CString GetDrive( CStringPart name )
 {
 	const int length = name.Length();
 
 	for( int i = 0; i < length; i++ ) {
 		const auto ch = name[i];
 		if( ch == L':' ) {
-			return UnicodeStr( name.Left( i + 1 ) );
+			return Str( name.Left( i + 1 ) );
 		} else if( isNameSeparator( ch ) ) {
 			break;
 		}
 	}
 
-	return CUnicodeString();
+	return CString();
 }
 
-static const CUnicodeView nameSeparators = L"\\/";
-CUnicodeString GetPath( CUnicodePart name )
+static const CStringView nameSeparators = "\\/";
+CString GetPath( CStringPart name )
 {
 	const int length = name.Length();
 
 	const int nameEndPos = name.ReverseFindOneOf( nameSeparators );
 	if( nameEndPos == NotFound ) {
-		return CUnicodeString();
+		return CString();
 	}
 
 	for( int i = 0; i < length; i++ ) {
 		const auto ch = name[i];
 		if( ch == L':' ) {
-			return UnicodeStr( name.Mid( i + 1, nameEndPos - i ) );
+			return Str( name.Mid( i + 1, nameEndPos - i ) );
 		} else if( isNameSeparator( ch ) ) {
-			return UnicodeStr( name.Left( nameEndPos + 1 ) );
+			return Str( name.Left( nameEndPos + 1 ) );
 		}
 	}
 
 	// Name separator is present in the path, previous loop should've been broken.
 	assert( false );
-	return CUnicodeString();
+	return CString();
 }
 
-CUnicodeString GetDrivePath( CUnicodePart name )
+CString GetDrivePath( CStringPart name )
 {
 	const int nameEndPos = name.ReverseFindOneOf( nameSeparators );
 	if( nameEndPos == NotFound ) {
-		return CUnicodeString();
+		return CString();
 	}
 
-	return UnicodeStr( name.Left( nameEndPos + 1 ) );
+	return Str( name.Left( nameEndPos + 1 ) );
 }
 
-CUnicodeString GetName( CUnicodePart name )
+CString GetName( CStringPart name )
 {
 	const int length = name.Length();
 	int nameEndPos = length;
@@ -412,14 +423,14 @@ CUnicodeString GetName( CUnicodePart name )
 			nameEndPos = i;
 		} else if( isNameSeparator( ch ) ) {
 			const int nameStartPos = i + 1;
-			return UnicodeStr( name.Mid( nameStartPos, nameEndPos - nameStartPos ) );
+			return Str( name.Mid( nameStartPos, nameEndPos - nameStartPos ) );
 		}
 	}
 
-	return UnicodeStr( name.Left( nameEndPos ) );
+	return Str( name.Left( nameEndPos ) );
 }
 
-CUnicodeString GetExt( CUnicodePart name )
+CString GetExt( CStringPart name )
 {
 	const int length = name.Length();
 	for( int i = length - 1; i >= 0; i-- ) {
@@ -427,32 +438,32 @@ CUnicodeString GetExt( CUnicodePart name )
 		if( ch == L'.' ) {
 			// Special tokens "." and ".." have no extension.
 			if( ( length == 1 ) || ( length == 2 && name[0] == L'.' && i == 1 ) ) {
-				return CUnicodeString();
+				return CString();
 			} else {
-				return UnicodeStr( name.Mid( i ) );
+				return Str( name.Mid( i ) );
 			}
 		} else if( isNameSeparator( ch ) ) {
 			break;
 		}
 	}
 
-	return CUnicodeString();
+	return CString();
 }
 
-CUnicodeString GetNameExt( CUnicodePart name )
+CString GetNameExt( CStringPart name )
 {
 	const int length = name.Length();
 	for( int i = length - 1; i >= 0; i-- ) {
 		const auto ch = name[i];
 		if( isNameSeparator( ch ) ) {
-			return UnicodeStr( name.Mid( i + 1 ) );
+			return Str( name.Mid( i + 1 ) );
 		}
 	}
 
-	return UnicodeStr( name );
+	return Str( name );
 }
 
-void AddPathSeparator( CUnicodeString& path )
+void AddPathSeparator( CString& path )
 {
 	if( path.IsEmpty() ) {
 		path += getNameSeparator();
@@ -472,7 +483,7 @@ void AddPathSeparator( CUnicodeString& path )
 	}
 }
 
-void NormalizePath( CUnicodeString& path )
+void NormalizePath( CString& path )
 {
 	const int length = path.Length();
 	if( length == 3 && isLetterLatin( path[0] ) && path[1] == L':' && isNameSeparator( path[2] ) ) {
@@ -490,7 +501,7 @@ void NormalizePath( CUnicodeString& path )
 	}
 }
 
-void ForceBackSlashes( CUnicodeString& path )
+void ForceBackSlashes( CString& path )
 {
 	for( int i = 0; i < path.Length(); i++ ) {
 		if( isNameSeparator( path[i] ) ) {
@@ -499,13 +510,13 @@ void ForceBackSlashes( CUnicodeString& path )
 	}
 }
 
-bool DirAccessible( CUnicodeView dir )
+bool DirAccessible( CStringPart dir )
 {
 	try {
 		if( dir.IsEmpty() ) {
 			return false;
 		}
-		CUnicodeString fullDir = CreateFullPath( dir );
+		CString fullDir = CreateFullPath( dir );
 		if( fullDir.Length() < 3 ) {
 			return false;
 		}
@@ -513,17 +524,17 @@ bool DirAccessible( CUnicodeView dir )
 			if( GetPathType( fullDir ) != PT_UNC ) {
 				return false;
 			}
-		} else if( fullDir[1] != L':' ) {
+		} else if( fullDir[1] != ':' ) {
 			return false;
 		}
 		// Check the root catalog case.
 		if( fullDir.Length() == 3 && fullDir[1] == ':' && isNameSeparator( fullDir[2] ) ) {
-			const UINT driveType = GetDriveTypeW( fullDir.Ptr() ); 
+			const UINT driveType = GetDriveTypeA( fullDir.Ptr() ); 
 			return driveType != DRIVE_NO_ROOT_DIR;
 		}
 
 		// Try and find at least one file in the directory. Every catalog but the root one has a file named "."
-		CUnicodeString fileMask = MergeName( fullDir, L"*" );
+		CString fileMask = MergeName( fullDir, "*" );
 		return FileExists( fileMask );
 
 	} catch( const CException& ) {
@@ -532,15 +543,16 @@ bool DirAccessible( CUnicodeView dir )
 	return false;
 }
 
-bool FileExists( CUnicodeView fileMask )
+bool FileExists( CStringPart fileMask )
 {
+	const auto unicodeMask = UnicodeStr( fileMask );
 	if( fileMask.IsEmpty() ) {
 		return false;
 	}
-	WIN32_FIND_DATAW findData;
+	WIN32_FIND_DATA findData;
 	const UINT prevErrorMode = SetErrorMode( 0 );
 	SetErrorMode( prevErrorMode | SEM_FAILCRITICALERRORS | SEM_NOOPENFILEERRORBOX );
-	HANDLE findResult = FindFirstFileW( fileMask.Ptr(), &findData );
+	HANDLE findResult = ::FindFirstFile( unicodeMask.Ptr(), &findData );
 	SetErrorMode( prevErrorMode );
 	if( findResult == INVALID_HANDLE_VALUE ) {
 		return false;
@@ -549,7 +561,7 @@ bool FileExists( CUnicodeView fileMask )
 	return true;
 }
 
-bool CanOpenFile( CUnicodeView fileName, TFileReadWriteMode readWriteMode, TFileCreationMode createMode, TFileShareMode shareMode )
+bool CanOpenFile( CStringPart fileName, TFileReadWriteMode readWriteMode, TFileCreationMode createMode, TFileShareMode shareMode )
 {
 	if( fileName.IsEmpty() ) {
 		return false;
@@ -558,30 +570,35 @@ bool CanOpenFile( CUnicodeView fileName, TFileReadWriteMode readWriteMode, TFile
 	return file.TryOpen( fileName, readWriteMode, createMode, shareMode );
 }
 
-DWORD GetAttributes( CUnicodeView fileName )
+DWORD GetAttributes( CStringPart fileName )
 {
-	const DWORD attributes = GetFileAttributesW( fileName.Ptr() );
+	const auto unicodeName = UnicodeStr( fileName );
+	const DWORD attributes = GetFileAttributesW( unicodeName.Ptr() );
 	checkLastFileError( attributes != INVALID_FILE_ATTRIBUTES, fileName );
 	return attributes;
 }
 
-void SetAttributes( CUnicodeView fileName, DWORD attributes )
+void SetAttributes( CStringPart fileName, DWORD attributes )
 {
-	checkLastFileError( SetFileAttributesW( fileName.Ptr(), attributes ) != 0, fileName );
+	const auto unicodeName = UnicodeStr( fileName );
+	checkLastFileError( SetFileAttributesW( unicodeName.Ptr(), attributes ) != 0, fileName );
 }
 
-void Rename( CUnicodeView fileName, CUnicodeView newFileName )
+void Rename( CStringPart fileName, CStringPart newFileName )
 {
-	checkLastFileError( ::MoveFileW( fileName.Ptr(), newFileName.Ptr() ) != 0, newFileName );
+	const auto unicodeOld = UnicodeStr( fileName );
+	const auto unicodeNew = UnicodeStr( newFileName );
+	checkLastFileError( ::MoveFileW( unicodeOld.Ptr(), unicodeNew.Ptr() ) != 0, newFileName );
 }
 
-void Delete( CUnicodeView fileName )
+void Delete( CStringPart fileName )
 {
-	checkLastFileError( ::DeleteFileW( fileName.Ptr() ) != 0, fileName );
+	const auto unicodeName = UnicodeStr( fileName );
+	checkLastFileError( ::DeleteFileW( unicodeName.Ptr() ) != 0, fileName );
 }
 
 // Additional checks for the destination file to be copyable.
-static void checkCanCopyTo( CUnicodeView fileName )
+static void checkCanCopyTo( CStringPart fileName )
 {
 	if( FileExists( fileName ) ) {
 		// Check if the destination file can be copied over.
@@ -590,33 +607,38 @@ static void checkCanCopyTo( CUnicodeView fileName )
 		}
 	} else {
 		// Check if the parent directory exists and is writable.
-		const CUnicodeString fullPath = CreateFullPath( fileName );
-		CUnicodeString folderName = GetDrivePath( fullPath );
+		const CString fullPath = CreateFullPath( fileName );
+		CString folderName = GetDrivePath( fullPath );
 		if( !DirAccessible( folderName ) ) {
 			ThrowFileException( CFileException::FET_BadPath, fileName );
 		}
 	}
 }
 
-void Copy( CUnicodeView src, CUnicodeView dest )
+void Copy( CStringPart src, CStringPart dest )
 {
-	if( !::CopyFileW( src.Ptr(), dest.Ptr(), FALSE ) ) {
+	const auto unicodeSrc = UnicodeStr( src );
+	const auto unicodeDest = UnicodeStr( dest );
+
+	if( !::CopyFileW( unicodeSrc.Ptr(), unicodeDest.Ptr(), FALSE ) ) {
 		checkLastFileError( CanOpenFile( src, FRWM_Read, FCM_OpenExisting, FSM_DenyWrite ), src );
 		checkCanCopyTo( dest );
 		if( FileExists( dest ) ) {
 			// Deletion will help if dest has a hidden attribute.
 			Delete( dest );
 		}
-		checkLastFileError( ::CopyFileW( src.Ptr(), dest.Ptr(), FALSE ) != 0, dest );
+		checkLastFileError( ::CopyFileW( unicodeSrc.Ptr(), unicodeDest.Ptr(), FALSE ) != 0, dest );
 	}
 }
 
-void Move( CUnicodeView src, CUnicodeView dest )
+void Move( CStringPart src, CStringPart dest )
 {
-	checkLastFileError( MoveFileExW( src.Ptr(), dest.Ptr(), MOVEFILE_COPY_ALLOWED | MOVEFILE_REPLACE_EXISTING | MOVEFILE_WRITE_THROUGH ) != 0, dest );
+	const auto unicodeSrc = UnicodeStr( src );
+	const auto unicodeDest = UnicodeStr( dest );
+	checkLastFileError( MoveFileExW( unicodeSrc.Ptr(), unicodeDest.Ptr(), MOVEFILE_COPY_ALLOWED | MOVEFILE_REPLACE_EXISTING | MOVEFILE_WRITE_THROUGH ) != 0, dest );
 }
 
-static bool deleteLastComponent( CUnicodeString& dir )
+static bool deleteLastComponent( CString& dir )
 {
 	if( dir.IsEmpty() ) {
 		return false;
@@ -645,18 +667,19 @@ static int tryCreateDir( CUnicodeView dir )
 	return GetLastError();
 }
 
-void CreateDir( CUnicodeView dir )
+void CreateDir( CStringPart dir )
 {
-	DWORD errorCode = tryCreateDir( dir );
+	const auto unicodeDir = UnicodeStr( dir );
+	DWORD errorCode = tryCreateDir( unicodeDir );
 	if( errorCode == 0 ) {
 		return;
 	}
 	// Check if the parent dir exists. Old windows system return ERROR_FILE_NOT_FOUND for UNC paths in this case.
 	if( errorCode == ERROR_PATH_NOT_FOUND || errorCode == ERROR_FILE_NOT_FOUND ) {
-		CUnicodeString parentDir = UnicodeStr( dir );
+		CString parentDir = Str( unicodeDir );
 		if( deleteLastComponent( parentDir ) && !DirAccessible( parentDir ) ) {
 			CreateDir( parentDir );
-			errorCode = tryCreateDir( dir );
+			errorCode = tryCreateDir( unicodeDir );
 		}
 	}
 	if( errorCode != 0 ) {
@@ -664,12 +687,13 @@ void CreateDir( CUnicodeView dir )
 	}
 }
 
-void DeleteDir( CUnicodeView dir )
+void DeleteDir( CStringPart dir )
 {
-	checkLastFileError( RemoveDirectoryW( dir.Ptr() ) != 0, dir );
+	const auto unicodeDir = UnicodeStr( dir );
+	checkLastFileError( RemoveDirectoryW( unicodeDir.Ptr() ) != 0, dir );
 }
 
-void DeleteTree( CUnicodeView dir )
+void DeleteTree( CStringPart dir )
 {
 	CArray<CFileStatus> files;
 	GetFilesInDir( dir, files, FIF_Directories | FIF_Files | FIF_Hidden );
@@ -692,7 +716,7 @@ void DeleteTree( CUnicodeView dir )
 	DeleteDir( dir );
 }
 
-void CopyTree( CUnicodePart src, CUnicodeView dest )
+void CopyTree( CStringPart src, CStringView dest )
 {
 	if( !DirAccessible( dest ) ) {
 		CreateDir( dest );
@@ -702,8 +726,8 @@ void CopyTree( CUnicodePart src, CUnicodeView dest )
 	GetFilesInDir( src, files, FIF_Directories | FIF_Files | FIF_Hidden );
 
 	for( const auto& file : files ) {
-		const CUnicodeView srcName = file.FullName;
-		const CUnicodeString destName = MergeName( dest, GetNameExt( srcName ) );
+		const CStringView srcName = file.FullName;
+		const CString destName = MergeName( dest, GetNameExt( srcName ) );
 		if( HasFlag( file.Attributes, FILE_ATTRIBUTE_DIRECTORY ) ) {
 			CopyTree( srcName, destName );
 		} else {
@@ -712,7 +736,7 @@ void CopyTree( CUnicodePart src, CUnicodeView dest )
 	}
 }
 
-void MoveTree( CUnicodeView src, CUnicodeView dest )
+void MoveTree( CStringView src, CStringView dest )
 {
 	if( !DirAccessible( dest ) ) {
 		CreateDir( dest );
@@ -722,8 +746,8 @@ void MoveTree( CUnicodeView src, CUnicodeView dest )
 	GetFilesInDir( src, files, FIF_Directories | FIF_Files | FIF_Hidden );
 
 	for( const auto& file : files ) {
-		const CUnicodeView srcName = file.FullName;
-		const CUnicodeString destName = MergeName( dest, GetNameExt( srcName ) );
+		const CStringView srcName = file.FullName;
+		const CString destName = MergeName( dest, GetNameExt( srcName ) );
 		if( HasFlag( file.Attributes, FILE_ATTRIBUTE_DIRECTORY ) ) {
 			MoveTree( srcName, destName );
 		} else {
@@ -733,16 +757,17 @@ void MoveTree( CUnicodeView src, CUnicodeView dest )
 	DeleteDir( src );
 }
 
-bool IsDirEmpty( CUnicodePart dir )
+bool IsDirEmpty( CStringPart dir )
 {
 	CArray<CFileStatus> files;
 	GetFilesInDir( dir, files, FIF_Directories | FIF_Files | FIF_Hidden );
 	return files.IsEmpty();
 }
 
-static HANDLE startFileSearch( CUnicodeView fullPath, WIN32_FIND_DATAW& findData, CUnicodePart dir )
+static HANDLE startFileSearch( CStringView fullPath, WIN32_FIND_DATAW& findData, CStringPart dir )
 {
-	const HANDLE result = FindFirstFileW( fullPath.Ptr(), &findData );
+	const auto unicodePath = UnicodeStr( fullPath );
+	const auto result = ::FindFirstFile( unicodePath.Ptr(), &findData );
 	if( result == INVALID_HANDLE_VALUE ) {
 		const DWORD err = GetLastError();
 		if( err != ERROR_NO_MORE_FILES && err != ERROR_FILE_NOT_FOUND ) {
@@ -752,21 +777,21 @@ static HANDLE startFileSearch( CUnicodeView fullPath, WIN32_FIND_DATAW& findData
 	return result;
 }
 
-static void finishFileSearch( HANDLE findHandle, CUnicodePart dir )
+static void finishFileSearch( HANDLE findHandle, CStringPart dir )
 {
 	DWORD err = GetLastError();
 	if( err == ERROR_NO_MORE_FILES || err == ERROR_FILE_NOT_FOUND ) {
-		checkLastFileError( FindClose( findHandle ) != 0, dir );
+		checkLastFileError( ::FindClose( findHandle ) != 0, dir );
 	} else {
-		FindClose( findHandle );
+		::FindClose( findHandle );
 		ThrowFileException( err, dir );
 	}
 }
 
-int GetFileCount( CUnicodePart dir )
+int GetFileCount( CStringPart dir )
 {
-	const CUnicodeView allFilesMask = L"*";
-	const CUnicodeString fullPath = MergeName( dir, allFilesMask );
+	const CStringView allFilesMask = "*";
+	const auto fullPath = MergeName( dir, allFilesMask );
 
 	WIN32_FIND_DATAW findData;
 	const HANDLE findHandle = startFileSearch( fullPath, findData, dir );
@@ -786,17 +811,17 @@ int GetFileCount( CUnicodePart dir )
 			continue;
 		}
 		result++;
-	} while( FindNextFileW( findHandle, &findData ) );
+	} while( ::FindNextFile( findHandle, &findData ) );
 
 	finishFileSearch( findHandle, dir );
 	return result;
 }
 
-static void getAllFilesInDir( CUnicodePart dir, CArray<CFileStatus>& fileList, CUnicodePart mask )
+static void getAllFilesInDir( CStringPart dir, CArray<CFileStatus>& fileList, CStringPart mask )
 {
 	fileList.Empty();
 	WIN32_FIND_DATAW findData;
-	const CUnicodeString fullPath = MergeName( dir, mask );
+	const CString fullPath = MergeName( dir, mask );
 
 	const HANDLE findHandle = startFileSearch( fullPath, findData, dir );
 	if( findHandle == INVALID_HANDLE_VALUE ) {
@@ -805,11 +830,11 @@ static void getAllFilesInDir( CUnicodePart dir, CArray<CFileStatus>& fileList, C
 	do {
 		const CUnicodeView currentName = findData.cFileName;
 		if( currentName == L"." || currentName == L".." ) {
-			// Filter the uninteresting folders.
+			// Filter uninteresting folders.
 			continue;
 		}
 		CFileStatus currentFile;
-		currentFile.FullName = MergePath( dir, currentName );
+		currentFile.FullName = MergePath( dir, Str( currentName ) );
 		currentFile.Attributes = findData.dwFileAttributes;
 		currentFile.CreationTime = findData.ftCreationTime;
 		currentFile.ModificationTime = findData.ftLastWriteTime;
@@ -822,7 +847,7 @@ static void getAllFilesInDir( CUnicodePart dir, CArray<CFileStatus>& fileList, C
 	finishFileSearch( findHandle, dir );
 }
 
-static void getFilteredFilesInDir( CUnicodePart dir, CArray<CFileStatus>& fileList, CUnicodePart mask, DWORD flags )
+static void getFilteredFilesInDir( CStringPart dir, CArray<CFileStatus>& fileList, CStringPart mask, DWORD flags )
 {
 	CArray<CFileStatus> allFiles;
 	getAllFilesInDir( dir, allFiles, mask );
@@ -842,15 +867,15 @@ static void getFilteredFilesInDir( CUnicodePart dir, CArray<CFileStatus>& fileLi
 	}
 }
 
-static void getFilesByMultipleMasks( CUnicodePart dir, CArray<CFileStatus>& fileList, CUnicodePart masks, DWORD flags )
+static void getFilesByMultipleMasks( CStringPart dir, CArray<CFileStatus>& fileList, CStringPart masks, DWORD flags )
 {
-	for( CUnicodePart mask : masks.Split( L';' ) ) {
+	for( auto mask : masks.Split( ';' ) ) {
 		getFilteredFilesInDir( dir, fileList, mask, flags );
 		
 	}
 }
 
-static void getFilesRecursive( CUnicodePart dir, CArray<CFileStatus>& fileList, CUnicodePart masks, DWORD flags )
+static void getFilesRecursive( CStringPart dir, CArray<CFileStatus>& fileList, CStringPart masks, DWORD flags )
 {
 	getFilesByMultipleMasks( dir, fileList, masks, flags );
 	if( !HasFlag( flags, FIF_Recursive ) ) {
@@ -858,9 +883,9 @@ static void getFilesRecursive( CUnicodePart dir, CArray<CFileStatus>& fileList, 
 	}
 
 	CArray<CFileStatus> subDirs;
-	getFilteredFilesInDir( dir, subDirs, L"*", ( flags & FIF_Hidden ) | FIF_Directories );
+	getFilteredFilesInDir( dir, subDirs, "*", ( flags & FIF_Hidden ) | FIF_Directories );
 	for( auto&& subDir : subDirs ) {
-		CUnicodeString dirName = move( subDir.FullName );
+		CString dirName = move( subDir.FullName );
 		NormalizePath( dirName );
 		getFilesRecursive( dirName, fileList, masks, flags );
 	}
@@ -877,7 +902,7 @@ static void removeDuplicateFiles( CArray<CFileStatus>& fileList )
 	}
 }
 
-void GetFilesInDir( CUnicodePart dir, CArray<CFileStatus>& result, DWORD flags /*= FIF_Files */, CUnicodePart masks /*= L"*"*/ )
+void GetFilesInDir( CStringPart dir, CArray<CFileStatus>& result, DWORD flags /*= FIF_Files */, CStringPart masks /*= "*"*/ )
 {
 	assert( HasFlag( flags, FIF_Files | FIF_Directories ) );
 	getFilesRecursive( dir, result, masks, flags );
@@ -885,12 +910,12 @@ void GetFilesInDir( CUnicodePart dir, CArray<CFileStatus>& result, DWORD flags /
 	removeDuplicateFiles( result );
 }
 
-CUnicodeString CreateUniqueName( CUnicodePart dir, CUnicodePart prefix, CUnicodeView extension )
+CString CreateUniqueName( CStringPart dir, CStringPart prefix, CStringView extension )
 {
 	int suffix = 0;
 	for( ;; ) {
-		CUnicodeString newName = prefix + L'(' + UnicodeStr( suffix ) + L')';
-		CUnicodeString newFullName = MergeName( dir, newName, extension );
+		auto newName = prefix + '(' + Str( suffix ) + ')';
+		auto newFullName = MergeName( dir, newName, extension );
 		if( !FileExists( newFullName ) ) {
 			return move( newFullName );
 		}
@@ -898,27 +923,27 @@ CUnicodeString CreateUniqueName( CUnicodePart dir, CUnicodePart prefix, CUnicode
 	}
 }
 
-CUnicodeString GetCurrentDir()
+CString GetCurrentDir()
 {
-	const int bufferLength = GetCurrentDirectoryW( 0, 0 );
-	checkLastFileError( bufferLength > 0, L"" );
+	const int bufferLength = ::GetCurrentDirectoryW( 0, nullptr );
+	checkLastFileError( bufferLength > 0, "" );
 
 	CUnicodeString result;
 	auto buffer = result.CreateRawBuffer( bufferLength - 1 );
-	const int length = GetCurrentDirectoryW( bufferLength, buffer );
+	const int length = ::GetCurrentDirectoryW( bufferLength, buffer );
 	assert( length < bufferLength );
 	buffer.Release( length );
-	checkLastFileError( length != 0, L"" );
-	return result;
+	checkLastFileError( length != 0, "" );
+	return Str( result );
 }
 
-void SetCurrentDir( CUnicodeView newDir )
+void SetCurrentDir( CStringPart newDir )
 {
-	CUnicodeString path = CreateFullPath( newDir );
-	checkLastFileError( SetCurrentDirectoryW( path.Ptr() ) != 0, path );
+	auto path = CreateFullUnicodePath( UnicodeStr( newDir ) );
+	checkLastFileError( ::SetCurrentDirectoryW( path.Ptr() ) != 0, newDir );
 }
 
-CUnicodeString GetExecutableName()
+CString GetExecutableName()
 {
 	int size = MAX_PATH;
 	CUnicodeString shortExeName;
@@ -926,62 +951,64 @@ CUnicodeString GetExecutableName()
 		auto resultPtr = shortExeName.CreateRawBuffer( size );
 		const int length = ::GetModuleFileName( nullptr, resultPtr, size + 1 );
 		resultPtr.Release( min( length, size ) );
-		checkLastFileError( length != 0, CUnicodePart() );
+		checkLastFileError( length != 0, CStringPart() );
 		if( length <= size ) {
 			break;
 		}
 		size *= 2;
 	}
 	// Convert the executable path name to long.
-	return CreateLongPath( move( shortExeName ) );
+	return Str( createLongUnicodePath( move( shortExeName ) ) );
 }
 
-CUnicodeString GetWindowsDir()
+CString GetWindowsDir()
 {
-	const int length = GetWindowsDirectory( 0, 0 );
-	checkLastFileError( length > 0, CUnicodePart() );
+	const int length = ::GetWindowsDirectory( 0, 0 );
+	checkLastFileError( length > 0, CStringPart() );
 
 	CUnicodeString result;
 	auto buffer = result.CreateRawBuffer( length - 1 );
-	const int realLength = GetWindowsDirectory( buffer, length );
+	const int realLength = ::GetWindowsDirectory( buffer, length );
 	buffer.Release( realLength );
-	checkLastFileError( realLength != 0, CUnicodeString() );
+	checkLastFileError( realLength != 0, CString() );
 	assert( realLength < length );
-	return result;
+	return Str( result ); 
 }
 
-CUnicodeString GetWindowsTempDir()
+CString GetWindowsTempDir()
 {
 	const int length = ::GetTempPath( 0, 0 );
-	checkLastFileError( length > 0, CUnicodePart() );
+	checkLastFileError( length > 0, CStringPart() );
 
-	CUnicodeString result;
-	auto buffer = result.CreateRawBuffer( length - 1 );
+	CUnicodeString unicodeResult;
+	auto buffer = unicodeResult.CreateRawBuffer( length - 1 );
 	const int realLength = ::GetTempPath( length, buffer );
 	buffer.Release( realLength );
-	checkLastFileError( realLength != 0, CUnicodeString() );
+	checkLastFileError( realLength != 0, CString() );
 	assert( realLength < length );
+	auto result = Str( unicodeResult );
 	NormalizePath( result );
-	return result;
+	return result; 
 }
 
-CUnicodeString REAPI GetEnvironmentVariable( CUnicodeView name )
+CString GetEnvironmentVariable( CStringPart name )
 {
-	const int bufferFullSize = ::GetEnvironmentVariable( name.Ptr(), nullptr, 0 );
+	const auto unicodeName = UnicodeStr( name );
+	const int bufferFullSize = ::GetEnvironmentVariable( unicodeName.Ptr(), nullptr, 0 );
 	checkLastError( bufferFullSize > 0 );
 	const int bufferSize = bufferFullSize - 1;
 	CUnicodeString result;
 	auto resultBuffer = result.CreateRawBuffer( bufferSize );
-	::GetEnvironmentVariable( name.Ptr(), resultBuffer, bufferFullSize );
+	::GetEnvironmentVariable( unicodeName.Ptr(), resultBuffer, bufferFullSize );
 	resultBuffer.Release( bufferSize );
-	return move( result );
+	return Str( result );
 }
 
-extern CUnicodeString SpecificUserAppDataPath;
-extern CUnicodeString AllUsersAppDataPath;
+extern CString SpecificUserAppDataPath;
+extern CString AllUsersAppDataPath;
 extern CCriticalSection ApplicationDataSection;
 
-static CUnicodeString getAppDataPathSimple( TAppDataPathType type )
+static CString getAppDataPathSimple( TAppDataPathType type )
 {
 	CCriticalSectionLock lock( ApplicationDataSection );
 	switch( type ) {
@@ -995,9 +1022,9 @@ static CUnicodeString getAppDataPathSimple( TAppDataPathType type )
 	}
 }
 
-CUnicodeView GetAppDataPath( TAppDataPathType type )
+CStringView GetAppDataPath( TAppDataPathType type )
 {
-	const CUnicodeString path = getAppDataPathSimple( type );
+	const CString path = getAppDataPathSimple( type );
 	try {
 		if( !DirAccessible( path ) ) {
 			CreateDir( path );
@@ -1011,7 +1038,7 @@ CUnicodeView GetAppDataPath( TAppDataPathType type )
 	return path;
 }
 
-void SetAppDataPath( TAppDataPathType type, CUnicodePart path )
+void SetAppDataPath( TAppDataPathType type, CStringPart path )
 {
 	CCriticalSectionLock lock( ApplicationDataSection );
 	switch( type ) {
@@ -1026,7 +1053,7 @@ void SetAppDataPath( TAppDataPathType type, CUnicodePart path )
 	}
 }
 
-static CUnicodeString getSpecialFolderLocation( int csIdl )
+static CString getSpecialFolderLocation( int csIdl )
 {
 	ITEMIDLIST* pidl = 0;
 	HRESULT hResult = SHGetFolderLocation( 0, csIdl, 0, 0, &pidl );
@@ -1035,34 +1062,36 @@ static CUnicodeString getSpecialFolderLocation( int csIdl )
 
 	CUnicodeString path;
 	auto buffer = path.CreateRawBuffer( MAX_PATH );
-	if( SHGetPathFromIDListW( pidl, buffer ) != 0 ) {
+	if( ::SHGetPathFromIDListW( pidl, buffer ) != 0 ) {
 		buffer.Release();
 	} else {
 		buffer.Release( 0 );
 	}
-	ILFree( pidl );
-	AddPathSeparator( path );
-	return path;
+	::ILFree( pidl );
+	auto result = Str( path );
+	AddPathSeparator( result );
+	return result;
 }
 
-void SetAppDataRelativePath( CUnicodeView path )
+void SetAppDataRelativePath( CStringView path )
 {
-	const CUnicodeString specificUserFolder = getSpecialFolderLocation( CSIDL_LOCAL_APPDATA );
+	const CString specificUserFolder = getSpecialFolderLocation( CSIDL_LOCAL_APPDATA );
 	SetAppDataPath( ADPT_SpecificUser, MergePath( specificUserFolder, path ) );
 
-	const CUnicodeString allUsersFolder = getSpecialFolderLocation( CSIDL_COMMON_APPDATA );
+	const CString allUsersFolder = getSpecialFolderLocation( CSIDL_COMMON_APPDATA );
 	SetAppDataPath( ADPT_AllUsers, MergePath( specificUserFolder, path ) );	
 }
 
-int GetDiskFreeSpace( CUnicodeView path )
+int GetDiskFreeSpace( CStringPart path )
 {
-	CUnicodeString root = GetRoot( path );
+	auto root = GetRoot( path );
 	ForceBackSlashes( root );
 
 	ULARGE_INTEGER free;
 	free.QuadPart = 0;
 
-	checkLastFileError( GetDiskFreeSpaceExW( root.Ptr(), &free, 0, 0 ) != 0, path );
+	const auto unicodeRoot = UnicodeStr( root );
+	checkLastFileError( ::GetDiskFreeSpaceEx( unicodeRoot.Ptr(), &free, 0, 0 ) != 0, path );
 
 	return free.QuadPart > INT_MAX ? INT_MAX : numeric_cast<int>( free.QuadPart );
 }

@@ -603,7 +603,7 @@ public:
 	static CString ToString( double value, int digitCount = 3 );
 	static CString ToString( CStringPart value );
 	static CString ToString( const char* value );
-	static CString ToString( CUnicodePart value, unsigned codePage = CP_ACP );
+	static CString ToString( CUnicodePart value, unsigned codePage = CP_UTF8 );
 	static CString ToString( CUnicodePart value, char defaultChar, unsigned codePage );
 	static CString ToString( CColor value );
 	template <class VecType, int dim>
@@ -877,8 +877,8 @@ public:
 	static CUnicodeString ToString( double value, int digitCount = 3 );
 	static CUnicodeString ToString( CUnicodePart value );
 	static CUnicodeString ToString( const wchar_t* value );
-	static CUnicodeString ToString( const char* value, unsigned codePage = CP_ACP );
-	static CUnicodeString ToString( CStringPart value, unsigned codePage = CP_ACP );
+	static CUnicodeString ToString( const char* value, unsigned codePage = CP_UTF8 );
+	static CUnicodeString ToString( CStringPart value, unsigned codePage = CP_UTF8 );
 	static CUnicodeString ToString( CColor value );
 	template <class VecType, int dim>
 	static CUnicodeString ToString( CVector<VecType, dim> vec, wchar_t delim = L';' );
@@ -1051,7 +1051,7 @@ inline CUnicodeString CStrConversionFunctions<wchar_t>::ToString( const wchar_t*
 	return CUnicodeString( value );
 }
 
-inline CUnicodeString CStrConversionFunctions<wchar_t>::ToString( const char* value, unsigned codePage /*= CP_ACP */ )
+inline CUnicodeString CStrConversionFunctions<wchar_t>::ToString( const char* value, unsigned codePage /*= CP_UTF8 */ )
 {
 	CUnicodeString result;
 	const CStringView valueStr = value;
@@ -1059,7 +1059,7 @@ inline CUnicodeString CStrConversionFunctions<wchar_t>::ToString( const char* va
 	return result;
 }
 
-inline CUnicodeString CStrConversionFunctions<wchar_t>::ToString( CStringPart value, unsigned codePage /*= CP_ACP */ )
+inline CUnicodeString CStrConversionFunctions<wchar_t>::ToString( CStringPart value, unsigned codePage /*= CP_UTF8 */ )
 {
 	CUnicodeString result;
 	CStringOperations<wchar_t>::ConvertStr( value, codePage, result );
@@ -1181,17 +1181,17 @@ CUnicodeString UnicodeStr( const T& val, Args&&... args )
 
 // Conversion between strings with the external buffer.
 // The provided buffer is asserted to be empty.
-inline void ConvertString( CStringPart val, CUnicodeString& result, unsigned codePage = CP_ACP )
+inline void ConvertString( CStringPart val, CUnicodeString& result, unsigned codePage = CP_UTF8 )
 {
 	RelibInternal::CStringOperations<wchar_t>::ConvertStr( val, codePage, result );
 }
 
-inline void ConvertString( CUnicodePart val, CString& result, unsigned codePage = CP_ACP )
+inline void ConvertString( CUnicodePart val, CString& result, unsigned codePage = CP_UTF8 )
 {
 	RelibInternal::CStringOperations<char>::ConvertStr( val, codePage, result );
 }
 
-inline void ConvertString( CUnicodePart val, CString& result, char defaultChar, unsigned codePage = CP_ACP )
+inline void ConvertString( CUnicodePart val, CString& result, char defaultChar, unsigned codePage = CP_UTF8 )
 {
 	RelibInternal::CStringOperations<char>::ConvertStr( val, codePage, defaultChar, result );
 }

@@ -9,7 +9,7 @@ namespace Relib {
 // Message logger that outputs messages in a dialog window.
 class REAPI CWindowMessageLog : public IMessageLog {
 public:
-	virtual void AddMessage( CUnicodeView text, TLogMessageType type, CMessageSource src ) override final;
+	virtual void AddMessage( CString text, TLogMessageType type ) override final;
 
 private:
 	static UINT getIconFlag( TLogMessageType type );
@@ -25,7 +25,7 @@ public:
 	bool IsStdOutputConsole() const
 		{ return isOutputConsole; }
 
-	virtual void AddMessage( CUnicodeView text, TLogMessageType type, CMessageSource src ) override final;
+	virtual void AddMessage( CString text, TLogMessageType type ) override final;
 
 private:
 	HANDLE outputHandle;
@@ -39,17 +39,17 @@ private:
 // When the target file size is reached for the current file, the target file is switched.
 class REAPI CFileMessageLog : public IMessageLog {
 public:
-	explicit CFileMessageLog( CUnicodeView _fileName, int targetFileSize ); 
+	explicit CFileMessageLog( CStringPart _fileName, int targetFileSize ); 
 
-	virtual void AddMessage( CUnicodeView text, TLogMessageType type, CMessageSource src ) override final;
+	virtual void AddMessage( CString text, TLogMessageType type ) override final;
 
 private:
-	CUnicodeString currentFileName;
+	CString currentFileName;
 
-	void moveRecentLogToStart( CUnicodeView fileName, int oldFileSize, int newFileSize );
+	void moveRecentLogToStart( CStringPart fileName, int oldFileSize, int newFileSize );
 	void initializeUnicodeFile( CFileWriteView target );
-	void writeToFile( CFileWriteView target, CUnicodeView text );
-	CUnicodeString addUtilityInfo( CUnicodeView text ) const;
+	void writeToFile( CFileWriteView target, CStringPart text );
+	CString addUtilityInfo( CStringPart text ) const;
 };
 
 //////////////////////////////////////////////////////////////////////////

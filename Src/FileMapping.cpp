@@ -110,22 +110,22 @@ CFileMapping::CFileMapping() :
 {
 }
 
-CFileMapping::CFileMapping( CUnicodeView fileName, TMappingMode _mode )
+CFileMapping::CFileMapping( CStringPart fileName, TMappingMode _mode )
 {
 	Open( fileName, _mode );
 }
 
-CFileMapping::CFileMapping( CUnicodeView fileName, TMappingMode _mode, CUnicodeView mappingName )
+CFileMapping::CFileMapping( CStringPart fileName, TMappingMode _mode, CUnicodeView mappingName )
 {
 	Open( fileName, _mode, mappingName );
 }
 
-CFileMapping::CFileMapping( CUnicodeView fileName, __int64 fileLength )
+CFileMapping::CFileMapping( CStringPart fileName, __int64 fileLength )
 {
 	Open( fileName, fileLength );
 }
 
-CFileMapping::CFileMapping( CUnicodeView fileName, __int64 fileLength, CUnicodeView mappingName )
+CFileMapping::CFileMapping( CStringPart fileName, __int64 fileLength, CUnicodeView mappingName )
 {
 	Open( fileName, fileLength, mappingName);
 }
@@ -139,27 +139,27 @@ CFileMapping::~CFileMapping()
 	}
 }
 
-void CFileMapping::Open( CUnicodeView fileName, TMappingMode _mode )
+void CFileMapping::Open( CStringPart fileName, TMappingMode _mode )
 {
 	doOpenMapping( fileName, _mode, nullptr );
 }
 
-void CFileMapping::Open( CUnicodeView fileName, TMappingMode _mode, CUnicodeView mappingName )
+void CFileMapping::Open( CStringPart fileName, TMappingMode _mode, CUnicodeView mappingName )
 {
 	doOpenMapping( fileName, _mode, mappingName.Ptr() );
 }
 
-void CFileMapping::Open( CUnicodeView fileName, __int64 fileLength )
+void CFileMapping::Open( CStringPart fileName, __int64 fileLength )
 {
 	doOpenMapping( fileName, fileLength, nullptr );
 }
 
-void CFileMapping::Open( CUnicodeView fileName, __int64 fileLength, CUnicodeView mappingName )
+void CFileMapping::Open( CStringPart fileName, __int64 fileLength, CUnicodeView mappingName )
 {
 	doOpenMapping( fileName, fileLength, mappingName.Ptr() );
 }
 
-void CFileMapping::doOpenMapping( CUnicodeView fileName, TMappingMode _mode, const wchar_t* mappingNamePtr )
+void CFileMapping::doOpenMapping( CStringPart fileName, TMappingMode _mode, const wchar_t* mappingNamePtr )
 {
 	assert( !IsOpen() );
 	mode = _mode;
@@ -168,7 +168,7 @@ void CFileMapping::doOpenMapping( CUnicodeView fileName, TMappingMode _mode, con
 	openMapping( 0, mappingNamePtr );
 }
 
-void CFileMapping::doOpenMapping( CUnicodeView fileName, __int64 fileLength, const wchar_t* mappingNamePtr )
+void CFileMapping::doOpenMapping( CStringPart fileName, __int64 fileLength, const wchar_t* mappingNamePtr )
 {
 	assert( !IsOpen() );
 	assert( fileLength >= 0 );

@@ -11,7 +11,7 @@ namespace Relib {
 
 //////////////////////////////////////////////////////////////////////////
 
-CJpgFile::CJpgFile( CUnicodePart _fileName ) :
+CJpgFile::CJpgFile( CStringPart _fileName ) :
 	fileName( _fileName )
 {
 }
@@ -31,7 +31,7 @@ void CJpgFile::Read( CStaticImageData& result ) const
 
 void CJpgFile::ReadRawData( CArrayView<BYTE> jpgData, CStaticImageData& result )
 {
-	doReadRawData( CUnicodePart(), jpgData, result.Colors, result.ImageSize ); 
+	doReadRawData( CStringPart(), jpgData, result.Colors, result.ImageSize ); 
 }
 
 // Internal exception to bypass default JPEG error handling.
@@ -41,7 +41,7 @@ static void handleDecompressionExit( j_common_ptr )
 	throw CJpgInternalException();
 }
 
-void CJpgFile::doReadRawData( CUnicodePart fileName, CArrayView<BYTE> jpgData, CArray<CColor>& result, CVector2<int>& resultSize )
+void CJpgFile::doReadRawData( CStringPart fileName, CArrayView<BYTE> jpgData, CArray<CColor>& result, CVector2<int>& resultSize )
 {
 	jpeg_decompress_struct jpegInfo;
 	jpeg_error_mgr defaultErrorHandler;

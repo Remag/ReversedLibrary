@@ -86,15 +86,15 @@ void SetDebugFlags( DWORD newFlags )
 	debugFlags = newFlags;
 }
 
-extern CUnicodeString ApplicationTitle;
+extern CString ApplicationTitle;
 extern CCriticalSection ApplicationTitleSection;
-CUnicodeView GetAppTitle()
+CStringView GetAppTitle()
 {
 	CCriticalSectionLock lock( ApplicationTitleSection );
 	return ApplicationTitle;
 }
 
-void SetAppTitle( CUnicodeView newTitle )
+void SetAppTitle( CStringPart newTitle )
 {
 	CCriticalSectionLock lock( ApplicationTitleSection );
 	ApplicationTitle = newTitle;

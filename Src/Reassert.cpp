@@ -8,10 +8,10 @@
 
 namespace Relib {
 
-extern const CUnicodeView DefaultAssertFailedMessage;
+extern const CStringView DefaultAssertFailedMessage;
 void GenerateInternalError( const char* functionName, const wchar_t* errorText, const wchar_t* fileName, int line )
 {
-	CUnicodeString text = DefaultAssertFailedMessage.SubstParam( errorText, fileName, CStringView( functionName ), line );
+	auto text = DefaultAssertFailedMessage.SubstParam( errorText, fileName, CStringView( functionName ), line );
 	throw CInternalException( move( text ) );
 }
 

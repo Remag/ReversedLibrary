@@ -25,9 +25,9 @@ CRelibInitializer::~CRelibInitializer()
 
 void CRelibInitializer::initAppDataPath()
 {
-	const CUnicodeString processName = FileSystem::GetExecutableName();
+	const auto processName = FileSystem::GetExecutableName();
 	try {
-		const CUnicodeString relativePath = L"Relib\\" + FileSystem::GetName( processName );
+		const auto relativePath = "Relib\\" + FileSystem::GetName( processName );
 		FileSystem::SetAppDataRelativePath( relativePath );
 		return;
 	} catch( const CException& ) {

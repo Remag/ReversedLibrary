@@ -24,7 +24,7 @@ int CMessageSystem::CNamedMessageOwner::HashKey() const
 
 //////////////////////////////////////////////////////////////////////////
 
-void CMessageSystem::LoadMessages( CUnicodeView fileName )
+void CMessageSystem::LoadMessages( CStringPart fileName )
 {
 	CFileReader file( fileName, FCM_OpenExisting );
 	CArchiveReader messageArchive( file );

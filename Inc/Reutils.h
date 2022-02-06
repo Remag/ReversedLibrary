@@ -61,8 +61,8 @@ void REAPI SetDebugFlags( DWORD newFlags );
 bool REAPI IsSilentAbort();
 void REAPI SetSilentAbort( bool value );
 
-CUnicodeView REAPI GetAppTitle();
-void REAPI SetAppTitle( CUnicodeView newTitle );
+CStringView REAPI GetAppTitle();
+void REAPI SetAppTitle( CStringPart newTitle );
 
 // Check library initialization.
 bool REAPI IsRelibInitialized();

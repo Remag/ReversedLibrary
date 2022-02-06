@@ -14,15 +14,15 @@ namespace Relib {
 
 //////////////////////////////////////////////////////////////////////////
 
-void CWindowMessageLog::AddMessage( CUnicodeView text, TLogMessageType type, CMessageSource )
+void CWindowMessageLog::AddMessage( CString text, TLogMessageType type )
 {
 	const UINT iconFlag = getIconFlag( type );
-	::MessageBox( nullptr, text.Ptr(), GetAppTitle().Ptr(), MB_OK | MB_TASKMODAL | iconFlag );
+	::MessageBox( nullptr, UnicodeStr( text ).Ptr(), UnicodeStr( GetAppTitle() ).Ptr(), MB_OK | MB_TASKMODAL | iconFlag );
 }
 
 UINT CWindowMessageLog::getIconFlag( TLogMessageType type )
 {
-	staticAssert( LMT_EnumCount == 6 );
+	staticAssert( LMT_EnumCount == 7 );
 	switch( type ) {
 		case LMT_Error:
 		case LMT_Exception:
@@ -32,6 +32,7 @@ UINT CWindowMessageLog::getIconFlag( TLogMessageType type )
 			return MB_ICONEXCLAMATION;
 		case LMT_Message:
 		case LMT_Periodic:
+		case LMT_Success:
 			return MB_ICONINFORMATION;
 		default:
 			assert( false );
@@ -54,40 +55,39 @@ bool CStdOutputLog::checkConsoleHandle( HANDLE handle )
 	return result != 0;
 }
 
-static CUnicodeString createOutputString( CUnicodeView text )
+static CString createOutputString( CStringPart text )
 {
 	const int textLength = text.Length();
-	CUnicodeString result;
+	CString result;
 	result.ReserveBuffer( text.Length() + 2 );
 	for( int i = 0; i < textLength; i++ ) {
-		if( text[i] == L'\n' && ( i == 0 || text[i - 1] != L'\r' ) ) {
-			result += L'\r';
+		if( text[i] == '\n' && ( i == 0 || text[i - 1] != '\r' ) ) {
+			result += '\r';
 		}
 		result += text[i];
 	}
 
-	result += L"\r\n";
+	result += "\r\n";
 	return result;	
 }
 
 extern CCriticalSection ConsoleWriteSection;
-void CStdOutputLog::AddMessage( CUnicodeView text, TLogMessageType, CMessageSource )
+void CStdOutputLog::AddMessage( CString text, TLogMessageType )
 {
 	CCriticalSectionLock lock( ConsoleWriteSection );
-	const CUnicodeString outputStr = createOutputString( text );
+	const auto outputStr = createOutputString( text );
 	DWORD writeCount;
 	if( isOutputConsole ) {
-		::WriteConsole( outputHandle, outputStr.Ptr(), outputStr.Length(), &writeCount, nullptr );
+		::WriteConsoleA( outputHandle, outputStr.Ptr(), outputStr.Length(), &writeCount, nullptr );
 	} else {
-		const CString ansiStr = Str( outputStr );
-		::WriteFile( outputHandle, ansiStr.Ptr(), ansiStr.Length(), &writeCount, nullptr );
+		::WriteFile( outputHandle, outputStr.Ptr(), outputStr.Length(), &writeCount, nullptr );
 	}
 }
 
 //////////////////////////////////////////////////////////////////////////
 
 extern CCriticalSection FileWriteSection;
-CFileMessageLog::CFileMessageLog( CUnicodeView _fileName, int targetFileSize ) :
+CFileMessageLog::CFileMessageLog( CStringPart _fileName, int targetFileSize ) :
 	currentFileName( _fileName )
 {
 	const auto maxSize = max( 32, targetFileSize );
@@ -102,7 +102,7 @@ CFileMessageLog::CFileMessageLog( CUnicodeView _fileName, int targetFileSize ) :
 	}
 }
 
-void CFileMessageLog::moveRecentLogToStart( CUnicodeView fileName, int oldFileSize, int newFileSize )
+void CFileMessageLog::moveRecentLogToStart( CStringPart fileName, int oldFileSize, int newFileSize )
 {
 	assert( newFileSize > 2 );
 	assert( newFileSize <= oldFileSize );
@@ -117,7 +117,7 @@ void CFileMessageLog::moveRecentLogToStart( CUnicodeView fileName, int oldFileSi
 	::memcpy( buffer + cutFileSize - newLineBufferSize, newLineBuffer.Ptr(), newLineBufferSize );
 }
 
-void CFileMessageLog::AddMessage( CUnicodeView text, TLogMessageType, CMessageSource )
+void CFileMessageLog::AddMessage( CString text, TLogMessageType )
 {
 	CCriticalSectionLock lock( FileWriteSection );
 	CFileWriter file( currentFileName, FCM_CreateOrOpen );
@@ -138,16 +138,16 @@ void CFileMessageLog::initializeUnicodeFile( CFileWriteView target )
 	target.Write( RelibInternal::Utf16LEFileTag, sizeof( RelibInternal::Utf16LEFileTag ) );
 }
 
-void CFileMessageLog::writeToFile( CFileWriteView target, CUnicodeView text )
+void CFileMessageLog::writeToFile( CFileWriteView target, CStringPart text )
 {
 	const auto rawOutput = createOutputString( text );
 	const auto output = addUtilityInfo( rawOutput );
 	target.Write( output.Ptr(), output.Length() * sizeof( wchar_t ) );
 }
 
-CUnicodeString CFileMessageLog::addUtilityInfo( CUnicodeView text ) const
+CString CFileMessageLog::addUtilityInfo( CStringPart text ) const
 {
-	const auto dateStr = UnicodeStr( CDateTime::Now(), L"[YYYY.MM.DD H:M:S] " );
+	const auto dateStr = Str( CDateTime::Now(), "[YYYY.MM.DD H:M:S] " );
 	return dateStr + text;
 }
 

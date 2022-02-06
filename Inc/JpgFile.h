@@ -8,16 +8,16 @@
 
 namespace Relib {
 
-extern const CUnicodeView GeneralJpgFileError;
+extern const CStringView GeneralJpgFileError;
 //////////////////////////////////////////////////////////////////////////
 
 // Exception that occurs while trying to extract data from a JPEG file.
 class REAPI CJpgException : public CFileWrapperException {
 public:
-	CJpgException( CUnicodePart fileName, CUnicodePart additionalInfo ) : CFileWrapperException( fileName, additionalInfo ) {}
+	CJpgException( CStringPart fileName, CStringPart additionalInfo ) : CFileWrapperException( fileName, additionalInfo ) {}
 
-	virtual CUnicodeString GetMessageTemplate() const override
-		{ return UnicodeStr( GeneralJpgFileError ); }
+	virtual CString GetMessageTemplate() const override
+		{ return Str( GeneralJpgFileError ); }
 };
 
 //////////////////////////////////////////////////////////////////////////
@@ -25,7 +25,7 @@ public:
 // Mechanism for JPEG image compression and decompression.
 class REAPI CJpgFile {
 public:
-	explicit CJpgFile( CUnicodePart fileName );
+	explicit CJpgFile( CStringPart fileName );
 
 	// Read the contents of a JPEG file and decompress them as a JPEG image.
 	void Read( CStaticImageData& result ) const;

@@ -29,13 +29,13 @@ static void throwPngException( const png_image& image, CUnicodePart fileName )
 // Utility class that handles proper closing of libpng file resources.
 class CPngLibFileReader {
 public:
-	CPngLibFileReader( CUnicodePart fileName, CArrayView<BYTE> fileData, png_image& image );
+	CPngLibFileReader( CStringPart fileName, CArrayView<BYTE> fileData, png_image& image );
 	~CPngLibFileReader();
 
 	void FinalizeReading( CArray<CColor>& result, int rowStride );
 
 private:
-	CUnicodePart fileName;
+	CStringPart fileName;
 	png_image* image = nullptr;
 
 	// Copying is prohibited.
@@ -45,7 +45,7 @@ private:
 
 //////////////////////////////////////////////////////////////////////////
 
-CPngLibFileReader::CPngLibFileReader( CUnicodePart _fileName, CArrayView<BYTE> fileData, png_image& _image ) : 
+CPngLibFileReader::CPngLibFileReader( CStringPart _fileName, CArrayView<BYTE> fileData, png_image& _image ) : 
 	image( &_image ),
 	fileName( _fileName )
 {
@@ -74,7 +74,7 @@ void CPngLibFileReader::FinalizeReading( CArray<CColor>& result, int rowStride )
 
 //////////////////////////////////////////////////////////////////////////
 
-CPngFile::CPngFile( CUnicodePart _fileName ) :
+CPngFile::CPngFile( CStringPart _fileName ) :
 	fileName( _fileName )
 {
 }
@@ -94,10 +94,10 @@ void CPngFile::Read( CStaticImageData& result ) const
 
 void CPngFile::ReadRawData( CArrayView<BYTE> pngData, CStaticImageData& result )
 {
-	doReadRawData( CUnicodePart(), pngData, result ); 
+	doReadRawData( CStringPart(), pngData, result ); 
 }
 
-void CPngFile::doReadRawData( CUnicodePart fileName, CArrayView<BYTE> pngData, CStaticImageData& result )
+void CPngFile::doReadRawData( CStringPart fileName, CArrayView<BYTE> pngData, CStaticImageData& result )
 {
 	png_image pngImage;
 	::memset( &pngImage,0, sizeof( pngImage ) );

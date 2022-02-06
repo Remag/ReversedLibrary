@@ -15,16 +15,16 @@ namespace RelibInternal {
 struct CGiffDecodeData;
 }
 
-extern const CUnicodeView GeneralGifFileError;
+extern const CStringView GeneralGifFileError;
 //////////////////////////////////////////////////////////////////////////
 
 // Exception that occurs while trying to extract data from a GIF file.
 class REAPI CGifException : public CFileWrapperException {
 public:
-	CGifException( CUnicodePart fileName, CUnicodePart additionalInfo ) : CFileWrapperException( fileName, additionalInfo ) {}
+	CGifException( CStringPart fileName, CStringPart additionalInfo ) : CFileWrapperException( fileName, additionalInfo ) {}
 
-	virtual CUnicodeString GetMessageTemplate() const override
-	{ return UnicodeStr( GeneralGifFileError ); }
+	virtual CString GetMessageTemplate() const override
+		{ return Str( GeneralGifFileError ); }
 };
 
 // Convert 1 and 0 delay to 10 delay.
@@ -34,7 +34,7 @@ public:
 // Mechanism for GIF file decompression.
 class REAPI CGifFile {
 public:
-	explicit CGifFile( CUnicodePart fileName );
+	explicit CGifFile( CStringPart fileName );
 
 	// Read the contents of the GIF file and decompress them as a 32bit RGBA image.
 	// Image pixel dimensions are returned in resultSize.
@@ -46,7 +46,7 @@ public:
 private:
 	CUnicodeString fileName;
 
-	static void doReadRawData( CUnicodePart fileName, CArrayView<BYTE> gifData, CAnimatedImageData& result );
+	static void doReadRawData( CStringPart fileName, CArrayView<BYTE> gifData, CAnimatedImageData& result );
 	static void readGifFrames( RelibInternal::CGiffDecodeData& decodeData, CArray<CImageFrameData>& result );
 	static void copyColorData( CArrayView<BYTE> frameData, int width, int height, const CDynamicBitSet<>& transparencyMask, CArray<CColor>& result );
 	static CColor createColor( CArrayView<BYTE> frameColors, int framePos );

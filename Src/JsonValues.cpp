@@ -4,41 +4,41 @@ namespace Relib {
 
 //////////////////////////////////////////////////////////////////////////
 
-extern const REAPI CUnicodeView JsonConversionError;
+extern const REAPI CStringView JsonConversionError;
 CJsonValueException::CJsonValueException( TJsonValueType expected, TJsonValueType actual )
 {
 	errorText = JsonConversionError.SubstParam( getValueTypeName( expected ), getValueTypeName( actual ) );
 }
 
-extern const REAPI CUnicodeView JsonMissingKeyError;
-CJsonValueException::CJsonValueException( CUnicodePart missingKeyName )
+extern const REAPI CStringView JsonMissingKeyError;
+CJsonValueException::CJsonValueException( CStringPart missingKeyName )
 {
 	errorText = JsonMissingKeyError.SubstParam( missingKeyName );
 }
 
-CUnicodeView CJsonValueException::getValueTypeName( TJsonValueType type )
+CStringView CJsonValueException::getValueTypeName( TJsonValueType type )
 {
 	staticAssert( JVT_EnumCount == 6 );
 	switch( type ) {
 		case JVT_Null:
-			return L"null";
+			return "null";
 		case JVT_Bool:
-			return L"boolean";
+			return "boolean";
 		case JVT_Number:
-			return L"number";
+			return "number";
 		case JVT_String:
-			return L"string";
+			return "string";
 		case JVT_Array:
-			return L"array";
+			return "array";
 		case JVT_Object:
-			return L"object";
+			return "object";
 		default:
 			assert( false );
-			return CUnicodeView();
+			return CStringView();
 	}
 }
 
-CUnicodeString CJsonValueException::GetMessageText() const
+CString CJsonValueException::GetMessageText() const
 {
 	return copy( errorText );
 }

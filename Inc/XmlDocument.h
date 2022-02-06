@@ -10,13 +10,13 @@ namespace Relib {
 // Exception thrown when a parsing error occurs.
 class REAPI CXmlException : public CException {
 public:
-	CXmlException( CUnicodePart description, long long symbolPos );
+	CXmlException( CStringPart description, long long symbolPos );
 	CXmlException( const CXmlException& other ) : description( copy( other.description ) ), symbolPos( other.symbolPos ) {}
 
-	virtual CUnicodeString GetMessageText() const override final;
+	virtual CString GetMessageText() const override final;
 
 private:
-	CUnicodeString description;
+	CString description;
 	long long symbolPos;
 };
 
@@ -31,13 +31,13 @@ class REAPI CXmlDocument {
 public:
 	CXmlDocument();
 
-	CUnicodeView GetName() const
+	CStringView GetName() const
 		{ return sourceStrName; }
 
 	// Saving and loading.
-	void LoadFromFile( CUnicodePart fileName );
+	void LoadFromFile( CStringPart fileName );
 	void LoadFromString( CUnicodeString str );
-	void SaveToFile( CUnicodeView fileName ) const;
+	void SaveToFile( CStringPart fileName ) const;
 
 	bool HasRoot() const
 		{ return root != nullptr; }
@@ -65,7 +65,7 @@ public:
 private:
 	// Name of the document string source. Corresponds with file names for documents created with files.
 	// Can be used to identify the document for diagnostic purposes.
-	CUnicodeString sourceStrName;
+	CString sourceStrName;
 	// Root element.
 	CXmlElement* root;
 	// rapidXML class that is used for parsing and allocating elements.

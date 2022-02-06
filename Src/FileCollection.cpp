@@ -8,12 +8,12 @@ namespace Relib {
 
 //////////////////////////////////////////////////////////////////////////
 
-CFileCollection::CFileCollection( CUnicodeView folderName )
+CFileCollection::CFileCollection( CStringPart folderName )
 {
 	parseFolderData( folderName );
 }
 
-void CFileCollection::parseFolderData( CUnicodeView folderName )
+void CFileCollection::parseFolderData( CStringPart folderName )
 {
 	const auto fullName = FileSystem::CreateFullPath( folderName );
 	CArray<CFileStatus> folderFiles;
@@ -26,7 +26,7 @@ void CFileCollection::parseFolderData( CUnicodeView folderName )
 	}
 }
 
-void CFileCollection::parseFileUnit( CUnicodeView fileName, int fileLength, CUnicodeView folderName )
+void CFileCollection::parseFileUnit( CStringPart fileName, int fileLength, CStringPart folderName )
 {
 	const auto relName = findRelativeFileName( fileName, folderName );
 	writeStringToData( relName );
@@ -43,7 +43,7 @@ void CFileCollection::parseFileUnit( CUnicodeView fileName, int fileLength, CUni
 	fileUnit.DataSize = fileLength;
 }
 
-CUnicodeView CFileCollection::findRelativeFileName( CUnicodeView fileName, CUnicodeView parentFolderName ) const
+CStringPart CFileCollection::findRelativeFileName( CStringPart fileName, CStringPart parentFolderName ) const
 {
 	assert( fileName.HasPrefix( parentFolderName ) );
 	const auto fileSuffix = fileName.Mid( parentFolderName.Length() );
@@ -60,12 +60,12 @@ void CFileCollection::writeIntToData( int value )
 	::memcpy( fileData.Ptr() + offset, &value, sizeof( int ) );
 }
 
-void CFileCollection::writeStringToData( CUnicodeView str )
+void CFileCollection::writeStringToData( CStringPart str )
 {
 	const int fileNameOffset = fileData.Size();
 	const int relNameByteSize = ( str.Length() + 1 ) * sizeof( wchar_t );
 	fileData.IncreaseSize( fileNameOffset + relNameByteSize );
-	::memcpy( fileData.Ptr() + fileNameOffset, str.Ptr(), relNameByteSize );
+	::memcpy( fileData.Ptr() + fileNameOffset, str.begin(), relNameByteSize );
 }
 
 CFileCollection::CFileCollection( CArray<BYTE> binaryData ) :
@@ -96,8 +96,8 @@ int CFileCollection::parseFileUnit( int unitOffset )
 {
 	const auto dataSize = fileData.Size();
 	checkDataError( dataSize > unitOffset );
-	const wchar_t* relPathBuffer = reinterpret_cast<const wchar_t*>( fileData.Ptr() + unitOffset );
-	const CUnicodeView relPathStr( relPathBuffer );
+	const auto relPathBuffer = reinterpret_cast<const char*>( fileData.Ptr() + unitOffset );
+	const CStringView relPathStr = relPathBuffer;
 	const int fileSizeOffset = unitOffset + ( relPathStr.Length() + 1 ) * sizeof( wchar_t );
 	checkDataError( dataSize > fileSizeOffset );
 	const auto fileSize = *reinterpret_cast<int*>( fileData.Ptr() + fileSizeOffset );
@@ -110,14 +110,14 @@ int CFileCollection::parseFileUnit( int unitOffset )
 	return result;
 }
 
-void CFileCollection::WriteToFolder( CUnicodeView folderName )
+void CFileCollection::WriteToFolder( CStringPart folderName )
 {
 	for( const auto& unit : unitInfo ) {
 		writeFileUnit( unit, folderName );
 	}
 }
 
-CUnicodeView CFileCollection::GetFileName( int filePos ) const
+CStringPart CFileCollection::GetFileName( int filePos ) const
 {
 	return unitInfo[filePos].RelativePath;
 }
@@ -127,7 +127,7 @@ CArrayView<BYTE> CFileCollection::GetFileData( int filePos ) const
 	return fileData.Mid( unitInfo[filePos].DataOffset, unitInfo[filePos].DataSize );
 }
 
-void CFileCollection::SetFileName( int filePos, CUnicodePart newName )
+void CFileCollection::SetFileName( int filePos, CStringPart newName )
 {
 	unitInfo[filePos].RelativePath = newName;
 }
@@ -160,7 +160,7 @@ void CFileCollection::updateFileUnit( CFileUnitData& unit, CArrayView<BYTE> data
 	unit.DataOffset = fileOffset;
 }
 
-void CFileCollection::writeFileUnit( const CFileUnitData& data, CUnicodeView folder )
+void CFileCollection::writeFileUnit( const CFileUnitData& data, CStringPart folder )
 {
 	const auto fileName = FileSystem::MergePath( folder, data.RelativePath );
 	const auto dirName = FileSystem::GetPath( fileName );

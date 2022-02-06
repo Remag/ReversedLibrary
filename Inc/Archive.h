@@ -145,7 +145,7 @@ inline void CArchive::writeSimpleType( Type var )
 // Class that reads and serializes data from a given file into the data structures.
 class REAPI CArchiveReader : public RelibInternal::CArchive {
 public:
-	explicit CArchiveReader( CUnicodeView fileName );
+	explicit CArchiveReader( CStringPart fileName );
 	explicit CArchiveReader( CFileReadView _file );
 	explicit CArchiveReader( CArray<BYTE> _fileData );
 
@@ -310,8 +310,8 @@ public:
 
 	~CArchiveWriter();
 
-	void FlushToFile( CUnicodeView fileName );
-	void FlushToCompressedFile( CUnicodeView fileName );
+	void FlushToFile( CStringPart fileName );
+	void FlushToCompressedFile( CStringPart fileName );
 	CArray<BYTE> FlushToByteString();
 
 	void Skip( int byteCount )

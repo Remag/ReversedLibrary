@@ -15,25 +15,25 @@ namespace TempFile {
 //////////////////////////////////////////////////////////////////////////
 
 // Get the designated temporary dir folder.
-CUnicodeString REAPI GetTempDir();
-void REAPI SetTempDir( CUnicodeString newDir );
+CString REAPI GetTempDir();
+void REAPI SetTempDir( CString newDir );
 
 // Creates a new temporary file in a designated folder.
-CUnicodeString REAPI New();
+CString REAPI New();
 // Creates a new temporary file in a specific folder.
-CUnicodeString REAPI NewInDir( CUnicodeView dir );
+CString REAPI NewInDir( CStringPart dir );
 
 // Delete the file. It must be closed before deletion.
-void REAPI Delete( CUnicodeView name );
+void REAPI Delete( CStringPart name );
 // A given file will not be deleted on library deinitialization.
-void REAPI MakePermanent( CUnicodeView name, CUnicodeView permanentName );
+void REAPI MakePermanent( CStringPart name, CStringPart permanentName );
 
 // Creates a temporary directory which will be deleted on cleanup.
 CUnicodeString REAPI NewDir();
 // Creates a temporary directory in a specific folder.
-CUnicodeString REAPI NewDirInDir( CUnicodeView name );
+CUnicodeString REAPI NewDirInDir( CStringPart name );
 // Delete the directory and all the files it contains.
-void REAPI DeleteDir( CUnicodeView name );
+void REAPI DeleteDir( CStringPart name );
 // The directory and its contents will not be deleted on cleanup. 
 void REAPI MakeDirPermanent( CUnicodeString name, CUnicodeString permanentName );
 
@@ -50,25 +50,25 @@ void REAPI Reset();
 class REAPI CTempFile : public RelibInternal::CFileReadWriteOperations {
 public:
 	CTempFile();
-	explicit CTempFile( CUnicodeView folder );
+	explicit CTempFile( CStringPart folder );
 	CTempFile( CTempFile&& other );
 	CTempFile& operator=( CTempFile&& other );
 	~CTempFile();
 
 	void Delete();
-	void MakePermanent( CUnicodeView permanentName );
+	void MakePermanent( CStringPart permanentName );
 
 private:
-	CUnicodeString name;
+	CString name;
 
-	void openTempFile( CUnicodeView fileName );
-	CUnicodeString createNewTempFile();
-	CUnicodeString createNewTempFile( CUnicodeView dirName );
-	CUnicodeString openUniqueFile( CUnicodeView dir );
+	void openTempFile( CStringPart fileName );
+	CString createNewTempFile();
+	CString createNewTempFile( CStringPart dirName );
+	CString openUniqueFile( CStringPart dir );
 	void deleteTempFile();
-	static int findTempFile( CUnicodeView name );
+	static int findTempFile( CStringPart name );
 
-	static CUnicodeString getTempDir();
+	static CString getTempDir();
 	static void filterException( const CFileException& e );
 
 	// Copying is prohibited.

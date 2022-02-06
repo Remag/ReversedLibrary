@@ -148,7 +148,6 @@ namespace RelibInternal {
 	class CCriticalSection;
 	class CRawBuffer;
 	class CExplicitCopyTag;
-	class CMessageSource;
 	class CInternetFile;
 	class CInternetFileBatch;
 	class CWebConnectionScheduler;

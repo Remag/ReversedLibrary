@@ -30,23 +30,22 @@ void CMessageFilter::Empty()
 	filteredValues.Empty();
 }
 
-bool CMessageFilter::IsMessageAllowed( CMessageSource src )
+bool CMessageFilter::IsMessageAllowed( CStringPart src )
 {
-	const bool filterHasMessage = filteredValues.HasValue( src.GetTypeInfo() );
+	const bool filterHasMessage = filteredValues.HasValue( src );
 	return filterHasMessage == isFilterWhitelist;
 }
 
-void CMessageFilter::AddToWhitelist( CMessageSource src, bool isSet )
+void CMessageFilter::AddToWhitelist( CStringPart src, bool isSet )
 {
 	if( !isFilterWhitelist ) {
 		filteredValues.Empty();
 		isFilterWhitelist = true;
 	}
-
 	setFilter( src, isSet );
 }
 
-void CMessageFilter::AddToBlacklist( CMessageSource src, bool isSet )
+void CMessageFilter::AddToBlacklist( CStringPart src, bool isSet )
 {
 	if( isFilterWhitelist ) {
 		filteredValues.Empty();
@@ -56,12 +55,12 @@ void CMessageFilter::AddToBlacklist( CMessageSource src, bool isSet )
 	setFilter( src, isSet );
 }
 
-void CMessageFilter::setFilter( CMessageSource src, bool isSet )
+void CMessageFilter::setFilter( CStringPart src, bool isSet )
 {
 	if( isSet ) {
-		filteredValues.Set( src.GetTypeInfo() );
+		filteredValues.Set( Str( src ) );
 	} else {
-		filteredValues.Delete( src.GetTypeInfo() );
+		filteredValues.Delete( src );
 	}
 }
 
@@ -79,7 +78,7 @@ CMessageFilterInitializer::CMessageFilterInitializer()
 
 namespace Log {
 
-bool IsMessageSourceShown( CMessageSource src )
+bool IsMessageSourceShown( CStringPart src )
 {
 	if( !RelibInternal::isFilterValid ) {
 		// Thread filter has already been destroyed, all messages are allowed.
@@ -89,12 +88,12 @@ bool IsMessageSourceShown( CMessageSource src )
 	return RelibInternal::getCurrentMessageFilter().IsMessageAllowed( src );
 }
 
-void BlacklistSource( CMessageSource src, bool isBlacklisted )
+void BlacklistSource( CStringPart src, bool isBlacklisted )
 {
 	RelibInternal::getCurrentMessageFilter().AddToBlacklist( src, isBlacklisted );
 }
 
-void WhitelistSource( CMessageSource src, bool isWhitelisted )
+void WhitelistSource( CStringPart src, bool isWhitelisted )
 {
 	RelibInternal::getCurrentMessageFilter().AddToWhitelist( src, isWhitelisted );
 }

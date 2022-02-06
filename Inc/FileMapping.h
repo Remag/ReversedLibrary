@@ -101,11 +101,11 @@ public:
 
 	CFileMapping();
 	// Create a mapping from an existing file.
-	CFileMapping( CUnicodeView fileName, TMappingMode mode );
-	CFileMapping( CUnicodeView fileName, TMappingMode mode, CUnicodeView mappingName );
+	CFileMapping( CStringPart fileName, TMappingMode mode );
+	CFileMapping( CStringPart fileName, TMappingMode mode, CUnicodeView mappingName );
 	// Create a mapping in read/write mode from a file that might not exist.
-	CFileMapping( CUnicodeView fileName, __int64 fileLength );
-	CFileMapping( CUnicodeView fileName, __int64 fileLength, CUnicodeView mappingName );
+	CFileMapping( CStringPart fileName, __int64 fileLength );
+	CFileMapping( CStringPart fileName, __int64 fileLength, CUnicodeView mappingName );
 	~CFileMapping();
 
 	TMappingMode Mode() const
@@ -116,11 +116,11 @@ public:
 	bool IsOpen() const
 		{ return mappingHandle != nullptr; }
 	// Open and map an existing file.
-	void Open( CUnicodeView fileName, TMappingMode mode );
-	void Open( CUnicodeView fileName, TMappingMode mode, CUnicodeView mappingName );
+	void Open( CStringPart fileName, TMappingMode mode );
+	void Open( CStringPart fileName, TMappingMode mode, CUnicodeView mappingName );
 	// Open a mapping in read/write mode from a file that might not exist. File size is increased to minLength if necessary.
-	void Open( CUnicodeView fileName, __int64 minLength );
-	void Open( CUnicodeView fileName, __int64 fileLength, CUnicodeView mappingName );
+	void Open( CStringPart fileName, __int64 minLength );
+	void Open( CStringPart fileName, __int64 fileLength, CUnicodeView mappingName );
 	// Open an existing file mapping with the given name. Returns true if a mapping with this name was found.
 	bool OpenExternal( CUnicodeView mappingName, TMappingMode mode );
 	
@@ -142,8 +142,8 @@ private:
 	// Mapping mode.
 	TMappingMode mode;
 
-	void doOpenMapping( CUnicodeView fileName, TMappingMode mode, const wchar_t* mappingNamePtr );
-	void doOpenMapping( CUnicodeView fileName, __int64 fileLength, const wchar_t* mappingNamePtr );
+	void doOpenMapping( CStringPart fileName, TMappingMode mode, const wchar_t* mappingNamePtr );
+	void doOpenMapping( CStringPart fileName, __int64 fileLength, const wchar_t* mappingNamePtr );
 	void openMapping( __int64 minLength, const wchar_t* mappingNamePtr );
 	void openView( DWORD viewMode, __int64 offset, int length, BYTE*& result, int& allocationOffset );
 	static int getAllocationGranularity();

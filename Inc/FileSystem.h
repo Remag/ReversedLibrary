@@ -15,11 +15,11 @@ namespace FileSystem {
 //////////////////////////////////////////////////////////////////////////
 
 // Check if the given name is syntactically valid.
-bool REAPI IsNameValid( CUnicodePart name );
+bool REAPI IsNameValid( CStringPart name );
 
 // Name comparison. Different file separators are considered equal.
-int REAPI CompareNames( CUnicodePart leftName, CUnicodePart rightName );
-bool REAPI NamesEqual( CUnicodePart leftName, CUnicodePart rightName );
+int REAPI CompareNames( CStringPart leftName, CStringPart rightName );
+bool REAPI NamesEqual( CStringPart leftName, CStringPart rightName );
 
 // Path types.
 enum TPathType {
@@ -29,71 +29,72 @@ enum TPathType {
 	PT_Absolute,	// absolute path ( c:\folder\subfolder )
 	PT_UNC	// UNC path ( \\serverName\folder\subfolder )
 };
-TPathType REAPI GetPathType( CUnicodePart path );
+TPathType REAPI GetPathType( CStringPart path );
 
 // Split the path into components.
-void REAPI SplitName( CUnicodeView fullName, CUnicodeString& drive, CUnicodeString& dir, CUnicodeString& name, CUnicodeString& ext );
-TPathType REAPI SplitName( CUnicodePart path, CArray<CUnicodePart>& components );
+void REAPI SplitName( CStringView fullName, CString& drive, CString& dir, CString& name, CString& ext );
+TPathType REAPI SplitName( CStringPart path, CArray<CStringPart>& components );
 // Merge a full path from different components.
-CUnicodeString REAPI MergeName( CUnicodePart driveDir, CUnicodePart nameExt );
-CUnicodeString REAPI MergeName( CUnicodePart driveDir, CUnicodeView name, CUnicodeView ext );
-CUnicodeString REAPI MergeName( CUnicodeView drive, CUnicodeView dir, CUnicodeView name, CUnicodeView ext );
+CString REAPI MergeName( CStringPart driveDir, CStringPart nameExt );
+CString REAPI MergeName( CStringPart driveDir, CStringView name, CStringView ext );
+CString REAPI MergeName( CStringView drive, CStringView dir, CStringView name, CStringView ext );
 // Combines a full path from the base dir and a relative path.
-CUnicodeString REAPI MergePath( CUnicodePart dir, CUnicodePart relativePath );
+CString REAPI MergePath( CStringPart dir, CStringPart relativePath );
 // Add the extension if necessary. Extention is provided without the leading period.
-void REAPI AddExtIfNone( CUnicodeString& name, CUnicodeView extNoPeriod );
+void REAPI AddExtIfNone( CString& name, CStringView extNoPeriod );
 // Replace the extension.
-void REAPI ReplaceExt( CUnicodeString& name, CUnicodeView extNoPeriod );
+void REAPI ReplaceExt( CString& name, CStringView extNoPeriod );
 // Create a full path assuming that the given relative path starts from the same catalog as the current process.
-CUnicodeString REAPI CreateFullPath( CUnicodeView path );
+CString REAPI CreateFullPath( CStringPart path );
+CUnicodeString REAPI CreateFullUnicodePath( CUnicodeView path );
 // Merge dir and relativePath and create a full path from the result.
-CUnicodeString REAPI CreateFullPath( CUnicodeView dir, CUnicodeView relativePath );
+CString REAPI CreateFullPath( CStringPart dir, CStringPart relativePath );
 // Convert a shortened path to a long path.
-CUnicodeString REAPI CreateLongPath( CUnicodeView path );
+CString REAPI CreateLongPath( CStringPart path );
 
 // Get the path components.
-CUnicodeString REAPI GetRoot( CUnicodePart name );
-CUnicodeString REAPI GetDrive( CUnicodePart name );
-CUnicodeString REAPI GetPath( CUnicodePart name );
-CUnicodeString REAPI GetDrivePath( CUnicodePart name );
-CUnicodeString REAPI GetName( CUnicodePart name );
+CString REAPI GetRoot( CStringPart name );
+CString REAPI GetDrive( CStringPart name );
+CString REAPI GetPath( CStringPart name );
+CString REAPI GetDrivePath( CStringPart name );
+CString REAPI GetName( CStringPart name );
 // Extension includes the dot symbol.
-CUnicodeString REAPI GetExt( CUnicodePart name );
-CUnicodeString REAPI GetNameExt( CUnicodePart name );
+CString REAPI GetExt( CStringPart name );
+CString REAPI GetNameExt( CStringPart name );
 
 // Add the separator to the end of path if there is none.
-void REAPI AddPathSeparator( CUnicodeString& path );
+void REAPI AddPathSeparator( CString& path );
 // Add a trailing separator if the path contains only the drive name or remove the trailing separator otherwise.
 // All normalized paths look like "C:\" or "C:\directory\etc".
-void REAPI NormalizePath( CUnicodeString& path );
+void REAPI NormalizePath( CString& path );
 // Change all the file separators to "\".
-void REAPI ForceBackSlashes( CUnicodeString& path );
+void REAPI ForceBackSlashes( CString& path );
 
 // Check directory/file existence.
-bool REAPI DirAccessible( CUnicodeView dir );
-bool REAPI FileExists( CUnicodeView fileName );
-bool REAPI CanOpenFile( CUnicodeView fileName, TFileReadWriteMode readWriteMode, TFileCreationMode createMode, TFileShareMode shareMode );
+bool REAPI DirAccessible( CStringPart dir );
+bool REAPI FileExists( CStringPart fileName );
+bool REAPI CanOpenFile( CStringPart fileName, TFileReadWriteMode readWriteMode, TFileCreationMode createMode, TFileShareMode shareMode );
 
 // File attributes management.
-DWORD REAPI GetAttributes( CUnicodeView fileName );
-void REAPI SetAttributes( CUnicodeView fileName, DWORD attributes );
+DWORD REAPI GetAttributes( CStringPart fileName );
+void REAPI SetAttributes( CStringPart fileName, DWORD attributes );
 
 // File redaction.
-void REAPI Rename( CUnicodeView fileName, CUnicodeView newFileName );
-void REAPI Delete( CUnicodeView fileName );
-void REAPI Copy( CUnicodeView src, CUnicodeView dest );
-void REAPI Move( CUnicodeView src, CUnicodeView dest );
+void REAPI Rename( CStringPart fileName, CStringPart newFileName );
+void REAPI Delete( CStringPart fileName );
+void REAPI Copy( CStringPart src, CStringPart dest );
+void REAPI Move( CStringPart src, CStringPart dest );
 
 // Directory redaction.
-void REAPI CreateDir( CUnicodeView dir );
-void REAPI DeleteDir( CUnicodeView dir );
-void REAPI DeleteTree( CUnicodeView dirTree );
-void REAPI CopyTree( CUnicodePart src, CUnicodeView dest );
-void REAPI MoveTree( CUnicodeView src, CUnicodeView dest );
+void REAPI CreateDir( CStringPart dir );
+void REAPI DeleteDir( CStringPart dir );
+void REAPI DeleteTree( CStringPart dirTree );
+void REAPI CopyTree( CStringPart src, CStringView dest );
+void REAPI MoveTree( CStringView src, CStringView dest );
 
-bool REAPI IsDirEmpty( CUnicodePart dir );
+bool REAPI IsDirEmpty( CStringPart dir );
 // Return the number of non-directories at the given path.
-int REAPI GetFileCount( CUnicodePart dir );
+int REAPI GetFileCount( CStringPart dir );
 
 enum TFileIncludeFlags {
 	FIF_Files = 1,	// include files in results
@@ -103,23 +104,23 @@ enum TFileIncludeFlags {
 };
 
 // Fill the fileList with the files from dir. Mask can contain several masks separated by a semicolon ( L"*.pdf;*.txt ).
-void REAPI GetFilesInDir( CUnicodePart dir, CArray<CFileStatus>& result, DWORD flags = FIF_Files, CUnicodePart mask = L"*" );
+void REAPI GetFilesInDir( CStringPart dir, CArray<CFileStatus>& result, DWORD flags = FIF_Files, CStringPart mask = "*" );
 
 // Create a unique name in the given folder.
-CUnicodeString REAPI CreateUniqueName( CUnicodePart dir, CUnicodePart prefix, CUnicodeView extension );
+CString REAPI CreateUniqueName( CStringPart dir, CStringPart prefix, CStringView extension );
 
 // Get the current executable full name.
-CUnicodeString REAPI GetExecutableName();
+CString REAPI GetExecutableName();
 // Get/Set the current process catalog.
-CUnicodeString REAPI GetCurrentDir();
-void REAPI SetCurrentDir( CUnicodeView newDir );
+CString REAPI GetCurrentDir();
+void REAPI SetCurrentDir( CStringPart newDir );
 // Windows catalog.
-CUnicodeString REAPI GetWindowsDir();
+CString REAPI GetWindowsDir();
 // Windows temp file catalog.
-CUnicodeString REAPI GetWindowsTempDir();
+CString REAPI GetWindowsTempDir();
 
 // Get the specified environment variable value.
-CUnicodeString REAPI GetEnvironmentVariable( CUnicodeView name );
+CString REAPI GetEnvironmentVariable( CStringPart name );
 
 // Path to the application data for different situations.
 enum TAppDataPathType {
@@ -128,13 +129,13 @@ enum TAppDataPathType {
 };
 
 // Get/Set the path for the application to store modifiable data.
-CUnicodeView REAPI GetAppDataPath( TAppDataPathType type );
-void REAPI SetAppDataPath( TAppDataPathType type, CUnicodePart path );
+CStringView REAPI GetAppDataPath( TAppDataPathType type );
+void REAPI SetAppDataPath( TAppDataPathType type, CStringPart path );
 // Add the given relative path to the current application data folder.
-void REAPI SetAppDataRelativePath( CUnicodeView path );
+void REAPI SetAppDataRelativePath( CStringView path );
 
 // Get the free space on the disk for the given path. Disk space is stored in KB.
-int REAPI GetDiskFreeSpace( CUnicodeView path );
+int REAPI GetDiskFreeSpace( CStringPart path );
 // Get the free space for the current process directory.
 int REAPI GetCurrentDiskFreeSpace();
 

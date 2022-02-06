@@ -67,14 +67,14 @@ public:
 	// Initialize a conversion error.
 	CJsonValueException( TJsonValueType expected, TJsonValueType actual );
 	// Initialize a missing object key error.
-	explicit CJsonValueException( CUnicodePart missingKeyName );
+	explicit CJsonValueException( CStringPart missingKeyName );
 
-	virtual CUnicodeString GetMessageText() const override final;
+	virtual CString GetMessageText() const override final;
 
 private:
-	CUnicodeString errorText;
+	CString errorText;
 
-	static CUnicodeView getValueTypeName( TJsonValueType type );
+	static CStringView getValueTypeName( TJsonValueType type );
 };
 
 //////////////////////////////////////////////////////////////////////////
@@ -247,7 +247,7 @@ inline CJsonValue& CJsonObject::FindValue( CStringPart keyName ) const
 			return *keyVal.Value;
 		}
 	}
-	throw CJsonValueException( UnicodeStr( keyName, CP_UTF8 ) );
+	throw CJsonValueException( keyName );
 }
 
 //////////////////////////////////////////////////////////////////////////

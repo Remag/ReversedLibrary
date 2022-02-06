@@ -13,7 +13,7 @@ namespace Relib {
 
 //////////////////////////////////////////////////////////////////////////
 
-CGifFile::CGifFile( CUnicodePart _fileName ) :
+CGifFile::CGifFile( CStringPart _fileName ) :
 	fileName( _fileName )
 {
 }
@@ -33,10 +33,10 @@ void CGifFile::Read( CAnimatedImageData& result ) const
 
 void CGifFile::ReadRawData( CArrayView<BYTE> gifData, CAnimatedImageData& result )
 {
-	doReadRawData( CUnicodePart(), gifData, result ); 
+	doReadRawData( CStringPart(), gifData, result ); 
 }
 
-void CGifFile::doReadRawData( CUnicodePart fileName, CArrayView<BYTE> gifData, CAnimatedImageData& result )
+void CGifFile::doReadRawData( CStringPart fileName, CArrayView<BYTE> gifData, CAnimatedImageData& result )
 {
 	try {
 		const RelibInternal::CGiffBuffer buffer{ gifData, 0 };

@@ -1,7 +1,5 @@
 #include <MessageLog.h>
 #include <MessageUtils.h>
-#include <BaseString.h>
-#include <BaseStringView.h>
 #include <Errors.h>
 #include <MessageLogImpls.h>
 
@@ -36,49 +34,42 @@ static IMessageLog& getCurrentMessageLog()
 	return currentMessageLog == nullptr ? getDefaultMessageLog() : *currentMessageLog;
 }
 
-//////////////////////////////////////////////////////////////////////////
-
-void Error( CUnicodeView text, CMessageSource subsystem )
+extern thread_local CStringView CurrentMessageSource;
+static CStringView getCurrentMessageSource()
 {
-	getCurrentMessageLog().AddMessage( text, LMT_Error, subsystem );
+	return CurrentMessageSource;
 }
+
+//////////////////////////////////////////////////////////////////////////
 
 void Exception( const CException& e )
 {
-	struct CExceptionMessageTag{};
-	getCurrentMessageLog().AddMessage( e.GetMessageText(), LMT_Exception, CExceptionMessageTag{} );
+	if( IsMessageSourceShown( getCurrentMessageSource() ) ) {
+		getCurrentMessageLog().AddMessage( e.GetMessageText(), LMT_Exception );
+	}
 }
 
 void CriticalException( const CException& e )
 {
-	struct CExceptionMessageTag{};
-	getCurrentMessageLog().AddMessage( e.GetMessageText(), LMT_CriticalException, CExceptionMessageTag{} );
-}
-
-void Warning( CUnicodeView text, CMessageSource subsystem )
-{
-	if( IsMessageSourceShown( subsystem ) ) {
-		getCurrentMessageLog().AddMessage( text, LMT_Warning, subsystem );
+	if( IsMessageSourceShown( getCurrentMessageSource() ) ) {
+		getCurrentMessageLog().AddMessage( e.GetMessageText(), LMT_CriticalException );
 	}
 }
 
-void Message( CUnicodeView text, CMessageSource subsystem )
-{
-	if( IsMessageSourceShown( subsystem ) ) {
-		getCurrentMessageLog().AddMessage( text, LMT_Message, subsystem );
-	}
-}
-
-void PeriodicUpdate( CUnicodeView text, CMessageSource subsystem )
-{
-	if( IsMessageSourceShown( subsystem ) ) {
-		getCurrentMessageLog().AddMessage( text, LMT_Periodic, subsystem );
-	}
-}
+}	// namespace Log.
 
 //////////////////////////////////////////////////////////////////////////
 
-}	// namespace Log.
+namespace RelibInternal {
+
+void sendLogMessage( TLogMessageType msgType, CString text )
+{
+	if( Log::IsMessageSourceShown( Log::getCurrentMessageSource() ) ) {
+		Log::getCurrentMessageLog().AddMessage( move( text ), LMT_Periodic );
+	}
+}
+
+}	// namespace RelibInternal.
 
 //////////////////////////////////////////////////////////////////////////
 
@@ -91,6 +82,20 @@ CMessageLogSwitcher::CMessageLogSwitcher( IMessageLog& newValue ) :
 CMessageLogSwitcher::~CMessageLogSwitcher()
 {
 	Log::currentMessageLog = prevLog;
+}
+
+//////////////////////////////////////////////////////////////////////////
+
+CMessageSourceSwitcher::CMessageSourceSwitcher( CStringPart srcName ) :
+	msgSource( srcName ),
+	prevSource( Log::CurrentMessageSource )
+{
+	Log::CurrentMessageSource = msgSource;
+}
+
+CMessageSourceSwitcher::~CMessageSourceSwitcher()
+{
+	Log::CurrentMessageSource = prevSource;
 }
 
 //////////////////////////////////////////////////////////////////////////

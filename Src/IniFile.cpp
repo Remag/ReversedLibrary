@@ -146,7 +146,7 @@ CUnicodeString CIniFileSection::GetKeyValuePairsString() const
 
 //////////////////////////////////////////////////////////////////////////
 
-CIniFile::CIniFile( CUnicodePart name ) :
+CIniFile::CIniFile( CStringPart name ) :
 	isModified( false )
 {
 	readFile( name );
@@ -189,7 +189,7 @@ static int skipUnicodeWhitespace( CUnicodeView substr )
 }
 
 // Read the given file and fill the class internal structures.
-void CIniFile::readFile( CUnicodePart fileName )
+void CIniFile::readFile( CStringPart fileName )
 {
 	filePath = fileName;
 	CUnicodeString fileContents;

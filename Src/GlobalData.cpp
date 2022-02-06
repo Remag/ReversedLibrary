@@ -63,12 +63,14 @@ char CStringView::emptyBufferStr = 0;
 wchar_t CUnicodeView::emptyBufferStr = 0;
 
 // Constant Strings.
-extern const CUnicodeView DefaultAssertFailedMessage = L"Assertion failed: %0\nFile: %1\nFunction: %2, line: %3.";
-extern const CUnicodeView UnknownComErrorMessage = L"Unknown COM Error:\nResult code: %0.";
-extern const CUnicodeView GeneralMultiCurlError = L"LibCurl multi interface returned an error.";
-const CUnicodeView CMemoryException::NotEnoughMemoryMessage = L"Not enough memory!";
-extern const CUnicodeView TempFilePrefix = L"relibtmp";
-extern const CUnicodeView TempFileExt = L"tmp";
+extern const CStringView DefaultAssertFailedMessage = "Assertion failed: %0\nFile: %1\nFunction: %2, line: %3.";
+extern const CStringView UnknownComErrorMessage = "Unknown COM Error:\nResult code: %0.";
+extern const CStringView GeneralMultiCurlError = "LibCurl multi interface returned an error.";
+const CStringView CMemoryException::NotEnoughMemoryMessage = "Not enough memory!";
+extern const CStringView TempFilePrefix = "relibtmp";
+extern const CStringView TempFileExt = "tmp";
+extern const CStringView CreatedFromStrName = "Document created from string.";
+
 
 // Message handlers.
 namespace Log {
@@ -77,33 +79,33 @@ namespace Log {
 }
 
 // Strings.
-CUnicodeString ApplicationTitle;
+CString ApplicationTitle;
 namespace FileSystem {
-	CUnicodeString SpecificUserAppDataPath;
-	CUnicodeString AllUsersAppDataPath;
+	CString SpecificUserAppDataPath;
+	CString AllUsersAppDataPath;
 }
 // File error descriptions.
-extern const CUnicodeView UnknownLastError = L"Unknown last error!\n Error code: %0.";
-extern const CUnicodeView GeneralFileError = L"General File Error! Error code: %1.\nFile name: %0.";
-extern const CUnicodeView FileNotFoundError = L"File not found!\nFile name: %0.";
-extern const CUnicodeView InvalidFileError = L"Invalid file!\nFile name: %0.";
-extern const CUnicodeView FileTooBigError = L"The file is too big!\nFile name: %0.";
-extern const CUnicodeView BadPathFileError = L"Invalid path!\nFile name: %0.";
-extern const CUnicodeView ObjectAlreadyExistsError = L"An object with this name already exists!\nFile name: %0.";
-extern const CUnicodeView AccessDeniedError = L"Access to file denied!\nFile name: %0.";
-extern const CUnicodeView SharingViolationFileError = L"File sharing violation!\nFile name: %0.";
-extern const CUnicodeView DiskFullError = L"The disk is too large to store the file!\nFile name: %0.";
-extern const CUnicodeView EarlyEndFileError = L"Unexpected end of file!\nFile name: %0.";
-extern const CUnicodeView HardwareFileError= L"Hardware IO error!\nFile name: %0.";
-extern const CUnicodeView XmlParsingError = L"XML parsing error at position %0:\n%1.";
-extern const CUnicodeView JsonParsingError = L"JSON parsing error at line %0, position %1.";
-extern const CUnicodeView JsonConversionError = L"JSON value was expected to be %0, the actual value was %1.";
-extern const CUnicodeView JsonMissingKeyError = L"JSON object is missing a key: \"%0\"";
-extern const CUnicodeView GeneralCurlError = L"Curl error. Error string buffer: %0.";
-extern const CUnicodeView GeneralPngFileError = L"JPEG parsing error: %1.\nFile name: %0";
-extern const CUnicodeView GeneralGifFileError = L"GIF parsing error: %1.\nFile name: %0";
-extern const CUnicodeView GeneralJpgFileError = L"PNG parsing error: %1.\nFile name: %0";
-extern const CUnicodeView UncommitedArchiveError = L"Archive was written to but never flushed to a file or buffer.";
+extern const CStringView UnknownLastError = "Unknown last error!\n Error code: %0.";
+extern const CStringView GeneralFileError = "General File Error! Error code: %1.\nFile name: %0.";
+extern const CStringView FileNotFoundError = "File not found!\nFile name: %0.";
+extern const CStringView InvalidFileError = "Invalid file!\nFile name: %0.";
+extern const CStringView FileTooBigError = "The file is too big!\nFile name: %0.";
+extern const CStringView BadPathFileError = "Invalid path!\nFile name: %0.";
+extern const CStringView ObjectAlreadyExistsError = "An object with this name already exists!\nFile name: %0.";
+extern const CStringView AccessDeniedError = "Access to file denied!\nFile name: %0.";
+extern const CStringView SharingViolationFileError = "File sharing violation!\nFile name: %0.";
+extern const CStringView DiskFullError = "The disk is too large to store the file!\nFile name: %0.";
+extern const CStringView EarlyEndFileError = "Unexpected end of file!\nFile name: %0.";
+extern const CStringView HardwareFileError= "Hardware IO error!\nFile name: %0.";
+extern const CStringView XmlParsingError = "XML parsing error at position %0:\n%1.";
+extern const CStringView JsonParsingError = "JSON parsing error at line %0, position %1.";
+extern const CStringView JsonConversionError = "JSON value was expected to be %0, the actual value was %1.";
+extern const CStringView JsonMissingKeyError = "JSON object is missing a key: \"%0\"";
+extern const CStringView GeneralCurlError = "Curl error. Error string buffer: %0.";
+extern const CStringView GeneralPngFileError = "JPEG parsing error: %1.\nFile name: %0";
+extern const CStringView GeneralGifFileError = "GIF parsing error: %1.\nFile name: %0";
+extern const CStringView GeneralJpgFileError = "PNG parsing error: %1.\nFile name: %0";
+extern const CStringView UncommitedArchiveError = "Archive was written to but never flushed to a file or buffer.";
 
 // Symbol sets.
 extern const CUnicodeSet InvalidFileNameSymbols{
@@ -115,17 +117,17 @@ extern const CUnicodeSet InvalidFileNameSymbols{
 };
 
 // Errors.
-extern const CError REAPI Err_SmallArchive( L"Trying to read an archive value after its end." );
-extern const CError REAPI Err_BadArchive( L"Unable to serialize with the given archive." );
-extern const CError REAPI Err_BadArchiveVersion( L"Archive version is incompatible with the current program." );
-extern const CError Err_BadIniFile( L"INI contains an invalid string.\nFile name: %0. String position: %1." );
-extern const CError Err_DuplicateIniKey( L"INI file contains a duplicate key.\nFile name: %0. Key name: %1." );
-extern const CError Err_RegistryOpenError{ L"Failed to open a registry key. Key name: %0.  Error code: %1." };
-extern const CError Err_RegistryWriteError{ L"Failed to write to a registry key. Value name: %0. Error code: %1." };
-extern const CError Err_ZlibInitError{ L"Failed to initialize ZLib. Error code: %0." };
-extern const CError Err_ZlibInflateError{ L"Failed to unzip data. Error code: %0." };
-extern const CError Err_BadCollectionData{ L"File collection data is corrupted." };
-extern const CError Err_CreateTempFile( L"Unable to open the temporary files folder.\nFolder name: %0.");
+extern const CError REAPI Err_SmallArchive( "Trying to read an archive value after its end." );
+extern const CError REAPI Err_BadArchive( "Unable to serialize with the given archive." );
+extern const CError REAPI Err_BadArchiveVersion( "Archive version is incompatible with the current program." );
+extern const CError Err_BadIniFile( "INI contains an invalid string.\nFile name: %0. String position: %1." );
+extern const CError Err_DuplicateIniKey( "INI file contains a duplicate key.\nFile name: %0. Key name: %1." );
+extern const CError Err_RegistryOpenError{ "Failed to open a registry key. Key name: %0.  Error code: %1." };
+extern const CError Err_RegistryWriteError{ "Failed to write to a registry key. Value name: %0. Error code: %1." };
+extern const CError Err_ZlibInitError{ "Failed to initialize ZLib. Error code: %0." };
+extern const CError Err_ZlibInflateError{ "Failed to unzip data. Error code: %0." };
+extern const CError Err_BadCollectionData{ "File collection data is corrupted." };
+extern const CError Err_CreateTempFile( "Unable to open the temporary files folder.\nFolder name: %0.");
 
 // Other.
 
@@ -165,8 +167,12 @@ namespace RelibInternal {
 	const CUnicodeView CStrConversionFunctions<wchar_t>::falseUnicodeStrings[2] = { L"false", L"0" };
 }
 
-CArray<CUnicodeString, CProcessHeap> TempFileNames;
+CArray<CString, CProcessHeap> TempFileNames;
 CRandomGenerator TempFileSuffixGenerator;
+
+namespace Log {
+	extern thread_local CStringView CurrentMessageSource = CStringView();
+}
 
 //////////////////////////////////////////////////////////////////////////
 

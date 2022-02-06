@@ -73,7 +73,7 @@ CXmlElement* xml_document::parse( CUnicodeString str )
 				return element;
 			}
 		} else {
-			throw CXmlException( L"expected <", text - textStart );
+			throw CXmlException( "expected <", text - textStart );
 		}
 	}
 	// No root detected. Clear the content and leave.
@@ -86,7 +86,7 @@ void xml_document::skip_xml_declaration( const wchar_t*& text )
 	// Skip until end of declaration.
 	while (text[0] != L'?' || text[1] != L'>') {
 		if (!text[0]) {
-			throw CXmlException( L"unexpected end of data", text - textStart );
+			throw CXmlException( "unexpected end of data", text - textStart );
 		}
 		++text;
 	}
@@ -98,7 +98,7 @@ void xml_document::skip_comment( const wchar_t*& text )
 	// Skip until end of comment.
 	while( text[0] != L'-' || text[1] != L'-' || text[2] != L'>' ) {
 		if( !text[0] ) {
-			throw CXmlException( L"unexpected end of data", text - textStart );
+			throw CXmlException( "unexpected end of data", text - textStart );
 		}
 		++text;
 	}
@@ -126,7 +126,7 @@ void xml_document::skip_doctype( const wchar_t*& text )
 				{
 					case L'[': ++depth; break;
 					case L']': --depth; break;
-					case 0: throw CXmlException( L"unexpected end of data", text - textStart );
+					case 0: throw CXmlException( "unexpected end of data", text - textStart );
 				}
 				++text;
 			}
@@ -135,7 +135,7 @@ void xml_document::skip_doctype( const wchar_t*& text )
 				
 		// Error on end of text.
 		case L'\0':
-			throw CXmlException( L"unexpected end of data", text - textStart );
+			throw CXmlException( "unexpected end of data", text - textStart );
 				
 		// Other character, skip it.
 		default:
@@ -151,7 +151,7 @@ void xml_document::skip_pi( const wchar_t*& text )
 	// Skip to '?>'
 	while (text[0] != L'?' || text[1] != L'>') {
 		if( *text == L'\0' ) {
-			throw CXmlException( L"unexpected end of data", text - textStart );
+			throw CXmlException( "unexpected end of data", text - textStart );
 		}
 		++text;
 	}
@@ -178,7 +178,7 @@ void xml_document::skip_cdata( const wchar_t*& text )
 	// Skip until end of cdata.
 	while( text[0] != L']' || text[1] != L']' || text[2] != L'>' ) {
 		if( !text[0] ) {
-			throw CXmlException( L"unexpected end of data", text - textStart );
+			throw CXmlException( "unexpected end of data", text - textStart );
 		}
 		++text;
 	}
@@ -191,7 +191,7 @@ CXmlElement* xml_document::parse_element( const wchar_t*& text )
 	const wchar_t* name = text;
 	skip<node_name_pred>(text);
 	if( text == name ) {
-		throw CXmlException( L"expected element name", text - textStart );
+		throw CXmlException( "expected element name", text - textStart );
 	}
 
 	const CUnicodePart elemName = CUnicodePart( name, static_cast<int>( text - name ) );
@@ -212,12 +212,12 @@ CXmlElement* xml_document::parse_element( const wchar_t*& text )
 	else if( *text == L'/' ) {
 		++text;
 		if( *text != L'>' ) {
-			throw CXmlException( L"expected >", text - textStart );
+			throw CXmlException( "expected >", text - textStart );
 		}
 		++text;
 	}
 	else {
-		throw CXmlException( L"expected >", text - textStart );
+		throw CXmlException( "expected >", text - textStart );
 	}
 
 	// Return parsed element.
@@ -301,7 +301,7 @@ CXmlElement* xml_document::parse_node( const wchar_t*& text )
 		++text;     // Skip !
 		while( *text != L'>' ) {
 			if( *text == 0 ) {
-				throw CXmlException( L"unexpected end of data", text - textStart );
+				throw CXmlException( "unexpected end of data", text - textStart );
 			}
 			++text;
 		}
@@ -329,7 +329,7 @@ void xml_document::parse_node_contents( const wchar_t*& text, CXmlElement& eleme
 				// Skip remaining whitespace after node name.
 				skip<whitespace_pred>( text );
 				if( *text != '>' ) {
-					throw CXmlException( L"expected >", text - textStart );
+					throw CXmlException( "expected >", text - textStart );
 				}
 				++text;     // Skip '>'
 				return;     // Node closed, finished parsing contents.
@@ -344,7 +344,7 @@ void xml_document::parse_node_contents( const wchar_t*& text, CXmlElement& eleme
 
 		// End of data - error.
 		case L'\0':
-			throw CXmlException( L"unexpected end of data", text - textStart );
+			throw CXmlException( "unexpected end of data", text - textStart );
 
 		// Data node.
 		default:
@@ -362,7 +362,7 @@ void xml_document::parse_node_attributes( const wchar_t*& text, CXmlElement& ele
 		++text;     // Skip first character of attribute name.
 		skip<attribute_name_pred>( text );
 		if( text == name ) {
-			throw CXmlException( L"expected attribute name", text - textStart );
+			throw CXmlException( "expected attribute name", text - textStart );
 		}
 
 		// Create new attribute.
@@ -373,7 +373,7 @@ void xml_document::parse_node_attributes( const wchar_t*& text, CXmlElement& ele
 
 		// Skip =
 		if( *text != L'=' )
-			throw CXmlException( L"expected =", text - textStart );
+			throw CXmlException( "expected =", text - textStart );
 		++text;
 
 		// Skip whitespace after =
@@ -382,7 +382,7 @@ void xml_document::parse_node_attributes( const wchar_t*& text, CXmlElement& ele
 		// Skip quote and remember if it was ' or "
 		wchar_t quote = *text;
 		if( quote != L'\'' && quote != L'"' ) {
-			throw CXmlException( L"expected ' or \"", text - textStart );
+			throw CXmlException( "expected ' or \"", text - textStart );
 		}
 		++text;
 
@@ -399,7 +399,7 @@ void xml_document::parse_node_attributes( const wchar_t*& text, CXmlElement& ele
 				
 		// Make sure that end quote is present.
 		if( *text != quote ) {
-			throw CXmlException( L"expected ' or \"", text - textStart );
+			throw CXmlException( "expected ' or \"", text - textStart );
 		}
 		// Skip quote.
 		++text;    

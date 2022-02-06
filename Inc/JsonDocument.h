@@ -27,7 +27,7 @@ public:
 	explicit CJsonParseException( int _lineNumber, int _linePos ) : lineNumber( _lineNumber ), linePos( _linePos ) {}
 
 	// CException.
-	virtual CUnicodeString GetMessageText() const override;
+	virtual CString GetMessageText() const override;
 
 private:
 	int lineNumber;
@@ -45,7 +45,7 @@ public:
 	bool IsEmpty() const
 		{ return root == nullptr; }
 
-	void CreateFromFile( CUnicodeView fileName );
+	void CreateFromFile( CStringPart fileName );
 	void CreateFromFile( CFileReader& fileReader );
 	void CreateFromString( CStringPart str );
 

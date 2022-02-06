@@ -167,7 +167,7 @@ CPtrOwner<ISerializable> CArchive::readUniqueObject( CFileReadView file )
 static const BYTE fileArchivePrefix = 0xFA;
 static const BYTE binaryArchivePrefix = 0xBA;
 static const BYTE compressedArchivePrefix = 0xCA;
-CArchiveReader::CArchiveReader( CUnicodeView fileName ) :
+CArchiveReader::CArchiveReader( CStringPart fileName ) :
 	CArchiveReader( CFileReader( fileName, FCM_OpenExisting ) )
 {
 }
@@ -212,15 +212,15 @@ CArchiveWriter::CArchiveWriter( int bufferSize )
 	skip( flagByteSize );
 }
 
-extern const CUnicodeView UncommitedArchiveError;
+extern const CStringView UncommitedArchiveError;
 CArchiveWriter::~CArchiveWriter()
 {
 	 if( getBufferSize() > 0 ) {
-		 Log::Error( UncommitedArchiveError, this );
+		 Log::Error( UncommitedArchiveError );
 	 }
 }
 
- void CArchiveWriter::FlushToFile( CUnicodeView fileName )
+ void CArchiveWriter::FlushToFile( CStringPart fileName )
  {
 	 CFileWriter file( fileName, FCM_CreateAlways );
 	 auto buffer = detachBuffer();
@@ -228,7 +228,7 @@ CArchiveWriter::~CArchiveWriter()
 	 file.Write( buffer.Ptr(), buffer.Size() );
  }
 
- void CArchiveWriter::FlushToCompressedFile( CUnicodeView fileName )
+ void CArchiveWriter::FlushToCompressedFile( CStringPart fileName )
  {
 	 const auto flagSize = sizeof( compressedArchivePrefix );
 	 CFileWriter file( fileName, FCM_CreateAlways );

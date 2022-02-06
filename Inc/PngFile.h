@@ -19,16 +19,16 @@ enum TPngColorFormat {
 	PCF_EnumCount
 };
 
-extern const CUnicodeView GeneralPngFileError;
+extern const CStringView GeneralPngFileError;
 //////////////////////////////////////////////////////////////////////////
 
 // Exception that occurs while trying to extract data from a PNG file.
 class REAPI CPngException : public CFileWrapperException {
 public:
-	CPngException( CUnicodePart fileName, CUnicodePart additionalInfo ) : CFileWrapperException( fileName, additionalInfo ) {}
+	CPngException( CStringPart fileName, CStringPart additionalInfo ) : CFileWrapperException( fileName, additionalInfo ) {}
 
-	virtual CUnicodeString GetMessageTemplate() const override
-	{ return UnicodeStr( GeneralPngFileError ); }
+	virtual CString GetMessageTemplate() const override
+		{ return Str( GeneralPngFileError ); }
 };
 
 //////////////////////////////////////////////////////////////////////////
@@ -36,7 +36,7 @@ public:
 // Mechanism for PNG file compression and decompression.
 class REAPI CPngFile {
 public:
-	explicit CPngFile( CUnicodePart fileName );
+	explicit CPngFile( CStringPart fileName );
 
 	// Read the contents of the PNG file and decompress them as a 32bit RGBA image.
 	// Image pixel dimensions are returned in resultSize.
@@ -57,7 +57,7 @@ private:
 	void doWrite( const void* fileData, unsigned pngLibFormat, int rowStride, CVector2<int> imageSize );
 	void writeCompressedData( CArray<BYTE>& compressedData, int dataSize ) const;
 
-	static void doReadRawData( CUnicodePart fileName, CArrayView<BYTE> pngData, CStaticImageData& result );
+	static void doReadRawData( CStringPart fileName, CArrayView<BYTE> pngData, CStaticImageData& result );
 };
 
 //////////////////////////////////////////////////////////////////////////

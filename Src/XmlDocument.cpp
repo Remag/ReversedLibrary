@@ -5,14 +5,14 @@
 
 namespace Relib {
 
-extern const CUnicodeView XmlParsingError;
-CXmlException::CXmlException( CUnicodePart _description, long long _symbolPos ) :
+extern const CStringView XmlParsingError;
+CXmlException::CXmlException( CStringPart _description, long long _symbolPos ) :
 	description( _description ),
 	symbolPos( _symbolPos )
 {
 }
 
-CUnicodeString CXmlException::GetMessageText() const 
+CString CXmlException::GetMessageText() const 
 {
 	return XmlParsingError.SubstParam( symbolPos, description );
 }
@@ -25,28 +25,28 @@ CXmlDocument::CXmlDocument() :
 {
 }
 
-void CXmlDocument::LoadFromFile( CUnicodePart fileName )
+void CXmlDocument::LoadFromFile( CStringPart fileName )
 {
 	document.Empty();
-	sourceStrName = UnicodeStr( fileName );
+	sourceStrName = Str( fileName );
 	root = document.parse( File::ReadUnicodeText( sourceStrName ) );
 }
 
-const CUnicodeView createdFromStrName = L"Document created from string.";
+extern const CStringView CreatedFromStrName;
 void CXmlDocument::LoadFromString( CUnicodeString str )
 {
 	document.Empty();
-	sourceStrName = UnicodeStr( createdFromStrName );
+	sourceStrName = Str( CreatedFromStrName );
 	root = document.parse( move( str ) );
 }
 
 static const CUnicodeView xmlHeaderText = L"<?xml version=\"1.0\" encoding=\"utf-8\"?>\r\n";
-void CXmlDocument::SaveToFile( CUnicodeView fileName ) const
+void CXmlDocument::SaveToFile( CStringPart fileName ) const
 {
 	if( root == nullptr ) {
 		return;
 	}
-	const CUnicodeString xmlText = xmlHeaderText + root->ToString();
+	const auto xmlText = xmlHeaderText + root->ToString();
 	File::WriteUnicodeText( fileName, xmlText, FTE_UTF8 );
 }
 

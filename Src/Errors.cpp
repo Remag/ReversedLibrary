@@ -34,12 +34,12 @@ CException::~CException()
 
 //////////////////////////////////////////////////////////////////////////
 
-CInternalException::CInternalException( CUnicodeString _errorText ) :
+CInternalException::CInternalException( CString _errorText ) :
 	errorText( move( _errorText ) )
 {
 }
 
-CUnicodeString CInternalException::GetMessageText() const
+CString CInternalException::GetMessageText() const
 {
 	return copy( errorText );
 }
@@ -50,9 +50,9 @@ CMemoryException::CMemoryException()
 {
 }
 
-CUnicodeString CMemoryException::GetMessageText() const
+CString CMemoryException::GetMessageText() const
 {
-	return UnicodeStr( NotEnoughMemoryMessage );
+	return Str( NotEnoughMemoryMessage );
 }
 
 void ThrowMemoryException()
@@ -70,7 +70,7 @@ void checkMemoryError( bool condition )
 
 //////////////////////////////////////////////////////////////////////////
 
-CUnicodeString CCheckException::GetMessageText() const
+CString CCheckException::GetMessageText() const
 {
 	return err.GetMessageText().SubstParam( params[0], params[1], params[2] );
 }
@@ -82,49 +82,49 @@ CLastErrorException::CLastErrorException( DWORD _errorCode ) :
 {
 }
 
-CUnicodeString CLastErrorException::GetMessageText() const
+CString CLastErrorException::GetMessageText() const
 {
 	return GetErrorText( errorCode );
 }
 
-extern const CUnicodeView UnknownLastError;
-CUnicodeString CLastErrorException::GetErrorText( DWORD errorCode )
+extern const CStringView UnknownLastError;
+CString CLastErrorException::GetErrorText( DWORD errorCode )
 {
 	if( errorCode == 0 ) {
 		return UnknownLastError.SubstParam( L"0" );
 	}
 
-	wchar_t* text = 0;
+	wchar_t* text = nullptr;
 	const DWORD formatResult = ::FormatMessage( FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_ARGUMENT_ARRAY,
 		0, errorCode, LANG_NEUTRAL, reinterpret_cast<wchar_t*>( &text ), 0, 0 );
 
-	CUnicodeString result = ( text == 0 || formatResult == 0 )
-		? UnknownLastError.SubstParam( UnicodeStr( numeric_cast<int>( errorCode ), 16 ) )
-		: UnicodeStr( text );
+	auto result = ( text == nullptr || formatResult == 0 )
+		? UnknownLastError.SubstParam( Str( numeric_cast<int>( errorCode ), 16 ) )
+		: Str( text );
 
 	if( text != nullptr ) {
-		LocalFree( static_cast<HLOCAL>( text ) );
+		::LocalFree( static_cast<HLOCAL>( text ) );
 	}
 	return result;
 }
 
 //////////////////////////////////////////////////////////////////////////
 
-CFileException::CFileException( DWORD _errorCode, CUnicodePart _fileName ) :
+CFileException::CFileException( DWORD _errorCode, CStringPart _fileName ) :
 	errorCode( _errorCode ),
 	fileName( _fileName ),
 	type( GetErrorType( _errorCode ) )
 {
 }
 
-CFileException::CFileException( TFileExceptionType _type, CUnicodePart _fileName ) :
+CFileException::CFileException( TFileExceptionType _type, CStringPart _fileName ) :
 	errorCode( 0 ),
 	fileName( _fileName ),
 	type( _type )
 {
 }
 
-CUnicodeString CFileException::GetMessageText() const
+CString CFileException::GetMessageText() const
 {
 	return GetErrorText( Type(), FileName(), errorCode );
 }
@@ -205,18 +205,18 @@ CFileException::TFileExceptionType CFileException::GetErrorType( DWORD errorCode
 	}
 }
 
-extern const CUnicodeView GeneralFileError;
-extern const CUnicodeView FileNotFoundError;
-extern const CUnicodeView InvalidFileError;
-extern const CUnicodeView FileTooBigError;
-extern const CUnicodeView BadPathFileError;
-extern const CUnicodeView ObjectAlreadyExistsError;
-extern const CUnicodeView AccessDeniedError;
-extern const CUnicodeView SharingViolationFileError;
-extern const CUnicodeView DiskFullError;
-extern const CUnicodeView EarlyEndFileError;
-extern const CUnicodeView HardwareFileError;
-CUnicodeString CFileException::GetErrorText( CFileException::TFileExceptionType type, CUnicodeView name, int code )
+extern const CStringView GeneralFileError;
+extern const CStringView FileNotFoundError;
+extern const CStringView InvalidFileError;
+extern const CStringView FileTooBigError;
+extern const CStringView BadPathFileError;
+extern const CStringView ObjectAlreadyExistsError;
+extern const CStringView AccessDeniedError;
+extern const CStringView SharingViolationFileError;
+extern const CStringView DiskFullError;
+extern const CStringView EarlyEndFileError;
+extern const CStringView HardwareFileError;
+CString CFileException::GetErrorText( CFileException::TFileExceptionType type, CStringView name, int code )
 {
 	switch( type ) {
 	case FET_FileNotFound:
@@ -246,12 +246,12 @@ CUnicodeString CFileException::GetErrorText( CFileException::TFileExceptionType 
 	}
 }
 
-void ThrowFileException( DWORD lastErrorCode, CUnicodePart fileName )
+void ThrowFileException( DWORD lastErrorCode, CStringPart fileName )
 {
 	throw CFileException( lastErrorCode, fileName );
 }
 
-void ThrowFileException( CFileException::TFileExceptionType type, CUnicodePart fileName )
+void ThrowFileException( CFileException::TFileExceptionType type, CStringPart fileName )
 {
 	throw CFileException( type, fileName );
 }

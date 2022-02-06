@@ -15,7 +15,7 @@ public:
 	CMessageSystem() = default;
 
 	// Load the messages from the given binary file.
-	void LoadMessages( CUnicodeView fileName );
+	void LoadMessages( CStringPart fileName );
 
 	int FindMessageId( int sectionId, CUnicodePart messageName ) const;
 	int FindMessageId( CStringPart sectionName, CUnicodePart messageName ) const;

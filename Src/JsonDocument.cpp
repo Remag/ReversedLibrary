@@ -6,8 +6,8 @@ namespace Relib {
 
 //////////////////////////////////////////////////////////////////////////
 
-extern const REAPI CUnicodeView JsonParsingError;
-CUnicodeString CJsonParseException::GetMessageText() const
+extern const REAPI CStringView JsonParsingError;
+CString CJsonParseException::GetMessageText() const
 {
 	return JsonParsingError.SubstParam( lineNumber, linePos );
 }
@@ -20,7 +20,7 @@ void CJsonDocument::Empty()
 	jsonData.Reset();
 }
 
-void CJsonDocument::CreateFromFile( CUnicodeView fileName )
+void CJsonDocument::CreateFromFile( CStringPart fileName )
 {
 	CFileReader jsonFile( fileName, FCM_OpenExisting );
 	CreateFromFile( jsonFile );

@@ -15,19 +15,19 @@ public:
 		{ return 1223218893; }
 
 	// Create a collection from folder.
-	explicit CFileCollection( CUnicodeView folderName );
+	explicit CFileCollection( CStringPart folderName );
 	// Create a collection from raw binary data.
 	explicit CFileCollection( CArray<BYTE> binaryData );
 
 	// Write the collection to a folder. Name conflicts are resolved by overwriting the files.
-	void WriteToFolder( CUnicodeView folderName );
+	void WriteToFolder( CStringPart folderName );
 	
 
 	int GetFileCount() const
 		{ return unitInfo.Size(); }
-	CUnicodeView GetFileName( int filePos ) const;
+	CStringPart GetFileName( int filePos ) const;
 	CArrayView<BYTE> GetFileData( int filePos ) const;
-	void SetFileName( int filePos, CUnicodePart newName );
+	void SetFileName( int filePos, CStringPart newName );
 	void DeleteFile( int filePos );
 
 	// Delete unnecessary information from binary data.
@@ -40,7 +40,7 @@ private:
 	CArray<BYTE> fileData;
 
 	struct CFileUnitData {
-		CUnicodeString RelativePath;
+		CString RelativePath;
 		int DataOffset;
 		int DataSize;
 	};
@@ -48,15 +48,15 @@ private:
 	// Data of the collection units.
 	CArray<CFileUnitData> unitInfo;
 
-	void parseFolderData( CUnicodeView folderName );
+	void parseFolderData( CStringPart folderName );
 	void checkDataError( bool condition );
 	void parseFileData();
 	int parseFileUnit( int unitOffset );
-	void parseFileUnit( CUnicodeView fileName, int fileLength, CUnicodeView folderName );
-	CUnicodeView findRelativeFileName( CUnicodeView fileName, CUnicodeView parentFolderName ) const;
-	void writeFileUnit( const CFileUnitData& data, CUnicodeView folder );
+	void parseFileUnit( CStringPart fileName, int fileLength, CStringPart folderName );
+	CStringPart findRelativeFileName( CStringPart fileName, CStringPart parentFolderName ) const;
+	void writeFileUnit( const CFileUnitData& data, CStringPart folder );
 	void writeIntToData( int value );
-	void writeStringToData( CUnicodeView str );
+	void writeStringToData( CStringPart str );
 	void updateFileUnit( CFileUnitData& unit, CArrayView<BYTE> data );
 };
 

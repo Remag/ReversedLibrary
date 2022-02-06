@@ -87,13 +87,13 @@ private:
 // Save format - UTF16LE with a BOM.
 class REAPI CIniFile {
 public:
-	explicit CIniFile( CUnicodePart name );
+	explicit CIniFile( CStringPart name );
 	CIniFile( CIniFile&& other );
 	const CIniFile& operator=( CIniFile&& other );
 	~CIniFile();
 
 	// File name.
-	CUnicodeView Name() const
+	CStringView Name() const
 		{ return filePath; }
 	// Does this file contain unsaved changes?
 	bool IsModified() const
@@ -155,7 +155,7 @@ public:
 
 private:
 	// Full name of the .ini file.
-	CUnicodeString filePath;
+	CString filePath;
 	// Section name to section map for fast section access.
 	CMap<CUnicodeString, int> sectionNameToSectionId;
 	// List of available sections.
@@ -163,7 +163,7 @@ private:
 	// Has the file been modified.
 	bool isModified;
 
-	void readFile( CUnicodePart fileName );
+	void readFile( CStringPart fileName );
 	static bool shouldSkip( CUnicodePart str );
 	static bool parseKeyValuePair( CUnicodePart str, CUnicodeString& key, CUnicodeString& value );
 	static bool parseSection( CUnicodePart str, CUnicodeString& section );

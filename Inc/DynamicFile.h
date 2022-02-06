@@ -1,6 +1,6 @@
 #pragma once
 #include <FileViews.h>
-#include <BaseStringView.h>
+#include <BaseStringPart.h>
 
 namespace Relib {
 
@@ -28,14 +28,14 @@ public:
 		{ return getFileHandle(); }
 
 	// Open and create methods that throw an exception on failure.
-	void Open( CUnicodeView fileName, TFileReadWriteMode readWriteMode, TFileCreationMode createMode, TFileShareMode shareMode )
+	void Open( CStringPart fileName, TFileReadWriteMode readWriteMode, TFileCreationMode createMode, TFileShareMode shareMode )
 		{ return open( fileName, readWriteMode, createMode, shareMode, FILE_ATTRIBUTE_NORMAL ); }
-	void Open( CUnicodeView fileName, TFileReadWriteMode readWriteMode, TFileCreationMode createMode, TFileShareMode shareMode, DWORD attributes )
+	void Open( CStringPart fileName, TFileReadWriteMode readWriteMode, TFileCreationMode createMode, TFileShareMode shareMode, DWORD attributes )
 		{ return open( fileName, readWriteMode, createMode, shareMode, attributes ); }
 	// Open and create methods that return false on failure.
-	bool TryOpen( CUnicodeView fileName, TFileReadWriteMode readWriteMode, TFileCreationMode createMode, TFileShareMode shareMode )
+	bool TryOpen( CStringPart fileName, TFileReadWriteMode readWriteMode, TFileCreationMode createMode, TFileShareMode shareMode )
 		{ return tryOpen( fileName, readWriteMode, createMode, shareMode, FILE_ATTRIBUTE_NORMAL ); }
-	bool TryOpen( CUnicodeView fileName, TFileReadWriteMode readWriteMode, TFileCreationMode createMode, TFileShareMode shareMode, DWORD attributes )
+	bool TryOpen( CStringPart fileName, TFileReadWriteMode readWriteMode, TFileCreationMode createMode, TFileShareMode shareMode, DWORD attributes )
 		{ return tryOpen( fileName, readWriteMode, createMode, shareMode, attributes ); }
 
 	// Save pending changes.

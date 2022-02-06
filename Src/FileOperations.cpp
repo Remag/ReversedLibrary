@@ -16,7 +16,7 @@ extern const char Utf16BEFileTag[2] = { char( 0xFEU ), char( 0xFFU ) };
 extern const char Utf8FileTag[3] = { char( 0xEFU ), char( 0xBBU ), char( 0xBFU ) };
 //////////////////////////////////////////////////////////////////////////
 
-CUnicodeString CFileReadWriteOperations::GetFileName() const
+CString CFileReadWriteOperations::GetFileName() const
 {
 	assert( IsOpen() );
 	CUnicodeString result;
@@ -31,7 +31,7 @@ CUnicodeString CFileReadWriteOperations::GetFileName() const
 	}
 	assert( length <= bufferLength );
 	resPtr.Release( length );
-	return result;
+	return Str( result );
 }
 
 void CFileReadWriteOperations::Write( const void* buffer, int bytesCount )
@@ -95,19 +95,19 @@ CFileStatus CFileReadWriteOperations::GetStatus() const
 	return result;
 }
 
-void CFileReadWriteOperations::open( CUnicodeView fileName, TFileReadWriteMode readWriteMode, TFileCreationMode createMode, TFileShareMode shareMode, DWORD attributes )
+void CFileReadWriteOperations::open( CStringPart fileName, TFileReadWriteMode readWriteMode, TFileCreationMode createMode, TFileShareMode shareMode, DWORD attributes )
 {
 	assert( !IsOpen() );
 	create( fileName, readWriteMode, shareMode, nullptr, createMode, attributes );
 }
 
-bool CFileReadWriteOperations::tryOpen( CUnicodeView fileName, TFileReadWriteMode readWriteMode, TFileCreationMode createMode, TFileShareMode shareMode, DWORD attributes )
+bool CFileReadWriteOperations::tryOpen( CStringPart fileName, TFileReadWriteMode readWriteMode, TFileCreationMode createMode, TFileShareMode shareMode, DWORD attributes )
 {
 	assert( !IsOpen() );
 	return tryCreate( fileName, readWriteMode, shareMode, nullptr, createMode, attributes );
 }
 
-HANDLE CFileReadWriteOperations::tryOpenHandle( CUnicodeView fileName, TFileReadWriteMode readWriteMode, TFileCreationMode createMode, TFileShareMode shareMode, DWORD attributes )
+HANDLE CFileReadWriteOperations::tryOpenHandle( CStringPart fileName, TFileReadWriteMode readWriteMode, TFileCreationMode createMode, TFileShareMode shareMode, DWORD attributes )
 {
 	return doCreateHandle( fileName, readWriteMode, createMode, nullptr, shareMode, attributes );
 }
@@ -216,7 +216,7 @@ TFileTextEncoding CFileReadWriteOperations::findFileEncoding( CArrayView<BYTE> f
 	return FTE_Undefined;
 }
 
-void CFileReadWriteOperations::create( CUnicodeView fileName, DWORD accessMode, DWORD shareMode, SECURITY_ATTRIBUTES* security, DWORD createMode, DWORD attributes )
+void CFileReadWriteOperations::create( CStringPart fileName, DWORD accessMode, DWORD shareMode, SECURITY_ATTRIBUTES* security, DWORD createMode, DWORD attributes )
 {
 	doCreate( fileName, accessMode, shareMode, security, createMode, attributes );
 	if( !IsOpen() ) {
@@ -224,21 +224,21 @@ void CFileReadWriteOperations::create( CUnicodeView fileName, DWORD accessMode, 
 	}
 }
 
-bool CFileReadWriteOperations::tryCreate( CUnicodeView fileName, DWORD accessMode, DWORD shareMode, SECURITY_ATTRIBUTES* security, DWORD createMode, DWORD attributes )
+bool CFileReadWriteOperations::tryCreate( CStringPart fileName, DWORD accessMode, DWORD shareMode, SECURITY_ATTRIBUTES* security, DWORD createMode, DWORD attributes )
 {
 	doCreate( fileName, accessMode, shareMode, security, createMode, attributes );
 	return IsOpen();
 }
 
-void CFileReadWriteOperations::doCreate( CUnicodeView fileName, DWORD accessMode, DWORD shareMode, SECURITY_ATTRIBUTES* security, DWORD createMode, DWORD attributes )
+void CFileReadWriteOperations::doCreate( CStringPart fileName, DWORD accessMode, DWORD shareMode, SECURITY_ATTRIBUTES* security, DWORD createMode, DWORD attributes )
 {
 	assert( !IsOpen() );
 	fileHandle = doCreateHandle( fileName, accessMode, shareMode, security, createMode, attributes );
 }
 
-HANDLE CFileReadWriteOperations::doCreateHandle( CUnicodeView fileName, DWORD accessMode, DWORD shareMode, SECURITY_ATTRIBUTES* security, DWORD createMode, DWORD attributes )
+HANDLE CFileReadWriteOperations::doCreateHandle( CStringPart fileName, DWORD accessMode, DWORD shareMode, SECURITY_ATTRIBUTES* security, DWORD createMode, DWORD attributes )
 {
-	CUnicodeString fullName = FileSystem::CreateFullPath( fileName );
+	const auto fullName = FileSystem::CreateFullUnicodePath( UnicodeStr( fileName ) );
 	return ::CreateFile( fullName.Ptr(), accessMode, shareMode, security, createMode, attributes, 0 );
 }
 
@@ -250,7 +250,7 @@ void CFileReadWriteOperations::throwException() const
 	ThrowFileException( errorCode, fileName );
 }
 
-void CFileReadWriteOperations::throwException( CUnicodePart fileName ) const
+void CFileReadWriteOperations::throwException( CStringPart fileName ) const
 {
 	ThrowFileException( ::GetLastError(), fileName );
 }
@@ -273,7 +273,7 @@ static CString readAnsi( CFileReadView file, int fileLength )
 	return result;
 }
 
-CString ReadText( CUnicodeView fileName )
+CString ReadText( CStringPart fileName )
 {
 	CFileReader file( fileName, FCM_OpenExisting );
 	return ReadText( file );
@@ -285,7 +285,7 @@ CString ReadText( CFileReadView file )
 	return readAnsi( file, length );
 }
 
-void WriteText( CUnicodeView fileName, CStringPart text )
+void WriteText( CStringPart fileName, CStringPart text )
 {
 	CFileWriter file( fileName, FCM_CreateAlways );
 	WriteText( file, text );
@@ -367,7 +367,7 @@ static CUnicodeString readUtf8( CFileReadView file )
 	return readAndConvertAnsi( file, length, CP_UTF8 );
 }
 
-CUnicodeString ReadUnicodeText( CUnicodeView fileName, UINT codePage )
+CUnicodeString ReadUnicodeText( CStringPart fileName, UINT codePage )
 {
 	CFileReader file( fileName, FCM_OpenExisting );
 	return ReadUnicodeText( file, codePage );
@@ -403,7 +403,7 @@ static void writeUtf16LE( CFileWriteView file, CUnicodePart text )
 	file.Write( text.begin(), length * sizeof( wchar_t ) );
 }
 
-void WriteUnicodeText( CUnicodeView fileName, CUnicodePart text, TFileTextEncoding encoding )
+void WriteUnicodeText( CStringPart fileName, CUnicodePart text, TFileTextEncoding encoding )
 {
 	CFileWriter file( fileName, FCM_CreateAlways );
 	WriteUnicodeText( file, text, encoding );

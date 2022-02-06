@@ -84,7 +84,7 @@ public:
 	CException();
 	virtual ~CException();
 
-	virtual CUnicodeString GetMessageText() const = 0;
+	virtual CString GetMessageText() const = 0;
 };
 
 //////////////////////////////////////////////////////////////////////////
@@ -92,14 +92,14 @@ public:
 // Exception that is thrown when an assertion fails. Contains information about the position of the failed assertion in the code.
 class REAPI CInternalException : public CException {
 public:
-	explicit CInternalException( CUnicodeString errorText );
+	explicit CInternalException( CString errorText );
 
 	// CException.
-	virtual CUnicodeString GetMessageText() const override final;
+	virtual CString GetMessageText() const override final;
 
 private:
 	// Description of the internal error.
-	CUnicodeString errorText;
+	CString errorText;
 };
 
 //////////////////////////////////////////////////////////////////////////
@@ -110,10 +110,10 @@ public:
 	CMemoryException();
 
 	// CException.
-	virtual CUnicodeString GetMessageText() const override final;
+	virtual CString GetMessageText() const override final;
 
 	// Message that is shown when the exception is thrown.
-	static const CUnicodeView NotEnoughMemoryMessage;
+	static const CStringView NotEnoughMemoryMessage;
 };
 
 void REAPI checkMemoryError( bool condition );
@@ -123,13 +123,13 @@ void REAPI checkMemoryError( bool condition );
 // Class representing an error message.
 class REAPI CError {
 public:
-	explicit CError( CUnicodeView name ) : messageStr( name ) {}
+	explicit CError( CStringView name ) : messageStr( name ) {}
 
-	CUnicodeView GetMessageText() const 
+	CStringView GetMessageText() const 
 		{ return messageStr; }
 
 private:
-	CUnicodeView messageStr;
+	CStringView messageStr;
 
 	// Copying is prohibited.
 	CError( CError& ) = delete;
@@ -145,33 +145,33 @@ public:
 	CCheckException( const CError& err, Params&&... params );
 
 	// CException.
-	virtual CUnicodeString GetMessageText() const; 
+	virtual CString GetMessageText() const; 
 
 	const CError& Error() const
 		{ return err; }
-	CUnicodeView FirstParameter() const
+	CStringView FirstParameter() const
 		{ return params[0]; }
-	CUnicodeView SecondParameter() const
+	CStringView SecondParameter() const
 		{ return params[1]; }
-	CUnicodeView ThirdParameter() const
+	CStringView ThirdParameter() const
 		{ return params[2]; }
 
-	void SetFirstParam( CUnicodePart newValue )
+	void SetFirstParam( CStringPart newValue )
 		{ params[0] = newValue; }
-	void SetSecondParam( CUnicodePart newValue )
+	void SetSecondParam( CStringPart newValue )
 		{ params[1] = newValue; }
-	void SetThirdParam( CUnicodePart newValue )
+	void SetThirdParam( CStringPart newValue )
 		{ params[2] = newValue; }
 
 private:
 	// An error object. It is assumed that all errors are static.
 	const CError& err;
 	// Optional error parameters.
-	CUnicodeString params[3];
+	CString params[3];
 
-	static void initParam( CUnicodeString* params );
+	static void initParam( CString* params );
 	template <class FirstParam, class...RestParams>
-	static void initParam( CUnicodeString* params, FirstParam&& first, RestParams&&... rest );
+	static void initParam( CString* params, FirstParam&& first, RestParams&&... rest );
 };
 
 template <class... Params>
@@ -182,14 +182,14 @@ CCheckException::CCheckException( const CError& _err, Params&&... _params ) :
 	initParam( params, forward<Params>( _params )... );
 }
 
-inline void CCheckException::initParam( CUnicodeString* )
+inline void CCheckException::initParam( CString* )
 {
 }
 
 template <class FirstParam, class...RestParams>
-void CCheckException::initParam( CUnicodeString* params, FirstParam&& first, RestParams&&... rest )
+void CCheckException::initParam( CString* params, FirstParam&& first, RestParams&&... rest )
 {
-	*params = UnicodeStr( forward<FirstParam>( first ) );
+	*params = Str( forward<FirstParam>( first ) );
 	initParam( params + 1, forward<RestParams>( rest )... );
 }
 
@@ -217,11 +217,11 @@ public:
 	explicit CLastErrorException( DWORD errorCode );
 	
 	// CException.
-	virtual CUnicodeString GetMessageText() const;
+	virtual CString GetMessageText() const;
 
 	DWORD ErrorCode() const
 		{ return errorCode;	}
-	static CUnicodeString GetErrorText( DWORD errorCode );
+	static CString GetErrorText( DWORD errorCode );
 
 private:
 	const DWORD errorCode;
@@ -247,51 +247,51 @@ public:
 		FET_EarlyEnd	// unexpected end of file.
 	};
 
-	CFileException( DWORD errorCode, CUnicodePart fileName );
-	CFileException( TFileExceptionType type, CUnicodePart fileName );
+	CFileException( DWORD errorCode, CStringPart fileName );
+	CFileException( TFileExceptionType type, CStringPart fileName );
 	CFileException( const CFileException& other ) : errorCode( other.errorCode ), type( other.type ), fileName( copy( other.fileName ) ) {}
 
 	// CException.
-	virtual CUnicodeString GetMessageText() const override;
+	virtual CString GetMessageText() const override;
 
 	DWORD ErrorCode() const
 		{ return errorCode; }
 	TFileExceptionType Type() const
 		{ return type; }
-	CUnicodeView FileName() const
+	CStringView FileName() const
 		{ return fileName; }
 
 	static TFileExceptionType GetErrorType( DWORD errorCode );
-	static CUnicodeString GetErrorText( TFileExceptionType type, CUnicodeView name, int code );
+	static CString GetErrorText( TFileExceptionType type, CStringView name, int code );
 
 private:
 	const DWORD errorCode;
 	const TFileExceptionType type;
-	const CUnicodeString fileName;
+	const CString fileName;
 };
 
-void ThrowFileException( DWORD lastErrorCode, CUnicodePart fileName );
-void ThrowFileException( CFileException::TFileExceptionType type, CUnicodePart fileName );
+void ThrowFileException( DWORD lastErrorCode, CStringPart fileName );
+void ThrowFileException( CFileException::TFileExceptionType type, CStringPart fileName );
 
 //////////////////////////////////////////////////////////////////////////
 
 // Generic exception thrown by a file wrapper class.
 class REAPI CFileWrapperException : public CException {
 public:
-	CFileWrapperException( CUnicodePart _fileName, CUnicodePart _additionalInfo ) :
+	CFileWrapperException( CStringPart _fileName, CStringPart _additionalInfo ) :
 		fileName( _fileName ), additionalInfo( _additionalInfo ) {}
 	CFileWrapperException( const CFileWrapperException& other ) : fileName( copy( other.fileName ) ), additionalInfo( copy( other.additionalInfo ) ) {}
 
-	virtual CUnicodeString GetMessageText() const final override
+	virtual CString GetMessageText() const final override
 		{ return GetMessageTemplate().SubstParam( fileName, additionalInfo ); }
 	
 	// Get the template for exception's message text.
 	// The template must have two parameters: first one is the name of the file and second one is additional information.
-	virtual CUnicodeString GetMessageTemplate() const = 0;
+	virtual CString GetMessageTemplate() const = 0;
 
 private:
-	CUnicodeString fileName;
-	CUnicodeString additionalInfo;
+	CString fileName;
+	CString additionalInfo;
 };
 
 //////////////////////////////////////////////////////////////////////////

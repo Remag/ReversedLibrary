@@ -43,7 +43,7 @@ enum TFileSeekPosition : unsigned {
 // Detailed file information.
 struct CFileStatus {
 	__int64 Length = 0;
-	CUnicodeString FullName;
+	CString FullName;
 	FILETIME CreationTime;
 	FILETIME ModificationTime;
 	DWORD Attributes = 0;
@@ -67,7 +67,7 @@ public:
 	explicit CFileReadWriteOperations( HANDLE _fileHandle ) : fileHandle( _fileHandle ) {}
 
 	// Get the full path to the opened file.
-	CUnicodeString GetFileName() const;
+	CString GetFileName() const;
 
 	bool IsOpen() const;
 	CFileStatus GetStatus() const;
@@ -113,11 +113,11 @@ protected:
 		{ swap( fileHandle, other.fileHandle ); }
 
 	// Open method that throws an exception on failure.
-	void open( CUnicodeView fileName, TFileReadWriteMode readWriteMode, TFileCreationMode createMode, TFileShareMode shareMode, DWORD attributes );
+	void open( CStringPart fileName, TFileReadWriteMode readWriteMode, TFileCreationMode createMode, TFileShareMode shareMode, DWORD attributes );
 	// Open method that returns false on failure.
-	bool tryOpen( CUnicodeView fileName, TFileReadWriteMode readWriteMode, TFileCreationMode createMode, TFileShareMode shareMode, DWORD attributes );
+	bool tryOpen( CStringPart fileName, TFileReadWriteMode readWriteMode, TFileCreationMode createMode, TFileShareMode shareMode, DWORD attributes );
 	// Open method that returns an invalid handle on failure.
-	static HANDLE tryOpenHandle( CUnicodeView fileName, TFileReadWriteMode readWriteMode, TFileCreationMode createMode, TFileShareMode shareMode, DWORD attributes );
+	static HANDLE tryOpenHandle( CStringPart fileName, TFileReadWriteMode readWriteMode, TFileCreationMode createMode, TFileShareMode shareMode, DWORD attributes );
 
 	// Save pending changes.
 	void flush();
@@ -129,13 +129,13 @@ protected:
 private:
 	HANDLE fileHandle = INVALID_HANDLE_VALUE;
 
-	void create( CUnicodeView fileName, DWORD accessMode, DWORD shareMode, SECURITY_ATTRIBUTES* security, DWORD createMode, DWORD attributes );
-	bool tryCreate( CUnicodeView fileName, DWORD accessMode, DWORD shareMode, SECURITY_ATTRIBUTES* security, DWORD createMode, DWORD attributes );
-	void doCreate( CUnicodeView fileName, DWORD accessMode, DWORD shareMode, SECURITY_ATTRIBUTES* security, DWORD createMode, DWORD attributes );
-	static HANDLE doCreateHandle( CUnicodeView fileName, DWORD accessMode, DWORD shareMode, SECURITY_ATTRIBUTES* security, DWORD createMode, DWORD attributes );
+	void create( CStringPart fileName, DWORD accessMode, DWORD shareMode, SECURITY_ATTRIBUTES* security, DWORD createMode, DWORD attributes );
+	bool tryCreate( CStringPart fileName, DWORD accessMode, DWORD shareMode, SECURITY_ATTRIBUTES* security, DWORD createMode, DWORD attributes );
+	void doCreate( CStringPart fileName, DWORD accessMode, DWORD shareMode, SECURITY_ATTRIBUTES* security, DWORD createMode, DWORD attributes );
+	static HANDLE doCreateHandle( CStringPart fileName, DWORD accessMode, DWORD shareMode, SECURITY_ATTRIBUTES* security, DWORD createMode, DWORD attributes );
 
 	void throwException() const;
-	void throwException( CUnicodePart fileName ) const;
+	void throwException( CStringPart fileName ) const;
 };
 
 //////////////////////////////////////////////////////////////////////////
@@ -191,18 +191,18 @@ namespace File {
 
 // ANSI read-write methods.
 // Put the contents of the given file in the result string. Newline symbols are intact.
-CString REAPI ReadText( CUnicodeView fileName );
+CString REAPI ReadText( CStringPart fileName );
 CString REAPI ReadText( CFileReadView file );
 // Write text from the given string.
-void REAPI WriteText( CUnicodeView fileName, CStringPart text );
+void REAPI WriteText( CStringPart fileName, CStringPart text );
 void REAPI WriteText( CFileWriteView file, CStringPart text );
 
 // Unicode read-write methods.
 // Put the contents of the given file in the result string. Non unicode files are converted to unicode with the given codePage. Newline symbols are intact.
-CUnicodeString REAPI ReadUnicodeText( CUnicodeView fileName, UINT codePage = CP_ACP );
-CUnicodeString REAPI ReadUnicodeText( CFileReadView file, UINT codePage = CP_ACP );
+CUnicodeString REAPI ReadUnicodeText( CStringPart fileName, UINT codePage = CP_UTF8 );
+CUnicodeString REAPI ReadUnicodeText( CFileReadView file, UINT codePage = CP_UTF8 );
 // Write text in the unicode encoding.
-void REAPI WriteUnicodeText( CUnicodeView fileName, CUnicodePart text, TFileTextEncoding encoding = FTE_UTF16LittleEndian );
+void REAPI WriteUnicodeText( CStringPart fileName, CUnicodePart text, TFileTextEncoding encoding = FTE_UTF16LittleEndian );
 void REAPI WriteUnicodeText( CFileWriteView file, CUnicodePart text, TFileTextEncoding encoding = FTE_UTF16LittleEndian );
 
 //////////////////////////////////////////////////////////////////////////
