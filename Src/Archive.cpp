@@ -144,7 +144,7 @@ void CArchive::writeObject( const ISerializable* object )
 	}
 }
 
-CPtrOwner<ISerializable> CArchive::readUniqueObject( CFileReadView file )
+CPtrOwner<ISerializable> CArchive::readUniqueObject()
 {
 	const int createIndex = readSmallValue();
 	const CBaseObjectCreationFunction* createFunction = readCreationFunctionPtr( createIndex );
@@ -175,9 +175,9 @@ CArchiveReader::CArchiveReader( CStringPart fileName ) :
 CArchiveReader::CArchiveReader( CFileReadView file )
 {
 	const auto length = file.GetLength32();
-	auto& buffer = getBuffer();
-	buffer.IncreaseSizeNoInitialize( length );
-	file.Read( buffer.Ptr(), length );
+	auto& detachedBuffer = getBuffer();
+	detachedBuffer.IncreaseSizeNoInitialize( length );
+	file.Read( detachedBuffer.Ptr(), length );
 
 	handleArchiveFlags();
 }
@@ -223,9 +223,9 @@ CArchiveWriter::~CArchiveWriter()
  void CArchiveWriter::FlushToFile( CStringPart fileName )
  {
 	 CFileWriter file( fileName, FCM_CreateAlways );
-	 auto buffer = detachBuffer();
-	 writeArchiveFlag( fileArchivePrefix, buffer );
-	 file.Write( buffer.Ptr(), buffer.Size() );
+	 auto detachedBuffer = detachBuffer();
+	 writeArchiveFlag( fileArchivePrefix, detachedBuffer );
+	 file.Write( detachedBuffer.Ptr(), detachedBuffer.Size() );
  }
 
  void CArchiveWriter::FlushToCompressedFile( CStringPart fileName )
@@ -233,19 +233,19 @@ CArchiveWriter::~CArchiveWriter()
 	 const auto flagSize = sizeof( compressedArchivePrefix );
 	 CFileWriter file( fileName, FCM_CreateAlways );
 	 CZipConverter zipper;
-	 auto buffer = detachBuffer();
+	 auto detachedBuffer = detachBuffer();
 	 CArray<BYTE> zippedBuffer;
 	 zippedBuffer.IncreaseSizeNoInitialize( flagSize );
 	 writeArchiveFlag( compressedArchivePrefix, zippedBuffer );
-	 zipper.ZipData( buffer.Mid( flagSize ), zippedBuffer );
+	 zipper.ZipData( detachedBuffer.Mid( flagSize ), zippedBuffer );
 	 file.Write( zippedBuffer.Ptr(), zippedBuffer.Size() );
  }
 
  CArray<BYTE> CArchiveWriter::FlushToByteString()
  {
-	 auto buffer = detachBuffer();
-	 writeArchiveFlag( binaryArchivePrefix, buffer );
-	 return buffer;
+	 auto detachedBuffer = detachBuffer();
+	 writeArchiveFlag( binaryArchivePrefix, detachedBuffer );
+	 return detachedBuffer;
  }
 
  void CArchiveWriter::writeArchiveFlag( BYTE flagValue, CArray<BYTE>& dest ) const

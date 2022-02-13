@@ -65,7 +65,7 @@ namespace RelibInternal {
 void sendLogMessage( TLogMessageType msgType, CString text )
 {
 	if( Log::IsMessageSourceShown( Log::getCurrentMessageSource() ) ) {
-		Log::getCurrentMessageLog().AddMessage( move( text ), LMT_Periodic );
+		Log::getCurrentMessageLog().AddMessage( move( text ), msgType );
 	}
 }
 

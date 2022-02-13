@@ -603,6 +603,7 @@ public:
 	static CString ToString( double value, int digitCount = 3 );
 	static CString ToString( CStringPart value );
 	static CString ToString( const char* value );
+	static CString ToString( const wchar_t* value, unsigned codePage = CP_UTF8 );
 	static CString ToString( CUnicodePart value, unsigned codePage = CP_UTF8 );
 	static CString ToString( CUnicodePart value, char defaultChar, unsigned codePage );
 	static CString ToString( CColor value );
@@ -773,7 +774,15 @@ inline CString CStrConversionFunctions<char>::ToString( const char* value )
 	return CString( value );
 }
 
-inline CString CStrConversionFunctions<char>::ToString( CUnicodePart value, unsigned codePage )
+inline CString CStrConversionFunctions<char>::ToString( const wchar_t* value, unsigned codePage /*= CP_UTF8*/ )
+{
+	CString result;
+	const CUnicodeView valueStr = value;
+	CStringOperations<char>::ConvertStr( valueStr, codePage, result );
+	return result;
+}
+
+inline CString CStrConversionFunctions<char>::ToString( CUnicodePart value, unsigned codePage /*= CP_UTF8*/ )
 {
 	CString result;
 	CStringOperations<char>::ConvertStr( value, codePage, result );
@@ -983,6 +992,7 @@ inline COptional<CString> CStrConversionFunctions<wchar_t>::GetValue( CUnicodePa
 {
 	return CreateOptional( CStrConversionFunctions<char>::ToString( str ) );
 }
+
 inline COptional<CDateTime> CStrConversionFunctions<wchar_t>::GetValue( CUnicodePart str, Types::Type<CDateTime> )
 {
 	const auto yearEndPos = str.Find( L'-' );

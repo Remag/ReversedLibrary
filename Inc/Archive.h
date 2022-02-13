@@ -77,7 +77,7 @@ private:
 	// Buffer for quick access to object's creation functions. Filled only in reading mode.
 	CArray<const CBaseObjectCreationFunction*> creationFunctionsBuffer;
 
-	CPtrOwner<ISerializable> readUniqueObject( CFileReadView file );
+	CPtrOwner<ISerializable> readUniqueObject();
 
 	void writeExternalName( CUnicodeView name );
 	const CBaseObjectCreationFunction* readCreationFunctionPtr( int objectId );
