@@ -124,18 +124,6 @@ void CArchive::writeEnum( Type enumValue )
 	writeSmallValue( enumValue );
 }
 
-template<class Type>
-inline void CArchive::readSimpleType( Type& var )
-{
-	read( &var, sizeof( Type ) );
-}
-
-template<class Type>
-inline void CArchive::writeSimpleType( Type var )
-{
-	write( &var, sizeof( Type ) );
-}
-
 //////////////////////////////////////////////////////////////////////////
 
 }	// namespace RelibInternal.
@@ -166,22 +154,6 @@ public:
 	Enum ReadEnum()
 		{ return readEnum<Enum>(); }
 
-	friend CArchiveReader& operator>>( CArchiveReader& archive, bool& var );
-	friend CArchiveReader& operator>>( CArchiveReader& archive, char& var );
-	friend CArchiveReader& operator>>( CArchiveReader& archive, signed char& var );
-	friend CArchiveReader& operator>>( CArchiveReader& archive, unsigned char& var );
-	friend CArchiveReader& operator>>( CArchiveReader& archive, wchar_t& var );
-	friend CArchiveReader& operator>>( CArchiveReader& archive, unsigned short& var );
-	friend CArchiveReader& operator>>( CArchiveReader& archive, short& var );
-	friend CArchiveReader& operator>>( CArchiveReader& archive, int& var );
-	friend CArchiveReader& operator>>( CArchiveReader& archive, unsigned int& var );
-	friend CArchiveReader& operator>>( CArchiveReader& archive, long& var );
-	friend CArchiveReader& operator>>( CArchiveReader& archive, unsigned long& var );
-	friend CArchiveReader& operator>>( CArchiveReader& archive, __int64& var );
-	friend CArchiveReader& operator>>( CArchiveReader& archive, unsigned __int64& var );
-	friend CArchiveReader& operator>>( CArchiveReader& archive, float& var );
-	friend CArchiveReader& operator>>( CArchiveReader& archive, double& var );
-
 	template<class ObjectType>
 	friend CArchiveReader& operator>>( CArchiveReader& archive, CSharedPtr<ObjectType>& object );
 	template<class ObjectType>
@@ -197,7 +169,7 @@ extern const REAPI CError Err_BadArchive;
 inline CArchiveReader& operator>>( CArchiveReader& archive, bool& var )
 {
 	BYTE byte;
-	archive.readSimpleType( byte );
+	archive.Read( &byte, sizeof( byte ) );
 	check( byte == 0 || byte == 1, Err_BadArchive );
 	var = byte == 1;
 	return archive;
@@ -205,85 +177,85 @@ inline CArchiveReader& operator>>( CArchiveReader& archive, bool& var )
 
 inline CArchiveReader& operator>>( CArchiveReader& archive, char& var )
 {
-	archive.readSimpleType( var );
+	archive.Read( &var, sizeof( var ) );
 	return archive;
 }
 
 inline CArchiveReader& operator>>( CArchiveReader& archive, signed char& var )
 {
-	archive.readSimpleType( var );
+	archive.Read( &var, sizeof( var ) );
 	return archive;
 }
 
 inline CArchiveReader& operator>>( CArchiveReader& archive, unsigned char& var )
 {
-	archive.readSimpleType( var );
+	archive.Read( &var, sizeof( var ) );
 	return archive;
 }
 
 inline CArchiveReader& operator>>( CArchiveReader& archive, wchar_t& var )
 {
-	archive.readSimpleType( var );
+	archive.Read( &var, sizeof( var ) );
 	return archive;
 }
 
 inline CArchiveReader& operator>>( CArchiveReader& archive, short& var )
 {
-	archive.readSimpleType( var );
+	archive.Read( &var, sizeof( var ) );
 	return archive;
 }
 
 inline CArchiveReader& operator>>( CArchiveReader& archive, unsigned short& var )
 {
-	archive.readSimpleType( var );
+	archive.Read( &var, sizeof( var ) );
 	return archive;
 }
 
 inline CArchiveReader& operator>>( CArchiveReader& archive, int& var )
 {
-	archive.readSimpleType( var );
+	archive.Read( &var, sizeof( var ) );
 	return archive;
 }
 
 inline CArchiveReader& operator>>( CArchiveReader& archive, unsigned int& var )
 {
-	archive.readSimpleType( var );
+	archive.Read( &var, sizeof( var ) );
 	return archive;
 }
 
 inline CArchiveReader& operator>>( CArchiveReader& archive, long& var )
 {
-	archive.readSimpleType( var );
+	archive.Read( &var, sizeof( var ) );
 	return archive;
 }
 
 inline CArchiveReader& operator>>( CArchiveReader& archive, unsigned long& var )
 {
-	archive.readSimpleType( var );
+	archive.Read( &var, sizeof( var ) );
 	return archive;
 }
 
 inline CArchiveReader& operator>>( CArchiveReader& archive, __int64& var )
 {
-	archive.readSimpleType( var );
+	archive.Read( &var, sizeof( var ) );
 	return archive;
 }
 
 inline CArchiveReader& operator>>( CArchiveReader& archive, unsigned __int64& var )
 {
-	archive.readSimpleType( var );
+	archive.Read( &var, sizeof( var ) );
 	return archive;
 }
 
 inline CArchiveReader& operator>>( CArchiveReader& archive, float& var )
 {
-	archive.readSimpleType( var );
+	archive.Read( &var, sizeof( var ) );
 	return archive;
 }
 
 inline CArchiveReader& operator>>( CArchiveReader& archive, double& var )
 {
-	archive.readSimpleType( var );
+	archive.Read( &var, sizeof( var ) );
 	return archive;
 }
 
@@ -303,15 +275,16 @@ inline CArchiveReader& operator>>( CArchiveReader& archive, CPtrOwner<ObjectType
 
 //////////////////////////////////////////////////////////////////////////
 
-// Class that binarizes the data. It must be flushed to a valid source before it's destroyed. 
+// Class that writes the binarized data. It must be flushed to a valid source before it's destroyed. 
 class REAPI CArchiveWriter : public RelibInternal::CArchive {
 public:
-	explicit CArchiveWriter( int bufferSize = 0 );
-
+	explicit CArchiveWriter( int reserveSize = 0 );
 	~CArchiveWriter();
 
 	void FlushToFile( CStringPart fileName );
+	void FlushToFile( CFileWriteView file );
 	void FlushToCompressedFile( CStringPart fileName );
+	void FlushToCompressedFile( CFileWriteView file );
 	CArray<BYTE> FlushToByteString();
 
 	void Skip( int byteCount )
@@ -328,22 +301,6 @@ public:
 	void WriteEnum( Enum value )
 		{ writeEnum( value ); }
 
-	friend CArchiveWriter& operator<<( CArchiveWriter& archive, bool var );
-	friend CArchiveWriter& operator<<( CArchiveWriter& archive, char var );
-	friend CArchiveWriter& operator<<( CArchiveWriter& archive, signed char var );
-	friend CArchiveWriter& operator<<( CArchiveWriter& archive, unsigned char var );
-	friend CArchiveWriter& operator<<( CArchiveWriter& archive, wchar_t var );
-	friend CArchiveWriter& operator<<( CArchiveWriter& archive, short var );
-	friend CArchiveWriter& operator<<( CArchiveWriter& archive, unsigned short var );
-	friend CArchiveWriter& operator<<( CArchiveWriter& archive, int var );
-	friend CArchiveWriter& operator<<( CArchiveWriter& archive, unsigned int var );
-	friend CArchiveWriter& operator<<( CArchiveWriter& archive, long var );
-	friend CArchiveWriter& operator<<( CArchiveWriter& archive, unsigned long var );
-	friend CArchiveWriter& operator<<( CArchiveWriter& archive, __int64 var );
-	friend CArchiveWriter& operator<<( CArchiveWriter& archive, unsigned __int64 var );
-	friend CArchiveWriter& operator<<( CArchiveWriter& archive, float var );
-	friend CArchiveWriter& operator<<( CArchiveWriter& archive, double var );
-
 	template<class ObjectType>
 	friend CArchiveWriter& operator<<( CArchiveWriter& archive, const CPtrOwner<ObjectType>& object );
 
@@ -353,96 +310,120 @@ private:
 
 //////////////////////////////////////////////////////////////////////////
 
+// Class that writes the binarized data to a given file. File write happens on destruction.
+class REAPI CFileArchiveWriter : public CArchiveWriter {
+public:
+	explicit CFileArchiveWriter( CStringPart fileName, int reserveSize = 4096 );
+	~CFileArchiveWriter();
+	
+private:
+	CString fileName;
+};
+
+//////////////////////////////////////////////////////////////////////////
+
+// Class that compresses and writes the binarized data to a given file. File write happens on destruction.
+class REAPI CCompressedArchiveWriter : public CArchiveWriter {
+public:
+	explicit CCompressedArchiveWriter( CStringPart fileName, int reserveSize = 4096 );
+	~CCompressedArchiveWriter();
+
+private:
+	CString fileName;
+};
+
+//////////////////////////////////////////////////////////////////////////
+
 inline CArchiveWriter& operator<<( CArchiveWriter& archive, bool var )
 {
-	BYTE byte = numeric_cast<BYTE>( var );
+	const auto byte = numeric_cast<BYTE>( var );
 	// var should be initialized.
 	assert( byte == 0 || byte == 1 );
-	archive.writeSimpleType( byte );
+	archive.Write( &byte, sizeof( byte ) );
 	return archive;
 }
 
 inline CArchiveWriter& operator<<( CArchiveWriter& archive, char var )
 {
-	archive.writeSimpleType( var );
+	archive.Write( &var, sizeof( var ) );
 	return archive;
 }
 
 inline CArchiveWriter& operator<<( CArchiveWriter& archive, signed char var )
 {
-	archive.writeSimpleType( var );
+	archive.Write( &var, sizeof( var ) );
 	return archive;
 }
 
 inline CArchiveWriter& operator<<( CArchiveWriter& archive, unsigned char var )
 {
-	archive.writeSimpleType( var );
+	archive.Write( &var, sizeof( var ) );
 	return archive;
 }
 
 inline CArchiveWriter& operator<<( CArchiveWriter& archive, wchar_t var )
 {
-	archive.writeSimpleType( var );
+	archive.Write( &var, sizeof( var ) );
 	return archive;
 }
 
 inline CArchiveWriter& operator<<( CArchiveWriter& archive, short var )
 {
-	archive.writeSimpleType( var );
+	archive.Write( &var, sizeof( var ) );
 	return archive;
 }
 
 inline CArchiveWriter& operator<<( CArchiveWriter& archive, unsigned short var )
 {
-	archive.writeSimpleType( var );
+	archive.Write( &var, sizeof( var ) );
 	return archive;
 }
 
 inline CArchiveWriter& operator<<( CArchiveWriter& archive, int var )
 {
-	archive.writeSimpleType( var );
+	archive.Write( &var, sizeof( var ) );
 	return archive;
 }
 
 inline CArchiveWriter& operator<<( CArchiveWriter& archive, unsigned int var )
 {
-	archive.writeSimpleType( var );
+	archive.Write( &var, sizeof( var ) );
 	return archive;
 }
 
 inline CArchiveWriter& operator<<( CArchiveWriter& archive, long var )
 {
-	archive.writeSimpleType( var );
+	archive.Write( &var, sizeof( var ) );
 	return archive;
 }
 
 inline CArchiveWriter& operator<<( CArchiveWriter& archive, unsigned long var )
 {
-	archive.writeSimpleType( var );
+	archive.Write( &var, sizeof( var ) );
 	return archive;
 }
 
 inline CArchiveWriter& operator<<( CArchiveWriter& archive, __int64 var )
 {
-	archive.writeSimpleType( var );
+	archive.Write( &var, sizeof( var ) );
 	return archive;
 }
 
 inline CArchiveWriter& operator<<( CArchiveWriter& archive, unsigned __int64 var )
 {
-	archive.writeSimpleType( var );
+	archive.Write( &var, sizeof( var ) );
 	return archive;
 }
 
 inline CArchiveWriter& operator<<( CArchiveWriter& archive, float var )
 {
-	archive.writeSimpleType( var );
+	archive.Write( &var, sizeof( var ) );
 	return archive;
 }
 
 inline CArchiveWriter& operator<<( CArchiveWriter& archive, double var )
 {
-	archive.writeSimpleType( var );
+	archive.Write( &var, sizeof( var ) );
 	return archive;
 }
 
@@ -473,7 +454,6 @@ inline CArchiveWriter& operator<<( CArchiveWriter& archive, const CPtrOwner<Obje
 }
 
 //////////////////////////////////////////////////////////////////////////
-
 // Array serialization.
 
 template <class Elem, class Allocator /*= CRuntimeHeap*/, class GrowStrategy /*= CDefaultGrowStrategy<8>*/>

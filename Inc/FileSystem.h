@@ -54,13 +54,13 @@ CString REAPI CreateLongPath( CStringPart path );
 
 // Get the path components.
 CString REAPI GetRoot( CStringPart name );
-CString REAPI GetDrive( CStringPart name );
-CString REAPI GetPath( CStringPart name );
-CString REAPI GetDrivePath( CStringPart name );
-CString REAPI GetName( CStringPart name );
+CStringPart REAPI GetDrive( CStringPart name );
+CStringPart REAPI GetPath( CStringPart name );
+CStringPart REAPI GetDrivePath( CStringPart name );
+CStringPart REAPI GetName( CStringPart name );
 // Extension includes the dot symbol.
-CString REAPI GetExt( CStringPart name );
-CString REAPI GetNameExt( CStringPart name );
+CStringPart REAPI GetExt( CStringPart name );
+CStringPart REAPI GetNameExt( CStringPart name );
 
 // Add the separator to the end of path if there is none.
 void REAPI AddPathSeparator( CString& path );
@@ -79,14 +79,15 @@ bool REAPI CanOpenFile( CStringPart fileName, TFileReadWriteMode readWriteMode, 
 DWORD REAPI GetAttributes( CStringPart fileName );
 void REAPI SetAttributes( CStringPart fileName, DWORD attributes );
 
-// File redaction.
+// File editing.
 void REAPI Rename( CStringPart fileName, CStringPart newFileName );
 void REAPI Delete( CStringPart fileName );
 void REAPI Copy( CStringPart src, CStringPart dest );
 void REAPI Move( CStringPart src, CStringPart dest );
 
-// Directory redaction.
-void REAPI CreateDir( CStringPart dir );
+// Directory editing.
+// Create a directory. If the directory already exists, return false.
+bool REAPI CreateDir( CStringPart dir );
 void REAPI DeleteDir( CStringPart dir );
 void REAPI DeleteTree( CStringPart dirTree );
 void REAPI CopyTree( CStringPart src, CStringView dest );

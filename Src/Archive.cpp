@@ -1,3 +1,5 @@
+#include "..\Inc\Archive.h"
+#include "..\Inc\Archive.h"
 #include <Archive.h>
 #include <Ptr.h>
 #include <BaseString.h>
@@ -161,7 +163,6 @@ CPtrOwner<ISerializable> CArchive::readUniqueObject()
 
 }	// namespace RelibInternal.
 
-
 //////////////////////////////////////////////////////////////////////////
 
 static const BYTE fileArchivePrefix = 0xFA;
@@ -205,52 +206,96 @@ void CArchiveReader::handleArchiveFlags()
 
 //////////////////////////////////////////////////////////////////////////
 
-CArchiveWriter::CArchiveWriter( int bufferSize )
+CArchiveWriter::CArchiveWriter( int reserveSize )
 {
 	const auto flagByteSize = sizeof( fileArchivePrefix );
-	increaseBuffer( bufferSize + flagByteSize );
+	increaseBuffer( reserveSize + flagByteSize );
 	skip( flagByteSize );
 }
 
 extern const CStringView UncommitedArchiveError;
 CArchiveWriter::~CArchiveWriter()
 {
-	 if( getBufferSize() > 0 ) {
-		 Log::Error( UncommitedArchiveError );
-	 }
+	if( getBufferSize() > 0 ) {
+		Log::Error( UncommitedArchiveError );
+	}
 }
 
- void CArchiveWriter::FlushToFile( CStringPart fileName )
- {
-	 CFileWriter file( fileName, FCM_CreateAlways );
-	 auto detachedBuffer = detachBuffer();
-	 writeArchiveFlag( fileArchivePrefix, detachedBuffer );
-	 file.Write( detachedBuffer.Ptr(), detachedBuffer.Size() );
+void CArchiveWriter::FlushToFile( CStringPart fileName )
+{
+	CFileWriter file( fileName, FCM_CreateAlways );
+	FlushToFile( file );
+}
+
+void CArchiveWriter::FlushToFile( CFileWriteView file )
+{
+	auto detachedBuffer = detachBuffer();
+	writeArchiveFlag( fileArchivePrefix, detachedBuffer );
+	file.Write( detachedBuffer.Ptr(), detachedBuffer.Size() );
+}
+
+void CArchiveWriter::FlushToCompressedFile( CStringPart fileName )
+{
+	CFileWriter file( fileName, FCM_CreateAlways );
+	FlushToCompressedFile( file );
+}
+
+void CArchiveWriter::FlushToCompressedFile( CFileWriteView file )
+{
+	const auto flagSize = sizeof( compressedArchivePrefix );
+	CZipConverter zipper;
+	auto detachedBuffer = detachBuffer();
+	CArray<BYTE> zippedBuffer;
+	zippedBuffer.IncreaseSizeNoInitialize( flagSize );
+	writeArchiveFlag( compressedArchivePrefix, zippedBuffer );
+	zipper.ZipData( detachedBuffer.Mid( flagSize ), zippedBuffer );
+	file.Write( zippedBuffer.Ptr(), zippedBuffer.Size() );
+}
+
+CArray<BYTE> CArchiveWriter::FlushToByteString()
+{
+	auto detachedBuffer = detachBuffer();
+	writeArchiveFlag( binaryArchivePrefix, detachedBuffer );
+	return detachedBuffer;
+}
+
+void CArchiveWriter::writeArchiveFlag( BYTE flagValue, CArray<BYTE>& dest ) const
+{
+	::memcpy( dest.Ptr(), &flagValue, sizeof( flagValue ) );
+}
+
+//////////////////////////////////////////////////////////////////////////
+
+CFileArchiveWriter::CFileArchiveWriter( CStringPart _fileName, int reserveSize ) :
+	CArchiveWriter( reserveSize ),
+	fileName( _fileName )
+{
+}
+
+CFileArchiveWriter::~CFileArchiveWriter()
+{
+	try {
+		FlushToFile( fileName );
+	} catch( CException& e ) {
+		Log::Exception( e );
+	}
  }
 
- void CArchiveWriter::FlushToCompressedFile( CStringPart fileName )
+ //////////////////////////////////////////////////////////////////////////
+
+ CCompressedArchiveWriter::CCompressedArchiveWriter( CStringPart _fileName, int reserveSize ) :
+	 CArchiveWriter( reserveSize ),
+	 fileName( _fileName )
  {
-	 const auto flagSize = sizeof( compressedArchivePrefix );
-	 CFileWriter file( fileName, FCM_CreateAlways );
-	 CZipConverter zipper;
-	 auto detachedBuffer = detachBuffer();
-	 CArray<BYTE> zippedBuffer;
-	 zippedBuffer.IncreaseSizeNoInitialize( flagSize );
-	 writeArchiveFlag( compressedArchivePrefix, zippedBuffer );
-	 zipper.ZipData( detachedBuffer.Mid( flagSize ), zippedBuffer );
-	 file.Write( zippedBuffer.Ptr(), zippedBuffer.Size() );
  }
 
- CArray<BYTE> CArchiveWriter::FlushToByteString()
+ CCompressedArchiveWriter::~CCompressedArchiveWriter()
  {
-	 auto detachedBuffer = detachBuffer();
-	 writeArchiveFlag( binaryArchivePrefix, detachedBuffer );
-	 return detachedBuffer;
- }
-
- void CArchiveWriter::writeArchiveFlag( BYTE flagValue, CArray<BYTE>& dest ) const
- {
-	 ::memcpy( dest.Ptr(), &flagValue, sizeof( flagValue ) );
+	 try {
+		 FlushToCompressedFile( fileName );
+	 } catch( CException& e ) {
+		 Log::Exception( e );
+	 }
  }
 
  //////////////////////////////////////////////////////////////////////////

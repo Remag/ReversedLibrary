@@ -232,8 +232,17 @@ bool CFileReadWriteOperations::tryCreate( CStringPart fileName, DWORD accessMode
 
 void CFileReadWriteOperations::doCreate( CStringPart fileName, DWORD accessMode, DWORD shareMode, SECURITY_ATTRIBUTES* security, DWORD createMode, DWORD attributes )
 {
-	assert( !IsOpen() );
 	fileHandle = doCreateHandle( fileName, accessMode, shareMode, security, createMode, attributes );
+	// Check if containing folder exists in case of failure.
+	if( !IsOpen() && createMode != OPEN_EXISTING ) {
+		const auto lastError = ::GetLastError();
+		if( lastError == ERROR_PATH_NOT_FOUND ) {
+			const auto filePath = FileSystem::GetDrivePath( fileName );
+			if( FileSystem::CreateDir( filePath ) ) {
+				fileHandle = doCreateHandle( fileName, accessMode, shareMode, security, createMode, attributes );
+			}
+		}
+	}
 }
 
 HANDLE CFileReadWriteOperations::doCreateHandle( CStringPart fileName, DWORD accessMode, DWORD shareMode, SECURITY_ATTRIBUTES* security, DWORD createMode, DWORD attributes )

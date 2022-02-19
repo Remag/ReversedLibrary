@@ -192,7 +192,7 @@ TPathType SplitName( CStringPart path, CArray<CStringPart>& components )
 
 CString MergeName( CStringPart driveDir, CStringPart nameExt )
 {
-	return MergeName( driveDir, GetName( nameExt ), GetExt( nameExt ) );
+	return MergeName( driveDir, Str( GetName( nameExt ) ), Str( GetExt( nameExt ) ) );
 }
 
 CString MergeName( CStringPart driveDir, CStringView name, CStringView ext )
@@ -201,13 +201,13 @@ CString MergeName( CStringPart driveDir, CStringView name, CStringView ext )
 	if( !rawDriveDir.IsEmpty() ) {
 		AddPathSeparator( rawDriveDir );
 	}
-	return MergeName( GetDrive( rawDriveDir ), GetPath( rawDriveDir ), name, ext );
+	return MergeName( Str( GetDrive( rawDriveDir ) ), Str( GetPath( rawDriveDir ) ), name, ext );
 }
 
 CString MergeName( CStringView drive, CStringView dir, CStringView name, CStringView ext )
 {
 	CString result;
-	const int bufferSize = max( MAX_PATH, drive.Length() + dir.Length() + name.Length() + ext.Length() + 3 );
+	const auto bufferSize = max( MAX_PATH, drive.Length() + dir.Length() + name.Length() + ext.Length() + 3 );
 	_makepath_s( result.CreateRawBuffer( bufferSize ), bufferSize + 1, drive.Ptr(), dir.Ptr(), name.Ptr(), ext.Ptr() );
 	return result;
 }
@@ -357,62 +357,60 @@ CString GetRoot( CStringPart path )
 		}
 		return Str( rawPath.Left( pos + 1 ) );
 	}
-	CString result = GetDrive( rawPath );
+	auto result = Str( GetDrive( rawPath ) );
 	AddPathSeparator( result );
 	return result;
 }
 
-CString GetDrive( CStringPart name )
+CStringPart GetDrive( CStringPart name )
 {
 	const int length = name.Length();
 
 	for( int i = 0; i < length; i++ ) {
 		const auto ch = name[i];
 		if( ch == L':' ) {
-			return Str( name.Left( i + 1 ) );
+			return name.Left( i + 1 );
 		} else if( isNameSeparator( ch ) ) {
 			break;
 		}
 	}
 
-	return CString();
+	return CStringPart();
 }
 
-static const CStringView nameSeparators = "\\/";
-CString GetPath( CStringPart name )
+CStringPart GetPath( CStringPart name )
 {
 	const int length = name.Length();
 
-	const int nameEndPos = name.ReverseFindOneOf( nameSeparators );
+	const int nameEndPos = name.ReverseFindOneOf( pathSeparators );
 	if( nameEndPos == NotFound ) {
-		return CString();
+		return CStringPart();
 	}
 
 	for( int i = 0; i < length; i++ ) {
 		const auto ch = name[i];
 		if( ch == L':' ) {
-			return Str( name.Mid( i + 1, nameEndPos - i ) );
+			return name.Mid( i + 1, nameEndPos - i );
 		} else if( isNameSeparator( ch ) ) {
-			return Str( name.Left( nameEndPos + 1 ) );
+			return name.Left( nameEndPos + 1 );
 		}
 	}
-
 	// Name separator is present in the path, previous loop should've been broken.
 	assert( false );
-	return CString();
+	return CStringPart();
 }
 
-CString GetDrivePath( CStringPart name )
+CStringPart GetDrivePath( CStringPart name )
 {
-	const int nameEndPos = name.ReverseFindOneOf( nameSeparators );
+	const int nameEndPos = name.ReverseFindOneOf( pathSeparators );
 	if( nameEndPos == NotFound ) {
 		return CString();
 	}
 
-	return Str( name.Left( nameEndPos + 1 ) );
+	return name.Left( nameEndPos + 1 );
 }
 
-CString GetName( CStringPart name )
+CStringPart GetName( CStringPart name )
 {
 	const int length = name.Length();
 	int nameEndPos = length;
@@ -423,14 +421,14 @@ CString GetName( CStringPart name )
 			nameEndPos = i;
 		} else if( isNameSeparator( ch ) ) {
 			const int nameStartPos = i + 1;
-			return Str( name.Mid( nameStartPos, nameEndPos - nameStartPos ) );
+			return name.Mid( nameStartPos, nameEndPos - nameStartPos );
 		}
 	}
 
-	return Str( name.Left( nameEndPos ) );
+	return name.Left( nameEndPos );
 }
 
-CString GetExt( CStringPart name )
+CStringPart GetExt( CStringPart name )
 {
 	const int length = name.Length();
 	for( int i = length - 1; i >= 0; i-- ) {
@@ -438,29 +436,29 @@ CString GetExt( CStringPart name )
 		if( ch == L'.' ) {
 			// Special tokens "." and ".." have no extension.
 			if( ( length == 1 ) || ( length == 2 && name[0] == L'.' && i == 1 ) ) {
-				return CString();
+				return CStringPart();
 			} else {
-				return Str( name.Mid( i ) );
+				return name.Mid( i );
 			}
 		} else if( isNameSeparator( ch ) ) {
 			break;
 		}
 	}
 
-	return CString();
+	return CStringPart();
 }
 
-CString GetNameExt( CStringPart name )
+CStringPart GetNameExt( CStringPart name )
 {
 	const int length = name.Length();
 	for( int i = length - 1; i >= 0; i-- ) {
 		const auto ch = name[i];
 		if( isNameSeparator( ch ) ) {
-			return Str( name.Mid( i + 1 ) );
+			return name.Mid( i + 1 );
 		}
 	}
 
-	return Str( name );
+	return name;
 }
 
 void AddPathSeparator( CString& path )
@@ -607,8 +605,8 @@ static void checkCanCopyTo( CStringPart fileName )
 		}
 	} else {
 		// Check if the parent directory exists and is writable.
-		const CString fullPath = CreateFullPath( fileName );
-		CString folderName = GetDrivePath( fullPath );
+		const auto fullPath = CreateFullPath( fileName );
+		const auto folderName = GetDrivePath( fullPath );
 		if( !DirAccessible( folderName ) ) {
 			ThrowFileException( CFileException::FET_BadPath, fileName );
 		}
@@ -661,36 +659,34 @@ static bool deleteLastComponent( CString& dir )
 
 static int tryCreateDir( CUnicodeView dir ) 
 {
-	if( CreateDirectoryW( dir.Ptr(), 0 ) != 0 ) {
+	if( ::CreateDirectory( dir.Ptr(), 0 ) != 0 ) {
 		return 0;
 	}
-	return GetLastError();
+	return ::GetLastError();
 }
 
-void CreateDir( CStringPart dir )
+bool CreateDir( CStringPart dir )
 {
 	const auto unicodeDir = UnicodeStr( dir );
 	DWORD errorCode = tryCreateDir( unicodeDir );
 	if( errorCode == 0 ) {
-		return;
+		return true;
 	}
-	// Check if the parent dir exists. Old windows system return ERROR_FILE_NOT_FOUND for UNC paths in this case.
-	if( errorCode == ERROR_PATH_NOT_FOUND || errorCode == ERROR_FILE_NOT_FOUND ) {
+	// Check if the parent dir exists.
+	if( errorCode == ERROR_PATH_NOT_FOUND ) {
 		CString parentDir = Str( unicodeDir );
 		if( deleteLastComponent( parentDir ) && !DirAccessible( parentDir ) ) {
 			CreateDir( parentDir );
 			errorCode = tryCreateDir( unicodeDir );
 		}
 	}
-	if( errorCode != 0 ) {
-		ThrowFileException( errorCode, dir );
-	}
+	return errorCode != ERROR_ALREADY_EXISTS;
 }
 
 void DeleteDir( CStringPart dir )
 {
 	const auto unicodeDir = UnicodeStr( dir );
-	checkLastFileError( RemoveDirectoryW( unicodeDir.Ptr() ) != 0, dir );
+	checkLastFileError( ::RemoveDirectory( unicodeDir.Ptr() ) != 0, dir );
 }
 
 void DeleteTree( CStringPart dir )
@@ -727,7 +723,7 @@ void CopyTree( CStringPart src, CStringView dest )
 
 	for( const auto& file : files ) {
 		const CStringView srcName = file.FullName;
-		const CString destName = MergeName( dest, GetNameExt( srcName ) );
+		const auto destName = MergeName( dest, GetNameExt( srcName ) );
 		if( HasFlag( file.Attributes, FILE_ATTRIBUTE_DIRECTORY ) ) {
 			CopyTree( srcName, destName );
 		} else {
@@ -747,7 +743,7 @@ void MoveTree( CStringView src, CStringView dest )
 
 	for( const auto& file : files ) {
 		const CStringView srcName = file.FullName;
-		const CString destName = MergeName( dest, GetNameExt( srcName ) );
+		const auto destName = MergeName( dest, GetNameExt( srcName ) );
 		if( HasFlag( file.Attributes, FILE_ATTRIBUTE_DIRECTORY ) ) {
 			MoveTree( srcName, destName );
 		} else {
@@ -821,7 +817,7 @@ static void getAllFilesInDir( CStringPart dir, CArray<CFileStatus>& fileList, CS
 {
 	fileList.Empty();
 	WIN32_FIND_DATAW findData;
-	const CString fullPath = MergeName( dir, mask );
+	const auto fullPath = MergeName( dir, mask );
 
 	const HANDLE findHandle = startFileSearch( fullPath, findData, dir );
 	if( findHandle == INVALID_HANDLE_VALUE ) {
