@@ -290,11 +290,13 @@ CBaseString<T> CCommonStringOperations<T>::createStrFromValue( ValueType&& val, 
 	return CStrConversionFunctions<T>::ToString( forward<ValueType>( val ) );
 }
 
+template <>
 inline char CCommonStringOperations<char>::getMessageParamPrefix()
 {
 	return '%';
 }
 
+template <>
 inline wchar_t CCommonStringOperations<wchar_t>::getMessageParamPrefix()
 {
 	return L'%';

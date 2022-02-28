@@ -195,7 +195,7 @@ CBaseString<T>::CBaseString( const T* str, int strLength ) :
 template <class T>
 int CBaseString<T>::getRequiredSize( int strLength )
 {
-	return sizeof( T ) * ( strLength + 1 );
+	return static_cast<int>( sizeof( T ) ) * ( strLength + 1 );
 }
 
 template <class T>

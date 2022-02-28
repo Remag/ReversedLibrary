@@ -3,7 +3,6 @@
 #include <Archive.h>
 #include <Ptr.h>
 #include <BaseString.h>
-#include <StrConversions.h>
 #include <FileViews.h>
 #include <FileOwners.h>
 #include <MessageLog.h>

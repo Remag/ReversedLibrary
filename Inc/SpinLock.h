@@ -22,7 +22,6 @@ inline CSpinLock::CSpinLock( CAtomic<bool>& _lock ) :
 	lock( _lock )
 {
 	bool unlockedValue = true;
-	const bool prevValue = lock.Load();
 	while( !lock.CompareExchangeWeak( unlockedValue, false ) ) {
 		unlockedValue = true;
 	}

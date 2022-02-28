@@ -98,9 +98,6 @@ REAPI CHeapAllocator& GetThreadHeap();
 template <class SmallAllocator, class LargeAllocator, int sizeCutoff>
 class CSizeConditionalAllocator : public TStaticAllocator {
 public:
-	static void* Allocate( int size )
-		{ static_assert( false, "Unsized allocation not supported for this allocator." ); return nullptr; }
-
 	static CRawBuffer AllocateSized( int size )
 		{ return size < sizeCutoff ? SmallAllocator::AllocateSized( size ) : LargeAllocator::AllocateSized( size ); }
 

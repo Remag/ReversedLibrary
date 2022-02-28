@@ -189,21 +189,25 @@ COptional<IntType> CCommonConversionFunctions<T>::parsePositiveInteger( CBaseStr
 	return COptional<IntType>( result );
 }
 
+template <>
 inline char CCommonConversionFunctions<char>::getMinusSign()
 {
 	return '-';
 }
 
+template<>
 inline wchar_t CCommonConversionFunctions<wchar_t>::getMinusSign()
 {
 	return L'-';
 }
 
+template <>
 inline char CCommonConversionFunctions<char>::getZeroSymbol()
 {
 	return '0';
 }
 
+template <>
 inline wchar_t CCommonConversionFunctions<wchar_t>::getZeroSymbol()
 {
 	return L'0';
@@ -212,7 +216,6 @@ inline wchar_t CCommonConversionFunctions<wchar_t>::getZeroSymbol()
 template <class T>
 COptional<unsigned> CCommonConversionFunctions<T>::parseHexValue( CBaseStringPart<T> str )
 {
-	const unsigned maxValue = CLimits<unsigned>::Max;
 	const int maxDigits = CLimits<unsigned>::MaxDigitsBase16;
 
 	unsigned result = 0;
@@ -259,51 +262,61 @@ bool CCommonConversionFunctions<T>::tryGetHexDigit( T ch, int& result )
 	return false;
 }
 
+template <>
 inline char CCommonConversionFunctions<char>::getCapitalA()
 {
 	return 'A';
 }
 
+template <>
 inline wchar_t CCommonConversionFunctions<wchar_t>::getCapitalA()
 {
 	return L'A';
 }
 
+template <>
 inline char CCommonConversionFunctions<char>::getCapitalF()
 {
 	return 'F';
 }
 
+template <>
 inline wchar_t CCommonConversionFunctions<wchar_t>::getCapitalF()
 {
 	return L'F';
 }
 
+template <>
 inline char CCommonConversionFunctions<char>::getA()
 {
 	return 'a';
 }
 
+template <>
 inline wchar_t CCommonConversionFunctions<wchar_t>::getA()
 {
 	return L'a';
 }
 
+template <>
 inline char CCommonConversionFunctions<char>::getF()
 {
 	return 'f';
 }
 
+template <>
 inline wchar_t CCommonConversionFunctions<wchar_t>::getF()
 {
 	return L'f';
 }
 
+template <>
 inline char CCommonConversionFunctions<char>::getX()
 {
 	return 'x';
 }
 
+template <>
 inline wchar_t CCommonConversionFunctions<wchar_t>::getX()
 {
 	return L'x';
@@ -453,31 +466,37 @@ FltType CCommonConversionFunctions<T>::mergeFloatWithExponent( FltType flt, IntT
 	return flt;
 }
 
+template <>
 inline char CCommonConversionFunctions<char>::getDecimalPoint()
 {
 	return '.';
 }
 
+template <>
 inline wchar_t CCommonConversionFunctions<wchar_t>::getDecimalPoint()
 {
 	return L'.';
 }
 
+template <>
 inline char CCommonConversionFunctions<char>::getSmallExponentLetter()
 {
 	return 'e';
 }
 
+template <>
 inline wchar_t CCommonConversionFunctions<wchar_t>::getSmallExponentLetter()
 {
 	return L'e';
 }
 
+template <>
 inline char CCommonConversionFunctions<char>::getLargeExponentLetter()
 {
 	return 'E';
 }
 
+template <>
 inline wchar_t CCommonConversionFunctions<wchar_t>::getLargeExponentLetter()
 {
 	return L'E';
@@ -524,11 +543,13 @@ COptional<unsigned> CCommonConversionFunctions<T>::ParseHexValue( CBaseStringPar
 	return parseHexValue( str );
 }
 
+template <>
 inline char CCommonConversionFunctions<char>::getNumberSign()
 {
 	return '#';
 }
 
+template <>
 inline wchar_t CCommonConversionFunctions<wchar_t>::getNumberSign()
 {
 	return L'#';
