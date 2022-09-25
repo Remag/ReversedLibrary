@@ -51,7 +51,7 @@ public:
 	static void ReadRawData( CArrayView<BYTE> pngData, CStaticImageData& result );
 
 private:
-	CUnicodeString fileName;
+	CString fileName;
 
 	unsigned findLibPngFormat( TPngColorFormat format ) const;
 	void doWrite( const void* fileData, unsigned pngLibFormat, int rowStride, CVector2<int> imageSize );

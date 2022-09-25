@@ -13,14 +13,14 @@ class CIniFileData;
 // Class for range-based for loop section values iteration.
 class REAPI CIniSectionKeyRange {
 public:
-	typedef RelibInternal::CHashIndexConstIterator<CMapData<CUnicodeString, int>, RelibInternal::CMapHashStrategy<CUnicodeString, int, CCaselessUnicodeHash>, CRuntimeHeap> TMapIterator;
+	typedef RelibInternal::CHashIndexConstIterator<CMapData<CString, int>, RelibInternal::CMapHashStrategy<CString, int, CCaselessStringHash>, CRuntimeHeap> TMapIterator;
 
-	CIniSectionKeyRange( const CMap<CUnicodeString, int, CCaselessUnicodeHash, CRuntimeHeap>& _valueNameToIds, CArrayView<CUnicodeString> _values, TMapIterator _mapIterator ) :
+	CIniSectionKeyRange( const CMap<CString, int, CCaselessStringHash>& _valueNameToIds, CArrayView<CString> _values, TMapIterator _mapIterator ) :
 		valueNameToIds( _valueNameToIds ), values( _values ), mapIterator( _mapIterator ) {}
 
 	void operator++()
 		{ ++mapIterator; } 
-	CPair<CUnicodeView> operator*() const;
+	CPair<CStringPart> operator*() const;
 	bool operator!=( CIniSectionKeyRange other ) const
 		{ return mapIterator != other.mapIterator; }
 
@@ -30,8 +30,8 @@ public:
 		{ return CIniSectionKeyRange( valueNameToIds, values, valueNameToIds.end() ); }
 
 private:
-	const CMap<CUnicodeString, int, CCaselessUnicodeHash, CRuntimeHeap>& valueNameToIds; 
-	CArrayView<CUnicodeString> values;
+	const CMap<CString, int, CCaselessStringHash>& valueNameToIds; 
+	CArrayView<CString> values;
 	TMapIterator mapIterator;
 };
 
@@ -40,40 +40,40 @@ private:
 // Section in an .ini file. Provides access to its keys.
 class REAPI CIniFileSection {
 public:
-	explicit CIniFileSection( CUnicodeView name ) : sectionName( name ) {}
+	explicit CIniFileSection( CStringPart name ) : sectionName( name ) {}
 
-	CUnicodeView Name() const
+	CStringPart GetName() const
 		{ return sectionName; }
 	bool IsEmpty() const;
 	// Delete all keys and values. All key ids are invalidated.
 	void Empty();
 
-	int GetKeyId( CUnicodePart keyName ) const;
-	int GetOrCreateKeyId( CUnicodePart keyName );
-	int GetOrCreateKeyId( CUnicodePart keyName, CUnicodeString defaultValue );
+	int GetKeyId( CStringPart keyName ) const;
+	int GetOrCreateKeyId( CStringPart keyName );
+	int GetOrCreateKeyId( CStringPart keyName, CString defaultValue );
 
 	// Check key presence.
-	bool HasKey( CUnicodePart keyName ) const;
+	bool HasKey( CStringPart keyName ) const;
 	bool HasKey( int keyId ) const;
 	// Conditional lookup.
-	const CUnicodeString* LookupString( CUnicodePart keyName ) const;
-	const CUnicodeString* LookupString( int keyId ) const;
-	void SetString( CUnicodePart keyName, CUnicodePart newValue );
-	void SetString( int keyId, CUnicodePart newValue );
+	const CString* LookupString( CStringPart keyName ) const;
+	const CString* LookupString( int keyId ) const;
+	void SetString( CStringPart keyName, CStringPart newValue );
+	void SetString( int keyId, CStringPart newValue );
 	// Delete the given key. Do nothing if no key is present.
-	void DeleteKey( CUnicodePart keyName );
+	void DeleteKey( CStringPart keyName );
 	void DeleteKey( int keyId );
 
 	CIniSectionKeyRange KeyValuePairs() const;
 	// Get contents of the section in a single string.
-	CUnicodeString GetKeyValuePairsString() const;
+	CString GetKeyValuePairsString() const;
 
 private:
 	// Section name.
-	CUnicodeView sectionName;
+	CStringPart sectionName;
 	// Key-value pairs.
-	CMap<CUnicodeString, int, CCaselessUnicodeHash, CRuntimeHeap> valueNameToId;
-	CArray<CUnicodeString> valueStrings;
+	CMap<CString, int, CCaselessStringHash, CRuntimeHeap> valueNameToId;
+	CArray<CString> valueStrings;
 };
 
 //////////////////////////////////////////////////////////////////////////
@@ -103,35 +103,35 @@ public:
 	void Save();
 	// Delete all values. All section ids are invalidated.
 	void Empty();
-	void EmptySection( CUnicodePart sectionName );
+	void EmptySection( CStringPart sectionName );
 
 	// Get the section's numerical id for quick section access. Section must be present in the file.
-	int GetSectionId( CUnicodePart sectionName ) const;
-	int GetOrCreateSectionId( CUnicodePart sectionName );
+	int GetSectionId( CStringPart sectionName ) const;
+	int GetOrCreateSectionId( CStringPart sectionName );
 
 	// Get all section data with the given name. If the section doesn't exist, nullptr is returned.
-	const CIniFileSection* GetSection( CUnicodePart sectionName ) const;
+	const CIniFileSection* GetSection( CStringPart sectionName ) const;
 	const CIniFileSection& GetSection( int sectionId ) const;
-	CIniFileSection* GetSection( CUnicodePart sectionName );
+	CIniFileSection* GetSection( CStringPart sectionName );
 	CIniFileSection& GetSection( int sectionId );
 
 	// Retrieve an id of the given key name for quick access.
-	int GetKeyId( int sectionId, CUnicodePart keyName ) const;
+	int GetKeyId( int sectionId, CStringPart keyName ) const;
 
 	// Conditional string lookup.
-	const CUnicodeString* LookupString( CUnicodePart sectionName, CUnicodePart keyName ) const;
-	const CUnicodeString* LookupString( int sectionId, int keyId ) const;
+	const CString* LookupString( CStringPart sectionName, CStringPart keyName ) const;
+	const CString* LookupString( int sectionId, int keyId ) const;
 	// Write the given value.
-	void SetString( CUnicodePart sectionName, CUnicodePart keyName, CUnicodeView newValue );
-	void SetString( int sectionId, int keyId, CUnicodeView newValue );
+	void SetString( CStringPart sectionName, CStringPart keyName, CStringPart newValue );
+	void SetString( int sectionId, int keyId, CStringPart newValue );
 	
 	// Delete the given key or do nothing if a key is not present in the file.
-	void DeleteKey( CUnicodePart sectionName, CUnicodePart keyName );
+	void DeleteKey( CStringPart sectionName, CStringPart keyName );
 	void DeleteKey( int sectionId, int keyId );
 
 	// Check section/key presence.
-	bool HasSection( CUnicodePart sectionName ) const;
-	bool HasKey( CUnicodePart sectionName, CUnicodePart keyName ) const;
+	bool HasSection( CStringPart sectionName ) const;
+	bool HasKey( CStringPart sectionName, CStringPart keyName ) const;
 	bool HasKey( int sectionId, int keyId ) const;
 	
 	// Iteration through sections.
@@ -140,38 +140,38 @@ public:
 
 	// Template methods that automatically perform the string-value casts with Value/UnicodeStr functions.
 	template <class ValueType>
-	int GetOrCreateKeyId( int sectionId, CUnicodePart keyName, const ValueType& defaultValue );
+	int GetOrCreateKeyId( int sectionId, CStringPart keyName, const ValueType& defaultValue );
 	template <class ValueType>
-	ValueType GetValue( CUnicodePart sectionName, CUnicodePart keyName, const ValueType& defaultValue ) const;
+	ValueType GetValue( CStringPart sectionName, CStringPart keyName, const ValueType& defaultValue ) const;
 	template <class ValueType>
 	ValueType GetValue( int sectionId, int keyId, const ValueType& defaultValue ) const;
 	template <class ValueType>
-	void SetValue( CUnicodeView sectionName, CUnicodeView keyName, const ValueType& newValue );
+	void SetValue( CStringPart sectionName, CStringPart keyName, const ValueType& newValue );
 	template <class ValueType>
 	void SetValue( int sectionId, int keyId, const ValueType& newValue );
 	// Conditional value lookup.
 	template <class ValueType>
-	bool LookupValue( CUnicodePart sectionName, CUnicodePart keyName, ValueType& result ) const;
+	bool LookupValue( CStringPart sectionName, CStringPart keyName, ValueType& result ) const;
 
 private:
 	// Full name of the .ini file.
 	CString filePath;
 	// Section name to section map for fast section access.
-	CMap<CUnicodeString, int> sectionNameToSectionId;
+	CMap<CString, int> sectionNameToSectionId;
 	// List of available sections.
 	CArray<CIniFileSection> sections;
 	// Has the file been modified.
 	bool isModified;
 
 	void readFile( CStringPart fileName );
-	static bool shouldSkip( CUnicodePart str );
-	static bool parseKeyValuePair( CUnicodePart str, CUnicodeString& key, CUnicodeString& value );
-	static bool parseSection( CUnicodePart str, CUnicodeString& section );
-	CIniFileSection* getSection( CUnicodePart name );
-	const CIniFileSection* getSection( CUnicodePart name ) const
+	static bool shouldSkip( CStringPart str );
+	static bool parseKeyValuePair( CStringPart str, CString& key, CString& value );
+	static bool parseSection( CStringPart str, CString& section );
+	CIniFileSection* getSection( CStringPart name );
+	const CIniFileSection* getSection( CStringPart name ) const
 		{ return const_cast<CIniFile*>( this )->getSection( move( name ) ); }
-	CIniFileSection& getOrCreateSection( CUnicodePart name );
-	int getOrCreateKeyId( int sectionId, CUnicodePart keyName, CUnicodeString defaultValue );
+	CIniFileSection& getOrCreateSection( CStringPart name );
+	int getOrCreateKeyId( int sectionId, CStringPart keyName, CString defaultValue );
 
 	// Copying is prohibited.
 	CIniFile( CIniFile& ) = delete;
@@ -181,13 +181,13 @@ private:
 //////////////////////////////////////////////////////////////////////////
 
 template<class ValueType>
-int CIniFile::GetOrCreateKeyId( int sectionId, CUnicodePart keyName, const ValueType& defaultValue )
+int CIniFile::GetOrCreateKeyId( int sectionId, CStringPart keyName, const ValueType& defaultValue )
 {
-	return getOrCreateKeyId( sectionId, keyName, UnicodeStr( defaultValue ) );
+	return getOrCreateKeyId( sectionId, keyName, Str( defaultValue ) );
 }
 
 template <class ValueType>
-ValueType CIniFile::GetValue( CUnicodePart sectionName, CUnicodePart keyName, const ValueType& defaultValue ) const
+ValueType CIniFile::GetValue( CStringPart sectionName, CStringPart keyName, const ValueType& defaultValue ) const
 {
 	const CUnicodeString* resultStr = LookupString( sectionName, keyName );
 	if( resultStr != nullptr ) {
@@ -213,19 +213,19 @@ ValueType CIniFile::GetValue( int sectionId, int keyId, const ValueType& default
 }
 
 template <class ValueType>
-void CIniFile::SetValue( CUnicodeView sectionName, CUnicodeView keyName, const ValueType& newValue )
+void CIniFile::SetValue( CStringPart sectionName, CStringPart keyName, const ValueType& newValue )
 {
-	SetString( sectionName, keyName, UnicodeStr( newValue ) );
+	SetString( sectionName, keyName, Str( newValue ) );
 }
 
 template <class ValueType>
 void CIniFile::SetValue( int sectionId, int keyId, const ValueType& newValue )
 {
-	SetString( sectionId, keyId, UnicodeStr( newValue ) );
+	SetString( sectionId, keyId, Str( newValue ) );
 }
 
 template <class ValueType>
-bool CIniFile::LookupValue( CUnicodePart sectionName, CUnicodePart keyName, ValueType& result ) const
+bool CIniFile::LookupValue( CStringPart sectionName, CStringPart keyName, ValueType& result ) const
 {
 	const CUnicodeString* resultStr = LookupString( sectionName, keyName );
 	if( resultStr == nullptr ) {

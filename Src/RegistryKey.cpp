@@ -8,12 +8,12 @@ namespace Relib {
 
 //////////////////////////////////////////////////////////////////////////
 
-CUnicodeString CRegistryKeyValueEnumerator::operator*() const
+CString CRegistryKeyValueEnumerator::operator*() const
 {
 	CUnicodeString newName;
 	DWORD valueLen = maxLength;
 	::RegEnumValue( keyHandle, enumPosition, newName.CreateRawBuffer( maxLength ), &valueLen, nullptr, nullptr, nullptr, nullptr );
-	return newName;
+	return Str( newName );
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -33,20 +33,20 @@ const CEnumDictionary<TRegistryRootKey, RRK_EnumCount> rootKeyNames {
 	{ RRK_CurrentConfig, L"CURRENT_CONFIG" }
 };
 extern const CError Err_RegistryOpenError;
-CRegistryKey::CRegistryKey( TRegistryRootKey rootKey, CUnicodeView keyName, TRegistryAccessType accessType )
+CRegistryKey::CRegistryKey( TRegistryRootKey rootKey, CStringView keyName, TRegistryAccessType accessType )
 {
 	const auto rootHandle = rootKeys[rootKey];
 	initializeRegistryKey( rootHandle, keyName, accessType );
 }
 
-CRegistryKey::CRegistryKey( const CRegistryKey& parentKey, CUnicodeView keyName, TRegistryAccessType accessType )
+CRegistryKey::CRegistryKey( const CRegistryKey& parentKey, CStringView keyName, TRegistryAccessType accessType )
 {
 	initializeRegistryKey( parentKey.keyHandle, keyName, accessType );
 }
 
-void CRegistryKey::initializeRegistryKey( HKEY parent, CUnicodeView name, TRegistryAccessType accessType )
+void CRegistryKey::initializeRegistryKey( HKEY parent, CStringView name, TRegistryAccessType accessType )
 {
-	const auto openResult = ::RegCreateKeyEx( parent, name.Ptr(), 0, nullptr, 0, accessType, nullptr, &keyHandle, nullptr );
+	const auto openResult = ::RegCreateKeyEx( parent, UnicodeStr( name ).Ptr(), 0, nullptr, 0, accessType, nullptr, &keyHandle, nullptr );
 	check( openResult == ERROR_SUCCESS, Err_RegistryOpenError, name, static_cast<int>( openResult ) );
 }
 
@@ -63,103 +63,89 @@ CRegistryKeyValueEnumerator CRegistryKey::ValueNames() const
 	return CRegistryKeyValueEnumerator( keyHandle, 0, valueCount, maxValueLen );
 }
 
-bool CRegistryKey::HasValue( CUnicodeView valueName ) const
+bool CRegistryKey::HasValue( CStringView valueName ) const
 {
 	DWORD size;
 	return tryGetRegValue( valueName, nullptr, size ) != ERROR_FILE_NOT_FOUND;
 }
 
-CUnicodeString CRegistryKey::doReadValue( CUnicodeView name, const CUnicodeString& defaultValue ) const
+CString CRegistryKey::doReadValue( CStringView name, const CString& defaultValue ) const
 {
 	return readStringValue( name, defaultValue );
 }
 
-CUnicodeString CRegistryKey::doReadValue( CUnicodeView name, const CUnicodeView& defaultValue ) const
+CString CRegistryKey::doReadValue( CStringView name, const CStringView& defaultValue ) const
 {
 	return readStringValue( name, defaultValue );
 }
 
-CUnicodeString CRegistryKey::doReadValue( CUnicodeView name, const CUnicodePart& defaultValue ) const
+CString CRegistryKey::doReadValue( CStringView name, const CStringPart& defaultValue ) const
 {
 	return readStringValue( name, defaultValue );
 }
 
-CUnicodeString CRegistryKey::doReadValue( CUnicodeView name, const TPrimitiveString& defaultValue ) const
+CString CRegistryKey::doReadValue( CStringView name, const TPrimitiveString& defaultValue ) const
 {
-	return readStringValue( name, CUnicodePart( defaultValue ) );
+	return readStringValue( name, CStringPart( defaultValue ) );
 }
 
-CUnicodeString CRegistryKey::readStringValue( CUnicodeView name, CUnicodePart defaultValue ) const
+CString CRegistryKey::readStringValue( CStringView name, CStringPart defaultValue ) const
 {
-	CUnicodeString result;
+	CString result;
 	const auto readSuccess = tryReadStringValue( name, result );
-	return readSuccess ? move( result ) : UnicodeStr( defaultValue );
+	return readSuccess ? move( result ) : Str( defaultValue );
 }
 
-CUnicodeString CRegistryKey::doGetOrCreateValue( CUnicodeView name, const CUnicodeString& defaultValue ) 
+CString CRegistryKey::doGetOrCreateValue( CStringView name, const CString& defaultValue ) 
 {
 	return doGetOrCreateStringValue( name, defaultValue );
 }
 
-CUnicodeString CRegistryKey::doGetOrCreateValue( CUnicodeView name, const CUnicodeView& defaultValue ) 
+CString CRegistryKey::doGetOrCreateValue( CStringView name, const CStringView& defaultValue ) 
 {
 	return doGetOrCreateStringValue( name, defaultValue );
 }
 
-CUnicodeString CRegistryKey::doGetOrCreateValue( CUnicodeView name, const CUnicodePart& defaultValue ) 
+CString CRegistryKey::doGetOrCreateValue( CStringView name, const CStringPart& defaultValue ) 
 {
 	return doGetOrCreateStringValue( name, defaultValue );
 }
 
-CUnicodeString CRegistryKey::doGetOrCreateValue( CUnicodeView name, const TPrimitiveString& defaultValue )
+CString CRegistryKey::doGetOrCreateValue( CStringView name, const TPrimitiveString& defaultValue )
 {
-	return doGetOrCreateStringValue( name, CUnicodePart( defaultValue ) );
+	return doGetOrCreateStringValue( name, CStringPart( defaultValue ) );
 }
 
-CUnicodeString CRegistryKey::doGetOrCreateStringValue( CUnicodeView name, CUnicodePart defaultValue )
+CString CRegistryKey::doGetOrCreateStringValue( CStringView name, CStringPart defaultValue )
 {
-	CUnicodeString result;
+	CString result;
 	const auto readSuccess = tryReadStringValue( name, result );
 	if( !readSuccess ) {
-		auto newValue = UnicodeStr( defaultValue );
-		SetValue( name, newValue );
-		return newValue;
+		SetValue( name, defaultValue );
+		return Str( defaultValue );
 	}
 	return result;
 }
 
-bool CRegistryKey::tryReadStringValue( CUnicodeView valueName, CUnicodeString& result ) const
+bool CRegistryKey::tryReadStringValue( CStringView valueName, CString& result ) const
 {
+	CUnicodeString utf16Value;
 	LSTATUS readStatus;
 	do {
 		DWORD requiredSize;
 		tryGetRegValue( valueName, nullptr, requiredSize );
-		auto resultBuffer = result.CreateRawBuffer( requiredSize / 2 + 1 );
+		auto resultBuffer = utf16Value.CreateRawBuffer( requiredSize / 2 + 1 );
 		readStatus = tryGetRegValue( valueName, resultBuffer.Ptr(), requiredSize );
 
 	} while( readStatus == ERROR_MORE_DATA );
 
+	result = Str( utf16Value );
 	return readStatus == ERROR_SUCCESS;
 }
 
-LSTATUS CRegistryKey::tryGetRegValue( CUnicodeView valueName, void* valuePtr, DWORD& valueSize ) const
+LSTATUS CRegistryKey::tryGetRegValue( CStringView valueName, void* valuePtr, DWORD& valueSize ) const
 {
-	return ::RegQueryValueEx( keyHandle, valueName.Ptr(), 0, nullptr, reinterpret_cast<BYTE*>( valuePtr ), &valueSize );
-}
-
-void CRegistryKey::retrieveValueWriteParams( const CUnicodeString& value, DWORD& dataType, const void*& dataPtr, DWORD& dataSize ) const
-{
-	retrieveStringWriteParams( value, dataType, dataPtr, dataSize );
-}
-
-void CRegistryKey::retrieveValueWriteParams( const CUnicodeView& value, DWORD& dataType, const void*& dataPtr, DWORD& dataSize ) const
-{
-	retrieveStringWriteParams( value, dataType, dataPtr, dataSize );
-}
-
-void CRegistryKey::retrieveValueWriteParams( wchar_t const* const& value, DWORD& dataType, const void*& dataPtr, DWORD& dataSize ) const
-{
-	retrieveStringWriteParams( CUnicodeView( value ), dataType, dataPtr, dataSize );
+	return ::RegQueryValueEx( keyHandle, UnicodeStr( valueName ).Ptr(), 0, nullptr, reinterpret_cast<BYTE*>( valuePtr ), &valueSize );
 }
 
 void CRegistryKey::retrieveStringWriteParams( CUnicodeView value, DWORD& dataType, const void*& dataPtr, DWORD& dataSize ) const
@@ -186,9 +172,9 @@ void CRegistryKey::retrieveValueWriteParams( const long long& value, DWORD& data
 }
 
 extern const CError Err_RegistryWriteError;
-void CRegistryKey::setRegValue( CUnicodeView valueName, DWORD dataType, const void* dataPtr, DWORD dataSize ) const
+void CRegistryKey::setRegValue( CStringView valueName, DWORD dataType, const void* dataPtr, DWORD dataSize ) const
 {
-	const auto writeResult = ::RegSetKeyValue( keyHandle, nullptr, valueName.Ptr(), dataType, dataPtr, dataSize );
+	const auto writeResult = ::RegSetKeyValue( keyHandle, nullptr, UnicodeStr( valueName ).Ptr(), dataType, dataPtr, dataSize );
 	check( writeResult == ERROR_SUCCESS, Err_RegistryWriteError, valueName, static_cast<int>( writeResult ) );
 }
 

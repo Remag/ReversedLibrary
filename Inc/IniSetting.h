@@ -10,7 +10,7 @@ namespace Relib {
 template <class FileSource, class T>
 class CIniSetting {
 public:
-	CIniSetting( CUnicodePart settingName, T defaultValue, CUnicodePart sectionName = CUnicodePart() );
+	CIniSetting( CStringPart settingName, T defaultValue, CStringPart sectionName = CStringPart() );
 
 	static void SaveChanges();
 
@@ -27,7 +27,7 @@ private:
 //////////////////////////////////////////////////////////////////////////
 
 template <class FileSource, class T>
-CIniSetting<FileSource, T>::CIniSetting( CUnicodePart settingName, T _defaultValue, CUnicodePart sectionName ) :
+CIniSetting<FileSource, T>::CIniSetting( CStringPart settingName, T _defaultValue, CStringPart sectionName ) :
 	fileSrc( FileSource::GetIniFile() ),
 	defaultValue( move( _defaultValue ) )
 {

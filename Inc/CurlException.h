@@ -13,12 +13,12 @@ namespace Relib {
 // Exception type for LibCurl related errors.
 class CCurlException : public CException {
 public:
-	explicit CCurlException( CUnicodeString msg ) : errorMsg( move( msg ) ) {}
+	explicit CCurlException( CString msg ) : errorMsg( move( msg ) ) {}
 
-	virtual CUnicodeString GetMessageText() const override final;
+	virtual CString GetMessageText() const override final;
 
 private:
-	CUnicodeString errorMsg;
+	CString errorMsg;
 };
 
 //////////////////////////////////////////////////////////////////////////

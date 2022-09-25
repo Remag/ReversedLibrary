@@ -202,7 +202,7 @@ size_t CInternetFile::curlReadFunction( void* buffer, size_t size, size_t nmemb,
 void CInternetFile::checkCurlError( bool condition )
 {
 	if( !condition ) {
-		auto errorStr = UnicodeStr( errorBuffer.Ptr() );
+		auto errorStr = Str( errorBuffer.Ptr() );
 		throw CCurlException( move( errorStr ) );
 	}
 }

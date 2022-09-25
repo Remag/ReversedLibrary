@@ -88,11 +88,11 @@ CCompletedHandlesRange CInternetFileBatch::Perform()
 	return CCompletedHandlesRange( multiHandle );
 }
 
-extern const CUnicodeView GeneralMultiCurlError;
+extern const CStringView GeneralMultiCurlError;
 void CInternetFileBatch::checkMultiCurlError( bool condition )
 {
 	if( !condition ) {
-		throw CCurlException( UnicodeStr( GeneralMultiCurlError ) );
+		throw CCurlException( Str( GeneralMultiCurlError ) );
 	}
 }
 
@@ -100,7 +100,7 @@ void CInternetFileBatch::checkMultiCurlError( int errorCode )
 {
 	if( errorCode != CURLM_OK ) {
 		const auto strBuffer = curl_multi_strerror( static_cast<CURLMcode>( errorCode ) );
-		throw CCurlException( UnicodeStr( strBuffer ) );
+		throw CCurlException( Str( strBuffer ) );
 	}
 }
 

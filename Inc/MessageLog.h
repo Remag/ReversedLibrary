@@ -136,6 +136,8 @@ void PeriodicUpdate( const TT&... messages )
 	RelibInternal::sendLogMessage( LMT_Periodic, RelibInternal::createMessageLogString( messages... ) );
 }
 
+CStringView REAPI GetCurrentMessageSource();
+
 }	// namespace Log.
 
 //////////////////////////////////////////////////////////////////////////

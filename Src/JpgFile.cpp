@@ -80,7 +80,7 @@ void CJpgFile::doReadRawData( CStringPart fileName, CArrayView<BYTE> jpgData, CA
 		const auto errCode = jpegInfo.err->msg_code;
 		const auto errMessage = jpegInfo.err->jpeg_message_table[errCode];
 		jpeg_destroy_decompress( &jpegInfo );
-		throw CJpgException( fileName, UnicodeStr( errMessage ) );
+		throw CJpgException( fileName, errMessage );
 	}
 }
 

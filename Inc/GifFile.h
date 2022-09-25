@@ -44,7 +44,7 @@ public:
 	static void ReadRawData( CArrayView<BYTE> gifData, CAnimatedImageData& result );
 
 private:
-	CUnicodeString fileName;
+	CString fileName;
 
 	static void doReadRawData( CStringPart fileName, CArrayView<BYTE> gifData, CAnimatedImageData& result );
 	static void readGifFrames( RelibInternal::CGiffDecodeData& decodeData, CArray<CImageFrameData>& result );

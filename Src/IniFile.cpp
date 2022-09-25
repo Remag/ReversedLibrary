@@ -10,17 +10,17 @@ namespace Relib {
 
 //////////////////////////////////////////////////////////////////////////
 
-CPair<CUnicodeView> CIniSectionKeyRange::operator*() const
+CPair<CStringPart> CIniSectionKeyRange::operator*() const
 {
 	const auto& data = *mapIterator;
-	return CPair<CUnicodeView>( data.Key(), values[data.Value()] );
+	return CPair<CStringPart>( data.Key(), values[data.Value()] );
 }
 
 //////////////////////////////////////////////////////////////////////////
 extern const CError Err_BadIniFile;
 extern const CError Err_DuplicateIniKey;
 
-static CUnicodePart deleteWhitespace( CUnicodePart str )
+static CStringPart deleteWhitespace( CStringPart str )
 {
 	return str.TrimSpaces();
 }
@@ -42,12 +42,12 @@ void CIniFileSection::Empty()
 	valueStrings.Empty();
 }
 
-int CIniFileSection::GetKeyId( CUnicodePart keyName ) const
+int CIniFileSection::GetKeyId( CStringPart keyName ) const
 {
 	return valueNameToId[deleteWhitespace( keyName )];
 }
 
-int CIniFileSection::GetOrCreateKeyId( CUnicodePart keyName )
+int CIniFileSection::GetOrCreateKeyId( CStringPart keyName )
 {
 	const auto valueCount = valueStrings.Size();
 	const auto resultId = valueNameToId.GetOrCreate( deleteWhitespace( keyName ), valueCount ).Value();
@@ -57,7 +57,7 @@ int CIniFileSection::GetOrCreateKeyId( CUnicodePart keyName )
 	return resultId;
 }
 
-int CIniFileSection::GetOrCreateKeyId( CUnicodePart keyName, CUnicodeString defaultValue )
+int CIniFileSection::GetOrCreateKeyId( CStringPart keyName, CString defaultValue )
 {
 	const auto valueCount = valueStrings.Size();
 	const auto resultId = valueNameToId.GetOrCreate( deleteWhitespace( keyName ), valueCount ).Value();
@@ -67,7 +67,7 @@ int CIniFileSection::GetOrCreateKeyId( CUnicodePart keyName, CUnicodeString defa
 	return resultId;
 }
 
-bool CIniFileSection::HasKey( CUnicodePart keyName ) const
+bool CIniFileSection::HasKey( CStringPart keyName ) const
 {
 	const auto keyId = valueNameToId.Get( deleteWhitespace( keyName ) );
 	return keyId != nullptr && HasKey( *keyId );
@@ -80,32 +80,32 @@ bool CIniFileSection::HasKey( int keyId ) const
 	return targetStr.Length() != 1 || targetStr[0] != ' ';
 }
 
-const CUnicodeString* CIniFileSection::LookupString( CUnicodePart keyName ) const
+const CString* CIniFileSection::LookupString( CStringPart keyName ) const
 {
 	const auto keyId = valueNameToId.Get( deleteWhitespace( keyName ) );
 	return keyId == nullptr ? nullptr : LookupString( *keyId );
 }
 
-const CUnicodeString* CIniFileSection::LookupString( int keyId ) const
+const CString* CIniFileSection::LookupString( int keyId ) const
 {
 	return HasKey( keyId ) ? &valueStrings[keyId] : nullptr;
 }
 
-static const wchar_t* prohibitedIniSymbols = L"\r\n";
-void CIniFileSection::SetString( CUnicodePart keyName, CUnicodePart newValue )
+static const char* prohibitedIniSymbols = "\r\n";
+void CIniFileSection::SetString( CStringPart keyName, CStringPart newValue )
 {
 	assert( keyName.FindOneOf( prohibitedIniSymbols ) == NotFound );
 	const auto keyId = GetOrCreateKeyId( keyName );
 	SetString( keyId, newValue );
 }
 
-void CIniFileSection::SetString( int keyId, CUnicodePart newValue )
+void CIniFileSection::SetString( int keyId, CStringPart newValue )
 {
 	assert( newValue.FindOneOf( prohibitedIniSymbols ) == NotFound );
 	valueStrings[keyId] = deleteWhitespace( newValue );
 }
 
-void CIniFileSection::DeleteKey( CUnicodePart keyName )
+void CIniFileSection::DeleteKey( CStringPart keyName )
 {
 	const auto keyId = valueNameToId.Get( deleteWhitespace( keyName ) );
 	if( keyId != nullptr ) {
@@ -115,7 +115,7 @@ void CIniFileSection::DeleteKey( CUnicodePart keyName )
 
 void CIniFileSection::DeleteKey( int keyId )
 {
-	valueStrings[keyId] = CUnicodeString();
+	valueStrings[keyId] = CString();
 }
 
 CIniSectionKeyRange CIniFileSection::KeyValuePairs() const
@@ -123,9 +123,9 @@ CIniSectionKeyRange CIniFileSection::KeyValuePairs() const
 	return CIniSectionKeyRange( valueNameToId, valueStrings, valueNameToId.begin() );
 }
 
-CUnicodeString CIniFileSection::GetKeyValuePairsString() const
+CString CIniFileSection::GetKeyValuePairsString() const
 {
-	typedef CPair<CUnicodePart, int> TKeyIdPair;
+	typedef CPair<CStringPart, int> TKeyIdPair;
 	CArray<TKeyIdPair> keyIdPairs;
 	keyIdPairs.ReserveBuffer( valueNameToId.Size() );
 	for( const auto& value : valueNameToId ) {
@@ -133,13 +133,13 @@ CUnicodeString CIniFileSection::GetKeyValuePairsString() const
 	}
 	keyIdPairs.QuickSort( LessByAction( &TKeyIdPair::Second ) );
 
-	CUnicodeString result;
+	CString result;
 	for( auto keyIdPair : keyIdPairs ) {
 		if( !HasKey( keyIdPair.Second ) ) {
 			continue;
 		}
-		const CUnicodePart valueStr = valueStrings[keyIdPair.Second];
-		result += keyIdPair.First + L'=' + valueStr + L"\r\n";
+		const CStringPart valueStr = valueStrings[keyIdPair.Second];
+		result += keyIdPair.First + '=' + valueStr + "\r\n";
 	}
 	return result;
 }
@@ -172,7 +172,7 @@ const CIniFile& CIniFile::operator=( CIniFile&& other )
 
 static const wchar_t unicodeLineSeparator = 0x2028;
 static const wchar_t unicodeParagraphSeparator = 0x2029;
-static int skipUnicodeWhitespace( CUnicodeView substr )
+static int skipUnicodeWhitespace( CStringPart substr )
 {
 	switch( substr[0] ) {
 		case L'\r':
@@ -192,9 +192,9 @@ static int skipUnicodeWhitespace( CUnicodeView substr )
 void CIniFile::readFile( CStringPart fileName )
 {
 	filePath = fileName;
-	CUnicodeString fileContents;
+	CString fileContents;
 	try {
-		fileContents = File::ReadUnicodeText( filePath );
+		fileContents = File::ReadText( filePath );
 	} catch( const CFileException& e ) {
 		if( e.Type() == CFileException::FET_FileNotFound ) {
 			// Ignore the missing file errors.
@@ -204,8 +204,8 @@ void CIniFile::readFile( CStringPart fileName )
 		}
 	}
 
-	sectionNameToSectionId.Add( CUnicodeString(), 0 );
-	CIniFileSection* currentSection = &sections.Add( CUnicodeView() );
+	sectionNameToSectionId.Add( CString(), 0 );
+	CIniFileSection* currentSection = &sections.Add( CStringPart() );
 	int lineNumber = 0;
 	for( auto line : fileContents.SplitByAction( skipUnicodeWhitespace ) ) {
 		const auto fileStr = deleteWhitespace( line );
@@ -213,8 +213,8 @@ void CIniFile::readFile( CStringPart fileName )
 			lineNumber++;
 			continue;
 		}
-		CUnicodeString keyName;
-		CUnicodeString valueName;
+		CString keyName;
+		CString valueName;
 		if( parseKeyValuePair( fileStr, keyName, valueName ) ) {
 			if( currentSection->HasKey( keyName ) ) {
 				check( false, Err_DuplicateIniKey, filePath, deleteWhitespace( keyName ) );
@@ -223,7 +223,7 @@ void CIniFile::readFile( CStringPart fileName )
 			lineNumber++;
 			continue;
 		} 
-		CUnicodeString newSectionName;
+		CString newSectionName;
 		if( parseSection( fileStr, newSectionName ) ) {
 			currentSection = &getOrCreateSection( move( newSectionName ) );
 			lineNumber++;
@@ -234,7 +234,7 @@ void CIniFile::readFile( CStringPart fileName )
 }
 
 // Determine if str denotes a comment or an empty string in the .ini file.
-bool CIniFile::shouldSkip( CUnicodePart str )
+bool CIniFile::shouldSkip( CStringPart str )
 {
 	return str.IsEmpty()
 		|| str.First() == L';'
@@ -242,7 +242,7 @@ bool CIniFile::shouldSkip( CUnicodePart str )
 }
 
 // Try and get a key-value pair from str. If str doesn't contain a valid pair, return false.
-bool CIniFile::parseKeyValuePair( CUnicodePart str, CUnicodeString& key, CUnicodeString& value )
+bool CIniFile::parseKeyValuePair( CStringPart str, CString& key, CString& value )
 {
 	const int equalIndex = str.Find( L'=' );
 	if( equalIndex == NotFound ) {
@@ -255,7 +255,7 @@ bool CIniFile::parseKeyValuePair( CUnicodePart str, CUnicodeString& key, CUnicod
 }
 
 // Try and get a section name from str. If str doesn't contain a section name, return false.
-bool CIniFile::parseSection( CUnicodePart str, CUnicodeString& section )
+bool CIniFile::parseSection( CStringPart str, CString& section )
 {
 	if( str.First() != L'[' || str.Last() != L']' ) {
 		return false;
@@ -266,7 +266,7 @@ bool CIniFile::parseSection( CUnicodePart str, CUnicodeString& section )
 }
 
 // Get an existing section with a given name or create a new one.
-CIniFileSection& CIniFile::getOrCreateSection( CUnicodePart name )
+CIniFileSection& CIniFile::getOrCreateSection( CStringPart name )
 {
 	assert( name.FindOneOf( prohibitedIniSymbols ) == NotFound );
 	const auto id = GetOrCreateSectionId( name );
@@ -274,7 +274,7 @@ CIniFileSection& CIniFile::getOrCreateSection( CUnicodePart name )
 }
 
 // Get the section with a given name. If no section is found, return 0.
-CIniFileSection* CIniFile::getSection( CUnicodePart name )
+CIniFileSection* CIniFile::getSection( CStringPart name )
 {
 	const auto idPtr = sectionNameToSectionId.Get( deleteWhitespace( name ) );
 	return idPtr == nullptr ? nullptr : &sections[*idPtr];
@@ -293,18 +293,18 @@ CIniFile::~CIniFile()
 
 void CIniFile::Save()
 {
-	CUnicodeString result;
+	CString result;
 	for( const auto& section : sections ) {
 		if( section.IsEmpty() ) {
 			continue;
 		}
-		const auto sectionName = section.Name();
-		const auto sectionDisplayName = sectionName.IsEmpty() ? CUnicodeString() : L'[' + sectionName + L"]\r\n";
+		const auto sectionName = section.GetName();
+		const auto sectionDisplayName = sectionName.IsEmpty() ? CString() : '[' + sectionName + "]\r\n";
 		result += sectionDisplayName;
-		result += section.GetKeyValuePairsString() + L"\r\n";
+		result += section.GetKeyValuePairsString() + "\r\n";
 	}
 
-	File::WriteUnicodeText( filePath, result );
+	File::WriteText( filePath, result );
 	isModified = false;
 }
 
@@ -315,7 +315,7 @@ void CIniFile::Empty()
 	isModified = true;	
 }
 
-void CIniFile::EmptySection( CUnicodePart sectionName )
+void CIniFile::EmptySection( CStringPart sectionName )
 {
 	CIniFileSection* section = getSection( sectionName );
 	if( section != nullptr ) {
@@ -324,12 +324,12 @@ void CIniFile::EmptySection( CUnicodePart sectionName )
 	}
 }
 
-int CIniFile::GetSectionId( CUnicodePart sectionName ) const
+int CIniFile::GetSectionId( CStringPart sectionName ) const
 {
 	return sectionNameToSectionId[deleteWhitespace( sectionName )];
 }
 
-int CIniFile::GetOrCreateSectionId( CUnicodePart sectionName )
+int CIniFile::GetOrCreateSectionId( CStringPart sectionName )
 {
 	const auto sectionCount = sections.Size();
 	const auto& newId = sectionNameToSectionId.GetOrCreate( deleteWhitespace( sectionName ), sectionCount );
@@ -339,7 +339,7 @@ int CIniFile::GetOrCreateSectionId( CUnicodePart sectionName )
 	return newId.Value();
 }
 
-const CIniFileSection* CIniFile::GetSection( CUnicodePart sectionName ) const
+const CIniFileSection* CIniFile::GetSection( CStringPart sectionName ) const
 {
 	return getSection( sectionName );
 }
@@ -349,7 +349,7 @@ const CIniFileSection& CIniFile::GetSection( int sectionId ) const
 	return sections[sectionId];
 }
 
-CIniFileSection* CIniFile::GetSection( CUnicodePart sectionName )
+CIniFileSection* CIniFile::GetSection( CStringPart sectionName )
 {
 	isModified = true;
 	return getSection( sectionName );
@@ -360,17 +360,17 @@ CIniFileSection& CIniFile::GetSection( int sectionId )
 	return sections[sectionId];
 }
 
-int CIniFile::GetKeyId( int sectionId, CUnicodePart keyName ) const
+int CIniFile::GetKeyId( int sectionId, CStringPart keyName ) const
 {
 	return sections[sectionId].GetKeyId( keyName );
 }
 
-int CIniFile::getOrCreateKeyId( int sectionId, CUnicodePart keyName, CUnicodeString defaultValue ) 
+int CIniFile::getOrCreateKeyId( int sectionId, CStringPart keyName, CString defaultValue ) 
 {
 	return sections[sectionId].GetOrCreateKeyId( keyName, move( defaultValue ) );
 }
 
-const CUnicodeString* CIniFile::LookupString( CUnicodePart sectionName, CUnicodePart keyName ) const
+const CString* CIniFile::LookupString( CStringPart sectionName, CStringPart keyName ) const
 {
 	const CIniFileSection* section = getSection( sectionName );
 	if( section == nullptr ) {
@@ -379,25 +379,25 @@ const CUnicodeString* CIniFile::LookupString( CUnicodePart sectionName, CUnicode
 	return section->LookupString( keyName );
 }
 
-const CUnicodeString* CIniFile::LookupString( int sectionId, int keyId ) const
+const CString* CIniFile::LookupString( int sectionId, int keyId ) const
 {
 	return sections[sectionId].LookupString( keyId );
 }
 
-void CIniFile::SetString( CUnicodePart sectionName, CUnicodePart keyName, CUnicodeView newValue )
+void CIniFile::SetString( CStringPart sectionName, CStringPart keyName, CStringPart newValue )
 {
 	CIniFileSection& section = getOrCreateSection( sectionName );
 	section.SetString( keyName, newValue );
 	isModified = true;
 }
 
-void CIniFile::SetString( int sectionId, int keyId, CUnicodeView newValue )
+void CIniFile::SetString( int sectionId, int keyId, CStringPart newValue )
 {
 	sections[sectionId].SetString( keyId, newValue );
 	isModified = true;
 }
 
-void CIniFile::DeleteKey( CUnicodePart sectionName, CUnicodePart keyName )
+void CIniFile::DeleteKey( CStringPart sectionName, CStringPart keyName )
 {
 	CIniFileSection* section = getSection( sectionName );
 	if( section != 0 ) {
@@ -412,12 +412,12 @@ void CIniFile::DeleteKey( int sectionId, int keyId )
 	isModified = true;
 }
 
-bool CIniFile::HasSection( CUnicodePart sectionName ) const
+bool CIniFile::HasSection( CStringPart sectionName ) const
 {
 	return sectionNameToSectionId.Has( deleteWhitespace( sectionName ) );
 }
 
-bool CIniFile::HasKey( CUnicodePart sectionName, CUnicodePart keyName ) const
+bool CIniFile::HasKey( CStringPart sectionName, CStringPart keyName ) const
 {
 	const CIniFileSection* section = getSection( sectionName );
 	return section != nullptr && section->HasKey( keyName );

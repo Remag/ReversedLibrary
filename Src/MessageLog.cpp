@@ -35,7 +35,7 @@ static IMessageLog& getCurrentMessageLog()
 }
 
 extern thread_local CStringView CurrentMessageSource;
-static CStringView getCurrentMessageSource()
+CStringView REAPI GetCurrentMessageSource()
 {
 	return CurrentMessageSource;
 }
@@ -44,14 +44,14 @@ static CStringView getCurrentMessageSource()
 
 void Exception( const CException& e )
 {
-	if( IsMessageSourceShown( getCurrentMessageSource() ) ) {
+	if( IsMessageSourceShown( GetCurrentMessageSource() ) ) {
 		getCurrentMessageLog().AddMessage( e.GetMessageText(), LMT_Exception );
 	}
 }
 
 void CriticalException( const CException& e )
 {
-	if( IsMessageSourceShown( getCurrentMessageSource() ) ) {
+	if( IsMessageSourceShown( GetCurrentMessageSource() ) ) {
 		getCurrentMessageLog().AddMessage( e.GetMessageText(), LMT_CriticalException );
 	}
 }
@@ -64,7 +64,7 @@ namespace RelibInternal {
 
 void sendLogMessage( TLogMessageType msgType, CString text )
 {
-	if( Log::IsMessageSourceShown( Log::getCurrentMessageSource() ) ) {
+	if( Log::IsMessageSourceShown( Log::GetCurrentMessageSource() ) ) {
 		Log::getCurrentMessageLog().AddMessage( move( text ), msgType );
 	}
 }

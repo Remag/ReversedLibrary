@@ -25,7 +25,7 @@ struct CGifTable {
 
 //////////////////////////////////////////////////////////////////////////
 
-static void throwGifError( CUnicodeView errorStr )
+static void throwGifError( CStringPart errorStr )
 {
 	throw CGifInternalException( errorStr );
 }
@@ -55,12 +55,12 @@ CGiffDecodeData gd_open_gif( CGiffBuffer fd )
 	/* Header */
 	read( fd, sigver, 3 );
 	if( ::memcmp( sigver, "GIF", 3 ) != 0 ) {
-		throwGifError( L"invalid signature" );
+		throwGifError( "invalid signature" );
 	}
 	/* Version */
 	read( fd, sigver, 3 );
 	if( ::memcmp( sigver, "89a", 3 ) != 0 ) {
-		throwGifError( L"invalid version" );
+		throwGifError( "invalid version" );
 	}
 	/* Width x Height */
 	width = read_num( fd );
@@ -69,7 +69,7 @@ CGiffDecodeData gd_open_gif( CGiffBuffer fd )
 	read( fd, &fdsz, 1 );
 	/* Presence of GCT */
 	if( !( fdsz & 0x80 ) ) {
-		throwGifError( L"no global color table\n" );
+		throwGifError( "no global color table\n" );
 	}
 	/* Color Space's Depth */
 	depth = ( ( fdsz >> 4 ) & 7 ) + 1;
@@ -216,7 +216,7 @@ static void read_ext( CGiffDecodeData* gif )
 			read_application_ext( gif );
 			break;
 		default:
-			throwGifError( L"unknown extension" );
+			throwGifError( "unknown extension" );
 	}
 }
 

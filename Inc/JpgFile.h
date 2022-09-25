@@ -33,9 +33,9 @@ public:
 	static void ReadRawData( CArrayView<BYTE> jpgData, CStaticImageData& result );
 
 private:
-	CUnicodeString fileName;
+	CString fileName;
 
-	static void doReadRawData( CUnicodePart fileName, CArrayView<BYTE> pngData, CArray<CColor>& result, CVector2<int>& resultSize );
+	static void doReadRawData( CStringPart fileName, CArrayView<BYTE> pngData, CArray<CColor>& result, CVector2<int>& resultSize );
 };
 
 //////////////////////////////////////////////////////////////////////////

@@ -17,11 +17,10 @@ namespace Relib {
 
 //////////////////////////////////////////////////////////////////////////
 
-static void throwPngException( const png_image& image, CUnicodePart fileName )
+static void throwPngException( const png_image& image, CStringPart fileName )
 {
 	const CStringView messageStr = image.message;
-	const auto imageMessage = UnicodeStr( messageStr );
-	throw CPngException( fileName, imageMessage );
+	throw CPngException( fileName, messageStr );
 }
 
 //////////////////////////////////////////////////////////////////////////

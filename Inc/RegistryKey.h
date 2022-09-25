@@ -2,6 +2,7 @@
 #include <Redefs.h>
 #include <BaseStringView.h>
 #include <TemplateUtils.h>
+#include <StrConversions.h>
 
 namespace Relib {
 
@@ -31,7 +32,7 @@ class REAPI CRegistryKeyValueEnumerator {
 public:
 	CRegistryKeyValueEnumerator( HKEY handle, DWORD pos, DWORD count, DWORD maxLen ) : keyHandle( handle ), enumPosition( pos ), enumCount( count ), maxLength( maxLen ) {}
 
-	CUnicodeString operator*() const;
+	CString operator*() const;
 	void operator++()
 		{ enumPosition++; }
 	bool operator!=( CRegistryKeyValueEnumerator other ) const
@@ -56,64 +57,66 @@ private:
 class REAPI CRegistryKey {
 public:
 	// Create a key with a given name at a given registry path.
-	CRegistryKey( TRegistryRootKey rootKey, CUnicodeView keyName, TRegistryAccessType accessType );
+	CRegistryKey( TRegistryRootKey rootKey, CStringView keyName, TRegistryAccessType accessType );
 	// Create a subkey of a given key.
-	CRegistryKey( const CRegistryKey& parentKey, CUnicodeView keyName, TRegistryAccessType accessType );
+	CRegistryKey( const CRegistryKey& parentKey, CStringView keyName, TRegistryAccessType accessType );
 	~CRegistryKey();
 
 	// Enumerate all values of this key.
 	CRegistryKeyValueEnumerator ValueNames() const;
 
 	// Check if a given value exists.
-	bool HasValue( CUnicodeView valueName ) const;
+	bool HasValue( CStringView valueName ) const;
 
 	// Value creation functions.
 
 	// Read the value with the given name. If the value does not exist or the type does not match the requested one, the default value is returned.
 	template <class T>
-	auto GetValue( CUnicodeView valueName, const T& defaultValue ) const;
+	auto GetValue( CStringView valueName, const T& defaultValue ) const;
 	// Read the value with the given name. If the value does not exist or the type does not match the requested one, the new value is created.
 	template <class T>
-	T GetOrCreateValue( CUnicodeView valueName, const T& defaultValue );
+	T GetOrCreateValue( CStringView valueName, const T& defaultValue );
 	template <class T>
-	void SetValue( CUnicodeView valueName, const T& newValue );
+	void SetValue( CStringView valueName, const T& newValue );
 
 private:
 	HKEY keyHandle;
 
-	typedef const wchar_t* TPrimitiveString;
+	typedef const char* TPrimitiveString;
 	
-	void initializeRegistryKey( HKEY parent, CUnicodeView name, TRegistryAccessType accessType );
+	void initializeRegistryKey( HKEY parent, CStringView name, TRegistryAccessType accessType );
 
 	template <class T>
-	T doReadValue( CUnicodeView name, const T& defaultValue ) const;
-	CUnicodeString doReadValue( CUnicodeView name, const CUnicodeString& defaultValue ) const;
-	CUnicodeString doReadValue( CUnicodeView name, const CUnicodeView& defaultValue ) const;
-	CUnicodeString doReadValue( CUnicodeView name, const CUnicodePart& defaultValue ) const;
-	CUnicodeString doReadValue( CUnicodeView name, const TPrimitiveString& defaultValue ) const;
-	CUnicodeString readStringValue( CUnicodeView name, CUnicodePart defaultValue ) const;
+	T doReadValue( CStringView name, const T& defaultValue ) const;
+	CString doReadValue( CStringView name, const CString& defaultValue ) const;
+	CString doReadValue( CStringView name, const CStringView& defaultValue ) const;
+	CString doReadValue( CStringView name, const CStringPart& defaultValue ) const;
+	CString doReadValue( CStringView name, const TPrimitiveString& defaultValue ) const;
+	CString readStringValue( CStringView name, CStringPart defaultValue ) const;
 
 	template <class T>
-	T doGetOrCreateValue( CUnicodeView name, const T& defaultValue );
-	CUnicodeString doGetOrCreateValue( CUnicodeView name, const CUnicodeString& defaultValue );
-	CUnicodeString doGetOrCreateValue( CUnicodeView name, const CUnicodeView& defaultValue );
-	CUnicodeString doGetOrCreateValue( CUnicodeView name, const CUnicodePart& defaultValue ); 
-	CUnicodeString doGetOrCreateValue( CUnicodeView name, const TPrimitiveString& defaultValue ); 
-	CUnicodeString doGetOrCreateStringValue( CUnicodeView name, CUnicodePart defaultValue );
+	T doGetOrCreateValue( CStringView name, const T& defaultValue );
+	CString doGetOrCreateValue( CStringView name, const CString& defaultValue );
+	CString doGetOrCreateValue( CStringView name, const CStringView& defaultValue );
+	CString doGetOrCreateValue( CStringView name, const CStringPart& defaultValue ); 
+	CString doGetOrCreateValue( CStringView name, const TPrimitiveString& defaultValue ); 
+	CString doGetOrCreateStringValue( CStringView name, CStringPart defaultValue );
 
 	void retrieveStringWriteParams( CUnicodeView value, DWORD& dataType, const void*& dataPtr, DWORD& dataSize ) const;
 
-	void retrieveValueWriteParams( const CUnicodeString& value, DWORD& dataType, const void*& dataPtr, DWORD& dataSize ) const;
-	void retrieveValueWriteParams( const CUnicodeView& value, DWORD& dataType, const void*& dataPtr, DWORD& dataSize ) const;
-	void retrieveValueWriteParams( wchar_t const* const& value, DWORD& dataType, const void*& dataPtr, DWORD& dataSize ) const;
 	void retrieveValueWriteParams( const int& value, DWORD& dataType, const void*& dataPtr, DWORD& dataSize ) const;
 	void retrieveValueWriteParams( const long long& value, DWORD& dataType, const void*& dataPtr, DWORD& dataSize ) const;
 	template <class T>
 	void retrieveValueWriteParams( const T& value, DWORD& dataType, const void*& dataPtr, DWORD& dataSize ) const;
 
-	bool tryReadStringValue( CUnicodeView valueName, CUnicodeString& result ) const;
-	LSTATUS tryGetRegValue( CUnicodeView valueName, void* valuePtr, DWORD& valueSize ) const;
-	void setRegValue( CUnicodeView valueName, DWORD dataType, const void* dataPtr, DWORD dataSize ) const;
+	bool tryReadStringValue( CStringView valueName, CString& result ) const;
+	LSTATUS tryGetRegValue( CStringView valueName, void* valuePtr, DWORD& valueSize ) const;
+	void setRegValue( CStringView valueName, DWORD dataType, const void* dataPtr, DWORD dataSize ) const;
+
+	template <class T>
+	void doSetValue( CStringView valueName, const T& value, Types::FalseType strMarker );
+	template <class T>
+	void doSetValue( CStringView valueName, const T& value, Types::TrueType strMarker );
 
 	// Copying is prohibited.
 	CRegistryKey( CRegistryKey& ) = delete;
@@ -123,9 +126,9 @@ private:
 //////////////////////////////////////////////////////////////////////////
 
 template <class T>
-T CRegistryKey::doReadValue( CUnicodeView name, const T& defaultValue ) const
+T CRegistryKey::doReadValue( CStringView name, const T& defaultValue ) const
 {
-	staticAssert( Types::IsFundamental<T>::Result );
+	staticAssert( Types::IsPOD<T>::Result );
 	T result;
 	const DWORD valueSize = sizeof( defaultValue );
 	DWORD size = valueSize;
@@ -134,16 +137,16 @@ T CRegistryKey::doReadValue( CUnicodeView name, const T& defaultValue ) const
 }
 
 template <class T>
-auto CRegistryKey::GetValue( CUnicodeView valueName, const T& defaultValue ) const
+auto CRegistryKey::GetValue( CStringView valueName, const T& defaultValue ) const
 {
-	staticAssert( ( Types::IsFundamental<T>::Result || Types::IsString<T, wchar_t>::Result ) );
+	staticAssert( ( Types::IsPOD<T>::Result || Types::IsString<T, char>::Result ) );
 	return doReadValue( valueName, defaultValue );
 }
 
 template <class T>
-T CRegistryKey::doGetOrCreateValue( CUnicodeView name, const T& defaultValue ) 
+T CRegistryKey::doGetOrCreateValue( CStringView name, const T& defaultValue ) 
 {
-	staticAssert( Types::IsFundamental<T>::Result );
+	staticAssert( Types::IsPOD<T>::Result );
 	T result;
 	const DWORD valueSize = sizeof( defaultValue );
 	DWORD size = valueSize;
@@ -156,20 +159,38 @@ T CRegistryKey::doGetOrCreateValue( CUnicodeView name, const T& defaultValue )
 }
 
 template <class T>
-T CRegistryKey::GetOrCreateValue( CUnicodeView valueName, const T& defaultValue )
+T CRegistryKey::GetOrCreateValue( CStringView valueName, const T& defaultValue )
 {
-	staticAssert( ( Types::IsFundamental<T>::Result || Types::IsString<T, wchar_t>::Result ) );
+	staticAssert( ( Types::IsPOD<T>::Result || Types::IsString<T, char>::Result ) );
 	return doGetOrCreateValue( valueName, defaultValue );
 }
 
 template <class T>
-void CRegistryKey::SetValue( CUnicodeView valueName, const T& newValue )
+void CRegistryKey::SetValue( CStringView valueName, const T& newValue )
 {
-	staticAssert( ( Types::IsFundamental<T>::Result || Types::IsString<T, wchar_t>::Result ) );
+	doSetValue( valueName, newValue, Types::IsString<T, char>() );
+}
+
+template<class T>
+inline void CRegistryKey::doSetValue( CStringView valueName, const T& newValue, Types::FalseType /*strMarker*/ )
+{
+	staticAssert( Types::IsPOD<T>::Result );
 	const void* dataPtr;
 	DWORD dataSize;
 	DWORD dataType;
 	retrieveValueWriteParams( newValue, dataType, dataPtr, dataSize );
+	setRegValue( valueName, dataType, dataPtr, dataSize );
+}
+
+template<class T>
+inline void CRegistryKey::doSetValue( CStringView valueName, const T& newValue, Types::TrueType /*strMarker*/ )
+{
+	staticAssert( ( Types::IsString<T, char>::Result ) );
+	const auto unicodeVal = UnicodeStr( newValue );
+	const void* dataPtr;
+	DWORD dataSize;
+	DWORD dataType;
+	retrieveStringWriteParams( unicodeVal, dataType, dataPtr, dataSize );
 	setRegValue( valueName, dataType, dataPtr, dataSize );
 }
 
