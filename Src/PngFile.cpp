@@ -10,8 +10,8 @@
 #include <StrConversions.h>
 #include <FileOwners.h>
 
-#include <LibPng\png.h>
-#include <LibPng\zlib.h>
+#include <libpng\png.h>
+#include <zlib\zlib.h>
 
 namespace Relib {
 

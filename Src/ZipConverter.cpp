@@ -2,7 +2,7 @@
 
 #ifndef RELIB_NO_ZLIB
 
-#include <LibPng\zlib.h>
+#include <zlib\zlib.h>
 
 #include <ArrayBuffer.h>
 #include <Array.h>

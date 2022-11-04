@@ -100,29 +100,35 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <TargetExt>.dll</TargetExt>
     <OutDir>$(SolutionDir)Bin\$(Platform)$(Configuration)\</OutDir>
+    <IntDir>Out\$(ProjectName)\$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <TargetExt>.dll</TargetExt>
     <OutDir>$(SolutionDir)Bin\$(Platform)$(Configuration)\</OutDir>
+    <IntDir>Out\$(ProjectName)\$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <TargetExt>.dll</TargetExt>
     <OutDir>$(SolutionDir)Bin\$(Platform)$(Configuration)\</OutDir>
+    <IntDir>Out\$(ProjectName)\$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <TargetExt>.dll</TargetExt>
     <OutDir>$(SolutionDir)Bin\$(Platform)$(Configuration)\</OutDir>
+    <IntDir>Out\$(ProjectName)\$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='StaticRelease|Win32'">
     <TargetExt>.lib</TargetExt>
     <OutDir>$(SolutionDir)Lib\$(Platform)$(Configuration)\</OutDir>
     <PostBuildEventUseInBuild>false</PostBuildEventUseInBuild>
+    <IntDir>Out\$(ProjectName)\$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='StaticRelease|x64'">
     <TargetExt>.lib</TargetExt>
     <OutDir>$(SolutionDir)Lib\$(Platform)$(Configuration)\</OutDir>
     <PostBuildEventUseInBuild>false</PostBuildEventUseInBuild>
     <TargetName>$(ProjectName)64</TargetName>
+    <IntDir>Out\$(ProjectName)\$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -130,7 +136,7 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>.\Inc;.\Src;.\Ext\Inc;.\Ext\Inc\FreeType</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.\Inc;.\Src;.\Ext;.\Ext\Inc;.\Ext\Inc\FreeType</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_WINDLL;REBUILD;REBUILD_DYNAMIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <FloatingPointModel>Fast</FloatingPointModel>
       <FloatingPointExceptions>false</FloatingPointExceptions>
@@ -138,7 +144,7 @@
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
-      <AdditionalLibraryDirectories>.\Ext\Lib\$(Platform)$(Configuration);</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>.\Ext\Lib\$(Platform)$(Configuration);$(SolutionDir)Lib\$(Platform)$(Configuration)</AdditionalLibraryDirectories>
       <ImportLibrary>$(SolutionDir)\Lib\$(Platform)$(Configuration)\$(TargetName).lib</ImportLibrary>
     </Link>
     <PostBuildEvent>
@@ -154,7 +160,7 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>.\Inc;.\Src;.\Ext\Inc;.\Ext\Inc\FreeType</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.\Inc;.\Src;.\Ext;.\Ext\Inc;.\Ext\Inc\FreeType</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_WINDLL;REBUILD;REBUILD_DYNAMIC;RELIB_MINIMAL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <FloatingPointModel>Fast</FloatingPointModel>
       <FloatingPointExceptions>false</FloatingPointExceptions>
@@ -162,7 +168,7 @@
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
-      <AdditionalLibraryDirectories>.\Ext\Lib\$(Platform)$(Configuration);</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>.\Ext\Lib\$(Platform)$(Configuration);.\Lib\$(Platform)$(Configuration)</AdditionalLibraryDirectories>
       <ImportLibrary>$(SolutionDir)\Lib\$(Platform)$(Configuration)\$(TargetName)64.lib</ImportLibrary>
     </Link>
     <PostBuildEvent>
@@ -181,7 +187,7 @@
       <SDLCheck>
       </SDLCheck>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>.\Inc;.\Src;.\Ext\Inc;.\Ext\Inc\FreeType</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.\Inc;.\Src;.\Ext;.\Ext\Inc;.\Ext\Inc\FreeType</AdditionalIncludeDirectories>
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <OmitFramePointers>true</OmitFramePointers>
@@ -197,7 +203,7 @@
       <SubSystem>Console</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalLibraryDirectories>.\Ext\Lib\$(Platform)$(Configuration);</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>.\Ext\Lib\$(Platform)$(Configuration);$(SolutionDir)Lib\$(Platform)$(Configuration)</AdditionalLibraryDirectories>
       <ImportLibrary>$(SolutionDir)\Lib\$(Platform)$(Configuration)\$(TargetName).lib</ImportLibrary>
     </Link>
     <PostBuildEvent>
@@ -214,7 +220,7 @@
       <SDLCheck>
       </SDLCheck>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>.\Inc;.\Src;.\Ext\Inc;.\Ext\Inc\FreeType</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.\Inc;.\Src;.\Ext;.\Ext\Inc;.\Ext\Inc\FreeType</AdditionalIncludeDirectories>
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <OmitFramePointers>true</OmitFramePointers>
@@ -230,7 +236,7 @@
       <SubSystem>Console</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalLibraryDirectories>.\Ext\Lib\$(Platform)$(Configuration);</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>.\Ext\Lib\$(Platform)$(Configuration);.\Lib\$(Platform)$(Configuration)</AdditionalLibraryDirectories>
       <ImportLibrary>$(SolutionDir)\Lib\$(Platform)$(Configuration)\$(TargetName)64.lib</ImportLibrary>
     </Link>
     <PostBuildEvent>
@@ -247,7 +253,7 @@
       <SDLCheck>
       </SDLCheck>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>.\Inc;.\Src;.\Ext\Inc;</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.\Inc;.\Src;.\Ext;.\Ext\Inc;.\Ext\Inc\FreeType</AdditionalIncludeDirectories>
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <OmitFramePointers>true</OmitFramePointers>
@@ -283,7 +289,7 @@
       <SDLCheck>
       </SDLCheck>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>.\Inc;.\Src;.\Ext\Inc;</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.\Inc;.\Src;.\Ext;.\Ext\Inc;.\Ext\Inc\FreeType</AdditionalIncludeDirectories>
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <OmitFramePointers>true</OmitFramePointers>
