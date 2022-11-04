@@ -10,7 +10,6 @@ namespace Relib {
 // EasingFunction is used for smoothing.
 template <class ValueType, class EasingFunction>
 class CValueAnimator {
-	staticAssert( ( Types::IsDerivedFrom<EasingFunction, IEasingFunction>::Result ) );
 public:
 	CValueAnimator( ValueType _leftValue, ValueType _rightValue, int _duration );
 

@@ -111,7 +111,7 @@ auto& CTuple<FirstType, TT...>::getElem( Types::TrueType )
 template <class... TT>
 auto CreateTuple( TT&&... types )
 {
-	return CTuple<Types::PureType<TT>::Result...>( forward<TT>( types )... );
+	return CTuple<typename Types::PureType<TT>::Result...>( forward<TT>( types )... );
 }
 
 //////////////////////////////////////////////////////////////////////////

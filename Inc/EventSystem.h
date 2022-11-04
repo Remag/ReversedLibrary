@@ -161,7 +161,7 @@ bool CEventSystem::HasListeners() const
 template <class ActionType>
 void CEventSystem::AddEventTarget( ActionType&& eventAction, CEventTarget& target )
 {
-	staticAssert( ( Types::IsSame<Types::FunctionInfo<ActionType>::ReturnType, void>::Result ) );
+	staticAssert( ( Types::IsSame<typename Types::FunctionInfo<ActionType>::ReturnType, void>::Result ) );
 	staticAssert( Types::FunctionInfo<ActionType>::ArgCount == 1 );
 	using TEventArgRef = typename Types::FunctionInfo<ActionType>::template ArgTypeAt<0>;
 	using TEventArg = typename Types::PureType<TEventArgRef>::Result;
