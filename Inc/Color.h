@@ -102,9 +102,9 @@ inline CColor::CColor( int r, int g, int b, int a /*= 255 */ ) :
 }
 
 inline CColor::CColor( float r, float g, float b, float a /*= 1.0f */ ) :
-	R( static_cast<BYTE>( b * 255 ) ),
+	R( static_cast<BYTE>( r * 255 ) ),
 	G( static_cast<BYTE>( g * 255 ) ),
-	B( static_cast<BYTE>( r * 255 ) ),
+	B( static_cast<BYTE>( b * 255 ) ),
 	A( static_cast<BYTE>( a * 255 ) )
 {
 	assert( r >= 0 && r <= 1 );

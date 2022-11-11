@@ -11,7 +11,7 @@ namespace Relib {
 CString CRegistryKeyValueEnumerator::operator*() const
 {
 	CUnicodeString newName;
-	DWORD valueLen = maxLength;
+	DWORD valueLen = maxLength + 1;
 	::RegEnumValue( keyHandle, enumPosition, newName.CreateRawBuffer( maxLength ), &valueLen, nullptr, nullptr, nullptr, nullptr );
 	return Str( newName );
 }

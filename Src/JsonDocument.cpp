@@ -290,7 +290,7 @@ CStringPart CJsonDocument::allocateStringPart( CStringPart source )
 CRawBuffer CJsonDocument::allocateStringBuffer( CStringPart source, int length )
 {
 	auto strBuffer = jsonData.Create( length, alignof( char ) );
-	::memcpy( strBuffer.Ptr(), source.begin(), length );
+	::memcpy( strBuffer.Ptr(), source.begin(), source.Length() );
 	return strBuffer;
 }
 

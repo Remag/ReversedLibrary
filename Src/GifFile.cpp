@@ -84,9 +84,7 @@ void CGifFile::copyColorData( CArrayView<BYTE> frameData, int width, int height,
 
 CColor CGifFile::createColor( CArrayView<BYTE> frameColors, int framePos )
 {
-	// Fill the color structure as if it was stored in an RBG format.
-	// This matches the output of the png file wrapper.
-	return CColor( frameColors[framePos + 2], frameColors[framePos + 1], frameColors[framePos] );
+	return CColor( frameColors[framePos], frameColors[framePos + 1], frameColors[framePos + 2] );
 }
 
 int CGifFile::getFrameDelay( RelibInternal::CGiffDecodeData& decodeData )
