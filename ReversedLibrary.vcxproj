@@ -168,11 +168,11 @@
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
-      <AdditionalLibraryDirectories>.\Ext\Lib\$(Platform)$(Configuration);.\Lib\$(Platform)$(Configuration)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>.\Ext\Lib\$(Platform)$(Configuration);$(SolutionDir)Lib\$(Platform)$(Configuration)</AdditionalLibraryDirectories>
       <ImportLibrary>$(SolutionDir)\Lib\$(Platform)$(Configuration)\$(TargetName)64.lib</ImportLibrary>
     </Link>
     <PostBuildEvent>
-      <Command>xcopy "$(ProjectDir)Ext\Bin\$(Configuration)\*.dll" "$(TargetDir)" /D /K /Y</Command>
+      <Command>xcopy "$(ProjectDir)Ext\Bin\$(Platform)$(Configuration)\*.dll" "$(TargetDir)" /D /K /Y</Command>
     </PostBuildEvent>
     <PostBuildEvent>
       <Message>Copying dll files...</Message>
@@ -236,11 +236,11 @@
       <SubSystem>Console</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalLibraryDirectories>.\Ext\Lib\$(Platform)$(Configuration);.\Lib\$(Platform)$(Configuration)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>.\Ext\Lib\$(Platform)$(Configuration);$(SolutionDir)Lib\$(Platform)$(Configuration)</AdditionalLibraryDirectories>
       <ImportLibrary>$(SolutionDir)\Lib\$(Platform)$(Configuration)\$(TargetName)64.lib</ImportLibrary>
     </Link>
     <PostBuildEvent>
-      <Command>xcopy "$(ProjectDir)Ext\Bin\$(Configuration)\*.dll" "$(TargetDir)" /D /K /Y</Command>
+      <Command>xcopy "$(ProjectDir)Ext\Bin\$(Platform)$(Configuration)\*.dll" "$(TargetDir)" /D /K /Y</Command>
       <Message>Copying dll files...</Message>
     </PostBuildEvent>
   </ItemDefinitionGroup>
