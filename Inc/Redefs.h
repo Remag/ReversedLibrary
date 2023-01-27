@@ -66,8 +66,11 @@
 #endif
 
 #ifndef RELIB_NO_IMAGELIB
-#pragma comment( lib, "jpeg.lib" )
 #pragma comment( lib, "libpng16.lib" )
+#endif
+
+#ifndef RELIB_NO_JPEG
+#pragma comment( lib, "jpeg.lib" )
 #endif
 
 #ifndef RELIB_NO_INTERNET
