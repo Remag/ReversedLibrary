@@ -19,6 +19,10 @@
 #define RELIB_NO_IMAGELIB
 #endif
 
+#ifdef RELIB_NO_IMAGELIB
+#define RELIB_NO_JPEG
+#endif
+
 // Disable the CRT provided assertion.
 #define NDEBUG
 #include <atomic>

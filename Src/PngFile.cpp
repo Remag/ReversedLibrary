@@ -155,20 +155,20 @@ void CPngFile::doWrite( const void* fileData, unsigned pngLibFormat, int rowStri
 
 	CArray<BYTE> compressedData;
 	const auto upperSize = PNG_IMAGE_PNG_SIZE_MAX( pngImage );
-	compressedData.IncreaseSize( upperSize );
+	compressedData.IncreaseSize( static_cast<int>( upperSize ) );
 	png_alloc_size_t bufferSize = upperSize;
 	if( png_image_write_to_memory( &pngImage, compressedData.Ptr(), &bufferSize, 0, fileData, rowStride, nullptr ) == 0 ) {
 		// The upper size may be calculated incorrectly in extreme cases. Handle this situation.
 		if( bufferSize > upperSize ) {
-			compressedData.IncreaseSize( bufferSize );
+			compressedData.IncreaseSize( static_cast<int>( bufferSize ) );
 			if( png_image_write_to_memory( &pngImage, compressedData.Ptr(), &bufferSize, 0, fileData, rowStride, nullptr ) != 0 ) {
-				writeCompressedData( compressedData, bufferSize );
+				writeCompressedData( compressedData, static_cast<int>( bufferSize ) );
 				return;
 			}
 		}
 		throwPngException( pngImage, fileName );
 	}
-	writeCompressedData( compressedData, bufferSize );
+	writeCompressedData( compressedData, static_cast<int>( bufferSize ) );
 }
 
 void CPngFile::writeCompressedData( CArray<BYTE>& compressedData, int dataSize ) const
