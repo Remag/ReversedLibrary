@@ -53,7 +53,15 @@ CString CJsonDocument::GetDocumentString() const
 {
 	assert( root != nullptr );
 	CString result;
-	writeToString( *root, result );
+	writeToString( *root, NotFound, result );
+	return result;
+}
+
+CString CJsonDocument::GetFormattedString() const
+{
+	assert( root != nullptr );
+	CString result;
+	writeToString( *root, 0, result );
 	return result;
 }
 
@@ -324,7 +332,7 @@ CJsonObject& CJsonDocument::allocateJsonObject( CJsonListNode<CJsonKeyValue>* he
 	return jsonData.Create<CJsonObject>( head, tail, size );
 }
 
-void CJsonDocument::writeToString( const CJsonValue& value, CString& result ) const
+void CJsonDocument::writeToString( const CJsonValue& value, int indentValue, CString& result ) const
 {
 	staticAssert( JVT_EnumCount == 6 );
 	switch( value.GetType() ) {
@@ -341,10 +349,10 @@ void CJsonDocument::writeToString( const CJsonValue& value, CString& result ) co
 			writeToString( static_cast<const CJsonBool&>( value ), result );
 			break;
 		case JVT_Array:
-			writeToString( static_cast<const CJsonDynamicArray&>( value ), result );
+			writeToString( static_cast<const CJsonDynamicArray&>( value ), indentValue, result );
 			break;
 		case JVT_Object:
-			writeToString( static_cast<const CJsonObject&>( value ), result );
+			writeToString( static_cast<const CJsonObject&>( value ), indentValue, result );
 			break;
 		default:
 			assert( false );
@@ -408,38 +416,54 @@ void CJsonDocument::writeToString( const CJsonBool& value, CString& result ) con
 	result += value.GetBool() ? "true" : "false";
 }
 
-void CJsonDocument::writeToString( const CJsonDynamicArray& arr, CString& result ) const
+void CJsonDocument::writeToString( const CJsonDynamicArray& arr, int indentValue, CString& result ) const
 {
 	const auto lastPos = arr.Size() - 1;
 	int valuePos = 0;
 
 	result += '[';
+	indentLine( indentValue + 1, result );
 	for( const auto& value : arr.GetValues() ) {
-		writeToString( *value, result );
+		writeToString( *value, indentValue + 1, result );
 		if( valuePos != lastPos ) {
 			result += ',';
+			indentLine( indentValue + 1, result );
 		}
 		valuePos++;
 	}
+	indentLine( indentValue, result );
 	result += ']';
 }
 
-void CJsonDocument::writeToString( const CJsonObject& value, CString& result ) const
+void CJsonDocument::writeToString( const CJsonObject& value, int indentValue, CString& result ) const
 {
 	const auto lastPos = value.Size() - 1;
 	int valuePos = 0;
 
 	result += '{';
+	indentLine( indentValue + 1, result );
 	for( const auto& keyValue : value.GetKeyValueList() ) {
 		writeStringValue( keyValue.Key, result );
-		result += ':';
-		writeToString( *keyValue.Value, result );
+		result += ( indentValue != NotFound ) ? ": " : ":";
+		writeToString( *keyValue.Value, indentValue + 1, result );
 		if( valuePos != lastPos ) {
 			result += ',';
+			indentLine( indentValue + 1, result );
 		}
 		valuePos++;
 	}
+	indentLine( indentValue, result );
 	result += '}';
+}
+
+void CJsonDocument::indentLine( int indentValue, CString& result ) const
+{
+	if( indentValue != NotFound ) {
+		result += '\n';
+		for( int i = 0; i < indentValue; i++ ) {
+			result += '\t';
+		}
+	}
 }
 
 CJsonNumber& CJsonDocument::CreateNumber( int value )

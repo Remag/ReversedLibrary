@@ -50,6 +50,7 @@ public:
 	void CreateFromString( CStringPart str );
 
 	CString GetDocumentString() const;
+	CString GetFormattedString() const;
 
 	const CJsonValue& GetRoot() const
 		{ assert( root != nullptr ); return *root; }
@@ -112,14 +113,16 @@ private:
 	CStringPart replaceEscapeSequences( CStringView str, int firstEscapePos, CJsonPosition& parsePos );
 	char getEscapeCharacter( char escapeCode ) const;
 
-	void writeToString( const CJsonValue& value, CString& result ) const;
+	void writeToString( const CJsonValue& value, int indentValue, CString& result ) const;
 	void writeToString( const CJsonNull& value, CString& result ) const;
 	void writeToString( const CJsonNumber& value, CString& result ) const;
 	void writeToString( const CJsonString& value, CString& result ) const;
 	void writeStringValue( CStringPart str, CString& result ) const;
 	void writeToString( const CJsonBool& value, CString& result ) const;
-	void writeToString( const CJsonDynamicArray& value, CString& result ) const;
-	void writeToString( const CJsonObject& value, CString& result ) const;
+	void writeToString( const CJsonDynamicArray& value, int indentValue, CString& result ) const;
+	void writeToString( const CJsonObject& value, int indentValue, CString& result ) const;
+
+	void indentLine( int indentValue, CString& result ) const;
 };
 
 //////////////////////////////////////////////////////////////////////////
