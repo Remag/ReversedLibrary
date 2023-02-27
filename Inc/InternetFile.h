@@ -45,6 +45,8 @@ public:
 	void PostFile( CArrayView<BYTE> data, CArray<BYTE>& response );
 	// Upload a file using a PATCH request.
 	void PatchFile( CArrayView<BYTE> data, CArray<BYTE>& response );
+	// Delete a file using a DELETE request.
+	void DeleteSrcFile( CArray<BYTE>& response );
 
 	// Set an action that gets called when the download progress is made.
 	// Function can return false if it wants to abort the download process, otherwise it should return true.
@@ -76,6 +78,7 @@ private:
 	static void preparePutRequest( CURL* easyHandle, CArrayView<BYTE> data );
 	static void preparePostRequest( CURL* easyHandle, CArrayView<BYTE> data );
 	static void preparePatchRequest( CURL* easyHandle, CArrayView<BYTE> data );
+	static void prepareDeleteRequest( CURL* easyHandle );
 
 	// Copying is prohibited.
 	CInternetFile( CInternetFile& ) = delete;

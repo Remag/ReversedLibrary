@@ -560,8 +560,8 @@ template <class FltType>
 CBaseString<T> CCommonConversionFunctions<T>::FloatToString( FltType value, int digitCount )
 {
 	assert( digitCount >= 0 );
-	FltType currentFractPart;
 	CBaseString<T> result;
+	FltType currentFractPart;
 	if( value >= 0 ) {
 		const auto intPart = static_cast<unsigned>( value );
 		result = CStrConversionFunctions<T>::ToString( intPart );
@@ -570,6 +570,10 @@ CBaseString<T> CCommonConversionFunctions<T>::FloatToString( FltType value, int 
 		const auto intPart = static_cast<unsigned>( -value );
 		result = getMinusSign() + CStrConversionFunctions<T>::ToString( intPart );
 		currentFractPart = -value - intPart;
+	}
+
+	if( digitCount == 0 ) {
+		return result;
 	}
 
 	const int intLength = result.Length();

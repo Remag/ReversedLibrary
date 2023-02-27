@@ -1,6 +1,7 @@
 #include <JsonDocument.h>
 #include <JsonValues.h>
 #include <FileOwners.h>
+#include <Remath.h>
 
 namespace Relib {
 
@@ -367,7 +368,9 @@ void CJsonDocument::writeToString( const CJsonNull&, CString& result ) const
 
 void CJsonDocument::writeToString( const CJsonNumber& value, CString& result ) const
 {
-	result += Str( value.GetNumber() );
+	const auto resultNum = value.GetNumber();
+	const auto digitCount = HasFractionalPart( resultNum ) ? 3 : 0;
+	result += Str( resultNum, digitCount );
 }
 
 void CJsonDocument::writeToString( const CJsonString& value, CString& result ) const

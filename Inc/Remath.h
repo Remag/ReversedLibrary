@@ -1,6 +1,6 @@
 #pragma once
 
-#include <math.h>
+#include <cmath>
 #include <time.h>
 #include <stdlib.h>
 #include <Interval.h>
@@ -341,6 +341,18 @@ void swap( Type& a, Type& b )
 }
 
 //////////////////////////////////////////////////////////////////////////
+
+inline bool HasFractionalPart( double d )
+{
+	double dummy;
+	return std::modf( d, &dummy ) != 0.0;
+}
+
+inline bool HasFractionalPart( float d )
+{
+	float dummy;
+	return std::modf( d, &dummy ) != 0.0f;
+}
 
 inline int Round( double d )
 {

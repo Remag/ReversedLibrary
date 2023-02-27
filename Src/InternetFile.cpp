@@ -76,6 +76,7 @@ void CInternetFile::prepareGetRequest( CURL* handle )
 	curl_easy_setopt( handle, CURLOPT_POSTFIELDS, nullptr );
 	curl_easy_setopt( handle, CURLOPT_POSTFIELDSIZE, 0L );
 
+	// Setting this will set CURLOPT_UPLOAD to 0.
 	curl_easy_setopt( handle, CURLOPT_HTTPGET, 1L );
 }
 
@@ -102,6 +103,16 @@ void CInternetFile::preparePatchRequest( CURL* handle, CArrayView<BYTE> data )
 {
 	preparePostRequest( handle, data );
 	curl_easy_setopt( handle, CURLOPT_CUSTOMREQUEST, "PATCH" );
+}
+
+void CInternetFile::prepareDeleteRequest( CURL* handle )
+{
+	curl_easy_setopt( handle, CURLOPT_CUSTOMREQUEST, "DELETE" );
+
+	curl_easy_setopt( handle, CURLOPT_UPLOAD, 0L );
+	curl_easy_setopt( handle, CURLOPT_POST, 0L );
+	curl_easy_setopt( handle, CURLOPT_POSTFIELDS, nullptr );
+	curl_easy_setopt( handle, CURLOPT_POSTFIELDSIZE, 0L );
 }
 
 void CInternetFile::DownloadFile( CArray<BYTE>& result )
@@ -136,6 +147,14 @@ void CInternetFile::PostFile( CArrayView<BYTE> data, CArray<BYTE>& response )
 void CInternetFile::PatchFile( CArrayView<BYTE> data, CArray<BYTE>& response )
 {
 	preparePatchRequest( easyHandle, data );
+	setDownloadData( response, easyHandle );
+	const auto performResult = curl_easy_perform( easyHandle );
+	checkCurlError( performResult == CURLE_OK );
+}
+
+void CInternetFile::DeleteSrcFile( CArray<BYTE>& response )
+{
+	prepareDeleteRequest( easyHandle );
 	setDownloadData( response, easyHandle );
 	const auto performResult = curl_easy_perform( easyHandle );
 	checkCurlError( performResult == CURLE_OK );
