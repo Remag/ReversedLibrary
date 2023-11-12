@@ -202,7 +202,7 @@ size_t CInternetFile::curlWriteFunction( void* buffer, size_t size, size_t nmemb
 
 	const auto byteSize = size * nmemb;
 	const auto writePos = writeDest.Size();
-	writeDest.IncreaseSize( writeDest.Size() + byteSize );
+	writeDest.IncreaseSize( writeDest.Size() + numeric_cast<int>( byteSize ) );
 	::memcpy( writeDest.Ptr() + writePos, buffer, byteSize );
 	return byteSize;
 }

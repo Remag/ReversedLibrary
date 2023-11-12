@@ -1,9 +1,9 @@
 #pragma once
-#include <Redefs.h>
+#include <Interval.h>
 #include <Reassert.h>
+#include <Redefs.h>
 #include <Remath.h>
 #include <Vector.h>
-#include <Interval.h>
 
 namespace Relib {
 
@@ -19,7 +19,7 @@ public:
 
 	// Get the unbound random value.
 	unsigned __int64 NextRandomValue();
-	
+
 	// Create a randomized seed for another random generator.
 	// These method is needed because seeding with NextRandomValue will result in two generators creating the same random sequence.
 	unsigned __int64 RandomSeed();
@@ -61,8 +61,8 @@ private:
 
 //////////////////////////////////////////////////////////////////////////
 
-inline CRandomGenerator::CRandomGenerator( unsigned __int64 _seed /*= __rdtsc() */ ) :
-	seed( _seed == 0 ? 1 : _seed )
+inline CRandomGenerator::CRandomGenerator( unsigned __int64 _seed /*= __rdtsc() */ )
+	: seed( _seed == 0 ? 1 : _seed )
 {
 }
 
@@ -115,24 +115,28 @@ inline int CRandomGenerator::RandomNumber( int minVal, int maxVal )
 	return randomDelta + minVal;
 }
 
-inline float CRandomGenerator::RandomNumber( float minVal, float maxVal )
-{
-	assert( maxVal >= minVal );
-	updateSeed();
-	const float max32BitValueInv = 1.f / _UI32_MAX;
-	const unsigned seed32 = seed & 0xFFFFFFFF;
-	const float randomMultiplier =  seed32 * max32BitValueInv;
-	const float delta = maxVal - minVal;
-	return randomMultiplier * delta + minVal;
-}
-
 inline double CRandomGenerator::RandomNumber( double minVal, double maxVal )
 {
 	assert( maxVal >= minVal );
 	updateSeed();
-	const double max64BitValueInv = 1. / _UI64_MAX;
-	const double randomMultiplier =  seed * max64BitValueInv;
-	const double delta = maxVal - minVal;
+
+	// "A standard double (64-bit) floating-point number in IEEE floating point format has 52 bits of significand, plus an implicit bit at the left of the significand. 
+	// Thus, the representation can actually store numbers with 53 significant binary digits."
+	// See https://prng.di.unimi.it/
+	const auto randomMultiplier = ( seed >> 11 ) * 0x1.0p-53;
+	const auto delta = maxVal - minVal;
+	return randomMultiplier * delta + minVal;
+}
+
+inline float CRandomGenerator::RandomNumber( float minVal, float maxVal )
+{
+	assert( maxVal >= minVal );
+	updateSeed();
+
+	// Same as double, but with 24 bits of precision for floats.
+	const auto randomMultiplier = ( seed >> 40 ) * 0x1.0p-24f;
+
+	const float delta = maxVal - minVal;
 	return randomMultiplier * delta + minVal;
 }
 
@@ -158,7 +162,7 @@ inline CVector2<T> CRandomGenerator::RandomDirection( T minAngleRad, T maxAngleR
 	return CVector2<T>{ dirX, dirY };
 }
 
-template<class T>
+template <class T>
 inline void CRandomGenerator::Shuffle( CArrayBuffer<T> elements )
 {
 	// Fisher-Yates shuffle.
@@ -168,7 +172,7 @@ inline void CRandomGenerator::Shuffle( CArrayBuffer<T> elements )
 	}
 }
 
-template<class T>
+template <class T>
 inline T CRandomGenerator::Choose( std::initializer_list<T> variants )
 {
 	const auto index = RandomNumber( 0, variants.size() - 1 );
@@ -189,5 +193,4 @@ inline void CRandomGenerator::updateSeed()
 
 //////////////////////////////////////////////////////////////////////////
 
-}	// namespace Relib.
-
+}	 // namespace Relib.
