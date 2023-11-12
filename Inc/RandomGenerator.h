@@ -82,9 +82,9 @@ inline unsigned __int64 CRandomGenerator::RandomSeed()
 	updateSeed();
 	// XOR shift the seed using the different triplet. This way the result seed will produce a different sequence.
 	auto result = seed;
-	static const unsigned firstShift = 5;
-	static const unsigned secondShift = 17;
-	static const unsigned thirdShift = 11;
+	static const unsigned firstShift = 17;
+	static const unsigned secondShift = 23;
+	static const unsigned thirdShift = 29;
 	result ^= result << firstShift;
 	result ^= result >> secondShift;
 	result ^= result << thirdShift;
