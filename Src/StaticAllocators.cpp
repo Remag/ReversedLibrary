@@ -1,14 +1,58 @@
-#include <StaticAllocators.h>
-#include <Reassert.h>
-#include <RawBuffer.h>
-#include <LibraryAllocators.h>
 #include <DynamicAllocators.h>
+#include <LibraryAllocators.h>
+#include <RawBuffer.h>
+#include <Reassert.h>
+#include <StaticAllocators.h>
 
 namespace Relib {
 
 namespace RelibInternal {
 	extern CVirtualAllocDynamicManager VirtualMemoryAllocator;
 }
+
+//////////////////////////////////////////////////////////////////////////
+
+void* CRuntimeHeap::Allocate( int size )
+{
+	void* result = ::malloc( size );
+	checkMemoryError( result != nullptr );
+	return result;
+}
+
+void CRuntimeHeap::Free( void* ptr )
+{
+	::free( ptr );
+}
+
+void* CRuntimeHeap::AllocatedAligned( int size, int alignment )
+{
+	void* result = ::_aligned_malloc( size, alignment );
+	checkMemoryError( result != nullptr );
+	return result;
+}
+
+void CRuntimeHeap::FreeAligned( void* ptr )
+{
+	::_aligned_free( ptr );
+}
+
+#ifdef _DEBUG
+
+void* CRuntimeHeap::Allocate( int size, const char* fileName, int line )
+{
+	void* result = ::_malloc_dbg( size, _NORMAL_BLOCK, fileName, line );
+	checkMemoryError( result != nullptr );
+	return result;
+}
+
+void* CRuntimeHeap::AllocateAligned( int size, int alignment, const char* fileName, int line )
+{
+	void* result = ::_aligned_malloc_dbg( size, alignment, fileName, line );
+	checkMemoryError( result != nullptr );
+	return result;
+}
+
+#endif
 
 //////////////////////////////////////////////////////////////////////////
 
@@ -105,7 +149,7 @@ void* CVirtualPageAllocator::Allocate( int size )
 
 void CVirtualPageAllocator::Free( CRawBuffer ptr )
 {
-	return RelibInternal::VirtualMemoryAllocator.Free( ptr ); 
+	return RelibInternal::VirtualMemoryAllocator.Free( ptr );
 }
 
 void CVirtualPageAllocator::Free( void* ptr )
@@ -127,5 +171,6 @@ void* CVirtualPageAllocator::Allocate( int size, const char* fileName, int line 
 
 #endif
 
-}	// namespace Relib.
+//////////////////////////////////////////////////////////////////////////
 
+}	 // namespace Relib.
