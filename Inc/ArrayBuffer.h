@@ -13,7 +13,7 @@ public:
 	CArrayView( const T* buffer, int size ) : RelibInternal::CArrayConstData<T>( buffer, size ) {}
 	template <int dim>
 	CArrayView( const T ( &arr )[dim] ) : RelibInternal::CArrayConstData<T>( arr, dim ) {}
-	CArrayView( std::initializer_list<T> initList ) : RelibInternal::CArrayConstData<T>( initList.begin(), initList.size() ) {}
+	CArrayView( std::initializer_list<T> initList ) : RelibInternal::CArrayConstData<T>( initList.begin(), static_cast<int>( initList.size() ) ) {}
 	explicit CArrayView( const T& singleObject ) : RelibInternal::CArrayConstData<T>( &singleObject, 1 ) {}
 
 	// Conversion to raw arrays.
