@@ -120,6 +120,7 @@ extern const CUnicodeSet InvalidFileNameSymbols{
 extern const CError REAPI Err_SmallArchive( "Trying to read an archive value after its end." );
 extern const CError REAPI Err_BadArchive( "Unable to serialize with the given archive." );
 extern const CError REAPI Err_BadArchiveVersion( "Archive version is incompatible with the current program." );
+extern const CError REAPI Err_CompressedArchive( "This library build doesn't support compressed archives." );
 extern const CError Err_BadIniFile( "INI contains an invalid string.\nFile name: %0. String position: %1." );
 extern const CError Err_DuplicateIniKey( "INI file contains a duplicate key.\nFile name: %0. Key name: %1." );
 extern const CError Err_RegistryOpenError{ "Failed to open a registry key. Key name: %0.  Error code: %1." };

@@ -1,16 +1,16 @@
 #pragma once
-#include <Redefs.h>
+#include <Color.h>
 #include <Errors.h>
 #include <FileViews.h>
-#include <Map.h>
 #include <HashTable.h>
-#include <PagedBitSet.h>
-#include <SafeCounters.h>
+#include <Map.h>
 #include <ObjectCreation.h>
-#include <Serializable.h>
+#include <PagedBitSet.h>
 #include <PtrOwner.h>
+#include <Redefs.h>
+#include <SafeCounters.h>
+#include <Serializable.h>
 #include <TemplateUtils.h>
-#include <Color.h>
 
 namespace Relib {
 
@@ -18,115 +18,119 @@ extern const REAPI CError Err_SmallArchive;
 
 namespace RelibInternal {
 
-// Class for data serialization.
-class REAPI CArchive {
-public:
-	CArchive();
+	// Class for data serialization.
+	class REAPI CArchive {
+	public:
+		CArchive();
 
-protected:
-	// Read/Write methods for arbitrary data.
-	void read( void* ptr, int size );
-	void write( const void* ptr, int size );
-	bool isEndOfReading() const;
+	protected:
+		// Read/Write methods for arbitrary data.
+		void read( void* ptr, int size );
+		void write( const void* ptr, int size );
+		bool isEndOfReading() const;
 
-	CArray<BYTE>& getBuffer()
-		{ return buffer; }
-	int getBufferSize() const
-		{ return buffer.Size(); }
+		CArray<BYTE>& getBuffer()
+		{
+			return buffer;
+		}
+		int getBufferSize() const
+		{
+			return buffer.Size();
+		}
 
-	void increaseBuffer( int bufferSize );
-	void attachBuffer( CArray<BYTE> newBuffer );
-	CArray<BYTE> detachBuffer();
+		void increaseBuffer( int bufferSize );
+		void attachBuffer( CArray<BYTE> newBuffer );
+		CArray<BYTE> detachBuffer();
 
-	void skip( int byteCount );
+		void skip( int byteCount );
 
-	// Serialization for small values.
-	// Integers from 0 to 254 are stored in 1 byte.
-	// Other integers are stored in 5 bytes.
-	int readSmallValue();
-	void writeSmallValue( int value );
+		// Serialization for small values.
+		// Integers from 0 to 254 are stored in 1 byte.
+		// Other integers are stored in 5 bytes.
+		int readSmallValue();
+		void writeSmallValue( int value );
 
-	// Custom serializable read/write.
-	CSharedPtr<ISerializable> readObject();
-	void writeObject( const ISerializable* object );
+		// Custom serializable read/write.
+		CSharedPtr<ISerializable> readObject();
+		void writeObject( const ISerializable* object );
 
-	// Enumeration type read/write.
-	template<class Type>
-	Type readEnum();
-	template<class Type>
-	void writeEnum( Type enumValue );
+		// Enumeration type read/write.
+		template <class Type>
+		Type readEnum();
+		template <class Type>
+		void writeEnum( Type enumValue );
 
-	template<class Type>
-	void readSimpleType( Type& var );
-	template<class Type>
-	void writeSimpleType( Type var );
+		template <class Type>
+		void readSimpleType( Type& var );
+		template <class Type>
+		void writeSimpleType( Type var );
 
-	// Serializes a version of an archive.
-	// If the version in the archive is bigger than currentVersion. The archive is incompatible with the program and an exception is thrown.
-	int readVersion( int currentVersion );
-	int writeVersion( int currentVersion );
-	
-private:
-	// Buffer to be written to the file.
-	CArray<BYTE> buffer;
-	// Current buffer position.
-	int currentBufferPos;
+		// Serializes a version of an archive.
+		// If the version in the archive is bigger than currentVersion. The archive is incompatible with the program and an exception is thrown.
+		int readVersion( int currentVersion );
+		int writeVersion( int currentVersion );
 
-	// Map that returns creationFunctionsBuffer's index for an object's name.
-	CMap<CUnicodeString, int> objectNamesDictionary;
-	// Buffer for quick access to object's creation functions. Filled only in reading mode.
-	CArray<const CBaseObjectCreationFunction*> creationFunctionsBuffer;
+	private:
+		// Buffer to be written to the file.
+		CArray<BYTE> buffer;
+		// Current buffer position.
+		int currentBufferPos;
 
-	CPtrOwner<ISerializable> readUniqueObject();
+		// Map that returns creationFunctionsBuffer's index for an object's name.
+		CMap<CUnicodeString, int> objectNamesDictionary;
+		// Buffer for quick access to object's creation functions. Filled only in reading mode.
+		CArray<const CBaseObjectCreationFunction*> creationFunctionsBuffer;
 
-	void writeExternalName( CUnicodeView name );
-	const CBaseObjectCreationFunction* readCreationFunctionPtr( int objectId );
-};
+		CPtrOwner<ISerializable> readUniqueObject();
 
-//////////////////////////////////////////////////////////////////////////
+		void writeExternalName( CUnicodeView name );
+		const CBaseObjectCreationFunction* readCreationFunctionPtr( int objectId );
+	};
 
-inline void CArchive::read( void* ptr, int size )
-{
-	assert( size >= 0 );
-	check( size < buffer.Size(), Err_SmallArchive );
-	if( size > 0 ) {
-		::memcpy( ptr, buffer.Ptr() + currentBufferPos, size );
+	//////////////////////////////////////////////////////////////////////////
+
+	inline void CArchive::read( void* ptr, int size )
+	{
+		assert( size >= 0 );
+		check( size < buffer.Size(), Err_SmallArchive );
+		if( size > 0 ) {
+			::memcpy( ptr, buffer.Ptr() + currentBufferPos, size );
+			currentBufferPos += size;
+		}
+	}
+
+	inline void CArchive::write( const void* ptr, int size )
+	{
+		assert( size >= 0 );
+		if( size + currentBufferPos >= buffer.Size() ) {
+			buffer.IncreaseSizeNoInitialize( size + currentBufferPos + 1 );
+		}
+		::memcpy( buffer.Ptr() + currentBufferPos, ptr, size );
 		currentBufferPos += size;
 	}
-}
 
-inline void CArchive::write( const void* ptr, int size )
-{
-	assert( size >= 0 );
-	if( size + currentBufferPos >= buffer.Size() ) {
-		buffer.IncreaseSizeNoInitialize( size + currentBufferPos + 1 );
+	inline bool CArchive::isEndOfReading() const
+	{
+		return currentBufferPos == buffer.Size();
 	}
-	::memcpy( buffer.Ptr() + currentBufferPos, ptr, size );
-	currentBufferPos += size;
-}
 
-inline bool CArchive::isEndOfReading() const
-{
-	return currentBufferPos == buffer.Size();
-}
+	template <class Type>
+	Type CArchive::readEnum()
+	{
+		staticAssert( Types::IsEnum<Type>::Result );
+		return Type( readSmallValue() );
+	}
 
-template<class Type>
-Type CArchive::readEnum()
-{
-	staticAssert( Types::IsEnum<Type>::Result );
-	return Type( readSmallValue() );
-}
+	template <class Type>
+	void CArchive::writeEnum( Type enumValue )
+	{
+		staticAssert( Types::IsEnum<Type>::Result );
+		writeSmallValue( enumValue );
+	}
 
-template<class Type>
-void CArchive::writeEnum( Type enumValue )
-{
-	staticAssert( Types::IsEnum<Type>::Result );
-	writeSmallValue( enumValue );
-}
+	//////////////////////////////////////////////////////////////////////////
 
-//////////////////////////////////////////////////////////////////////////
-
-}	// namespace RelibInternal.
+}	 // namespace RelibInternal.
 
 //////////////////////////////////////////////////////////////////////////
 
@@ -138,25 +142,37 @@ public:
 	explicit CArchiveReader( CArray<BYTE> _fileData );
 
 	void Skip( int byteCount )
-		{ skip( byteCount ); }
+	{
+		skip( byteCount );
+	}
 
 	bool IsEndOfArchive() const
-		{ return isEndOfReading(); }
-	
+	{
+		return isEndOfReading();
+	}
+
 	int ReadSmallValue()
-		{ return readSmallValue(); }
+	{
+		return readSmallValue();
+	}
 	int ReadVersion( int currentVersion )
-		{ return readVersion( currentVersion ); }
+	{
+		return readVersion( currentVersion );
+	}
 	void Read( void* ptr, int size )
-		{ read( ptr, size ); }
+	{
+		read( ptr, size );
+	}
 
 	template <class Enum>
 	Enum ReadEnum()
-		{ return readEnum<Enum>(); }
+	{
+		return readEnum<Enum>();
+	}
 
-	template<class ObjectType>
+	template <class ObjectType>
 	friend CArchiveReader& operator>>( CArchiveReader& archive, CSharedPtr<ObjectType>& object );
-	template<class ObjectType>
+	template <class ObjectType>
 	friend CArchiveReader& operator>>( CArchiveReader& archive, CPtrOwner<ObjectType>& object );
 
 private:
@@ -266,7 +282,7 @@ CArchiveReader& operator>>( CArchiveReader& archive, CSharedPtr<ObjectType>& obj
 	return archive;
 }
 
-template<class ObjectType>
+template <class ObjectType>
 inline CArchiveReader& operator>>( CArchiveReader& archive, CPtrOwner<ObjectType>& object )
 {
 	object = ptr_dynamic_cast<ObjectType>( archive.readUniqueObject() );
@@ -275,7 +291,7 @@ inline CArchiveReader& operator>>( CArchiveReader& archive, CPtrOwner<ObjectType
 
 //////////////////////////////////////////////////////////////////////////
 
-// Class that writes the binarized data. It must be flushed to a valid source before it's destroyed. 
+// Class that writes the binarized data. It must be flushed to a valid source before it's destroyed.
 class REAPI CArchiveWriter : public RelibInternal::CArchive {
 public:
 	explicit CArchiveWriter( int reserveSize = 0 );
@@ -283,25 +299,37 @@ public:
 
 	void FlushToFile( CStringPart fileName );
 	void FlushToFile( CFileWriteView file );
+#ifndef RELIB_NO_ZLIB
 	void FlushToCompressedFile( CStringPart fileName );
 	void FlushToCompressedFile( CFileWriteView file );
+#endif
 	CArray<BYTE> FlushToByteString();
 
 	void Skip( int byteCount )
-		{ skip( byteCount ); }
+	{
+		skip( byteCount );
+	}
 
 	void WriteSmallValue( int value )
-		{ writeSmallValue( value ); }
+	{
+		writeSmallValue( value );
+	}
 	int WriteVersion( int currentVersion )
-		{ return writeVersion( currentVersion ); }
+	{
+		return writeVersion( currentVersion );
+	}
 	void Write( const void* ptr, int size )
-		{ write( ptr, size ); }
+	{
+		write( ptr, size );
+	}
 
 	template <class Enum>
 	void WriteEnum( Enum value )
-		{ writeEnum( value ); }
+	{
+		writeEnum( value );
+	}
 
-	template<class ObjectType>
+	template <class ObjectType>
 	friend CArchiveWriter& operator<<( CArchiveWriter& archive, const CPtrOwner<ObjectType>& object );
 
 private:
@@ -315,13 +343,14 @@ class REAPI CFileArchiveWriter : public CArchiveWriter {
 public:
 	explicit CFileArchiveWriter( CStringPart fileName, int reserveSize = 4096 );
 	~CFileArchiveWriter();
-	
+
 private:
 	CString fileName;
 };
 
 //////////////////////////////////////////////////////////////////////////
 
+#ifndef RELIB_NO_ZLIB
 // Class that compresses and writes the binarized data to a given file. File write happens on destruction.
 class REAPI CCompressedArchiveWriter : public CArchiveWriter {
 public:
@@ -331,6 +360,7 @@ public:
 private:
 	CString fileName;
 };
+#endif
 
 //////////////////////////////////////////////////////////////////////////
 
@@ -444,7 +474,7 @@ CArchiveWriter& operator<<( CArchiveWriter& archive, const CSharedPtr<ObjectType
 	return archive;
 }
 
-template<class ObjectType>
+template <class ObjectType>
 inline CArchiveWriter& operator<<( CArchiveWriter& archive, const CPtrOwner<ObjectType>& object )
 {
 	staticAssert( ( Types::IsDerivedFrom<ObjectType, ISerializable>::Result ) );
@@ -544,7 +574,7 @@ CArchiveWriter& operator<<( CArchiveWriter& archive, RelibInternal::CStringData<
 	const T* buffer = str.begin();
 	archive.WriteSmallValue( length );
 	archive.Write( buffer, length * sizeof( T ) );
-	return archive;	
+	return archive;
 }
 
 template <class T>
@@ -567,7 +597,7 @@ CArchiveReader& operator>>( CArchiveReader& archive, RelibInternal::CBaseString<
 //////////////////////////////////////////////////////////////////////////
 // Hash table serialization.
 
-template<class Elem, class HashStrategy, class Allocator>
+template <class Elem, class HashStrategy, class Allocator>
 CArchiveWriter& operator<<( CArchiveWriter& archive, const CHashTable<Elem, HashStrategy, Allocator>& dict )
 {
 	const int length = dict.Size();
@@ -578,7 +608,7 @@ CArchiveWriter& operator<<( CArchiveWriter& archive, const CHashTable<Elem, Hash
 	return archive;
 }
 
-template<class Elem, class HashStrategy, class Allocator>
+template <class Elem, class HashStrategy, class Allocator>
 CArchiveReader& operator>>( CArchiveReader& archive, CHashTable<Elem, HashStrategy, Allocator>& dict )
 {
 	dict.Empty();
@@ -596,7 +626,7 @@ CArchiveReader& operator>>( CArchiveReader& archive, CHashTable<Elem, HashStrate
 //////////////////////////////////////////////////////////////////////////
 // Map serialization.
 
-template<class KeyType, class ValueType, class HashStrategy, class Allocator>
+template <class KeyType, class ValueType, class HashStrategy, class Allocator>
 CArchiveWriter& operator<<( CArchiveWriter& left, const CMap<KeyType, ValueType, HashStrategy, Allocator>& right )
 {
 	const int length = right.Size();
@@ -608,7 +638,7 @@ CArchiveWriter& operator<<( CArchiveWriter& left, const CMap<KeyType, ValueType,
 	return left;
 }
 
-template<class KeyType, class ValueType, class HashStrategy, class Allocator>
+template <class KeyType, class ValueType, class HashStrategy, class Allocator>
 CArchiveReader& operator>>( CArchiveReader& left, CMap<KeyType, ValueType, HashStrategy, Allocator>& right )
 {
 	right.Empty();
@@ -680,5 +710,4 @@ inline CArchiveWriter& operator<<( CArchiveWriter& writer, CColor color )
 
 //////////////////////////////////////////////////////////////////////////
 
-}	// namespace Relib.
-
+}	 // namespace Relib.
