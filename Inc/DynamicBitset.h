@@ -27,7 +27,9 @@ public:
 	ContainerType& GetStorage() const
 		{ return storage; }
 
-	int Size() const
+	int BitSize() const
+		{ return bitSize; }
+	int StorageSize() const
 		{ return storage.Size(); }
 	void ReserveBuffer( int newBitSize );
 	void Empty();
@@ -39,9 +41,9 @@ public:
 
 	// Iteration support.
 	DWORD* begin()
-		{ return storage.begin();	}
+		{ return storage.begin(); }
 	const DWORD* begin() const
-		{ return storage.begin();	}
+		{ return storage.begin(); }
 
 	DWORD* end()
 		{ return storage.end(); }
@@ -50,6 +52,7 @@ public:
 
 private:
 	ContainerType storage;
+	int bitSize = 0;
 };
 
 //////////////////////////////////////////////////////////////////////////
@@ -81,6 +84,7 @@ CDynamicBitSetStorage<ContainerType>& CDynamicBitSetStorage<ContainerType>::oper
 template <class ContainerType>
 void CDynamicBitSetStorage<ContainerType>::ReserveBuffer( int newBitSize )
 {
+	bitSize = newBitSize;
 	const auto newByteSize = ( newBitSize + bitsPerElement - 1 ) / bitsPerElement;
 	if( newByteSize > storage.Size() ) {
 		storage.IncreaseSize( newByteSize );
@@ -97,6 +101,7 @@ template <class ContainerType>
 DWORD& CDynamicBitSetStorage<ContainerType>::operator[]( int index )
 {
 	if( storage.Size() <= index ) {
+		bitSize = max( bitSize, bitsPerElement * ( index + 1 ) );
 		storage.IncreaseSize( index + 1 );
 	}
 	return storage[index];

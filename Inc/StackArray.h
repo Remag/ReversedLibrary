@@ -14,7 +14,7 @@ public:
 	// Construct the array from a range of arguments.
 	template<class... TT>
 	CStackArray( TT&&... argList );
-	// All versions of copy and move constructors need to explicitly declared to prevent the previous constructor from rerplacing them.
+	// All versions of copy and move constructors need to explicitly declared to prevent the previous constructor from replacing them.
 	CStackArray( CStackArray<Elem, dim>& other );
 	CStackArray( const CStackArray<Elem, dim>& other );
 	CStackArray( CStackArray<Elem, dim>&& other ) = default;

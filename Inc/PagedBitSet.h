@@ -42,7 +42,7 @@ public:
 	void operator++()
 	{ pos++; }
 
-	const DWORD& operator*() const
+	const auto& operator*() const
 	{ return storage[pos]; }
 
 	bool operator!=( CPagedStorageConstIterator<bitSetSize, pageSize, Allocator>& other ) const
@@ -58,10 +58,10 @@ private:
 template <int bitSetSize, int pageSize, class Allocator>
 class CPagedStorage {
 public:
-	typedef DWORD TElemType;
-	static const int bitsPerElement = CHAR_BIT * sizeof( DWORD );
+	using TElemType = unsigned __int64;
+	static const int bitsPerElement = CHAR_BIT * sizeof( TElemType );
 	static const int realPageSize = ( ( pageSize + bitsPerElement - 1 ) / bitsPerElement ) * bitsPerElement;
-	typedef CBitSet<realPageSize> TPage;
+	using TPage = CBitSet<realPageSize>;
 	static const int PageSizeInBytes = sizeof( TPage );
 	static const int PagesCount = ( bitSetSize + realPageSize - 1 ) / realPageSize;
 
@@ -73,12 +73,14 @@ public:
 	CPagedStorage( CPagedStorage&& other );
 	CPagedStorage& operator=( CPagedStorage other );
 
-	static int Size()
+	static int BitSize()
+		{ return bitSetSize; }
+	static int StorageSize()
 		{ return PagesCount * realPageSize / bitsPerElement; }
 	void Empty();
 
-	DWORD& operator[]( int index );
-	DWORD operator[]( int index ) const;
+	TElemType& operator[]( int index );
+	TElemType operator[]( int index ) const;
 
 	int HashKey() const;
 
@@ -89,9 +91,9 @@ public:
 		{ return CPagedStorageConstIterator<bitSetSize, pageSize, Allocator>( *this, 0 ); }
 
 	CPagedStorageIterator<bitSetSize, pageSize, Allocator> end()
-		{ return CPagedStorageIterator<bitSetSize, pageSize, Allocator>( *this, Size() ); }
+		{ return CPagedStorageIterator<bitSetSize, pageSize, Allocator>( *this, StorageSize() ); }
 	CPagedStorageConstIterator<bitSetSize, pageSize, Allocator> end() const
-		{ return CPagedStorageConstIterator<bitSetSize, pageSize, Allocator>( *this, Size() ); }
+		{ return CPagedStorageConstIterator<bitSetSize, pageSize, Allocator>( *this, StorageSize() ); }
 
 private:
 	CStackArray<CPtrOwner<TPage, Allocator>, PagesCount> pages;
@@ -131,7 +133,7 @@ void CPagedStorage<bitSetSize, pageSize, Allocator>::Empty()
 }
 
 template <int bitSetSize, int pageSize, class Allocator>
-DWORD& CPagedStorage<bitSetSize, pageSize, Allocator>::operator[]( int index )
+unsigned __int64& CPagedStorage<bitSetSize, pageSize, Allocator>::operator[]( int index )
 {
 	static const int pageSizeInWords = realPageSize / bitsPerElement;
 
@@ -144,7 +146,7 @@ DWORD& CPagedStorage<bitSetSize, pageSize, Allocator>::operator[]( int index )
 }
 
 template <int bitSetSize, int pageSize, class Allocator>
-DWORD CPagedStorage<bitSetSize, pageSize, Allocator>::operator[]( int index ) const
+unsigned __int64 CPagedStorage<bitSetSize, pageSize, Allocator>::operator[]( int index ) const
 {
 	static const int pageSizeInWords = realPageSize / bitsPerElement;
 
@@ -179,11 +181,7 @@ template <int bitSetSize, int pageSize, class Allocator>
 void swap( RelibInternal::CPagedStorage<bitSetSize, pageSize, Allocator>& first, RelibInternal::CPagedStorage<bitSetSize, pageSize, Allocator>& second )
 {
 	assert( first.PagesCount == second.PagesCount );
-	typename RelibInternal::CPagedStorage<bitSetSize, pageSize, Allocator>::TPage* temp[first.PagesCount];
-	const int pagesLength = sizeof( first.Pages() );
-	memmove( temp, first.Pages(), pagesLength );
-	memmove( first.Pages(), second.Pages(), pagesLength );
-	memmove( second.Pages(), temp, pagesLength );
+	swap( first.Pages(), second.Pages() );
 }
 
 //////////////////////////////////////////////////////////////////////////
