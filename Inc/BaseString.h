@@ -446,7 +446,7 @@ void CBaseString<T>::InsertAt( int pos, CBaseStringPart<T> part )
 	ReserveBuffer( newLength );
 	T* targetBuffer = this->getWritableBuffer() + pos;
 	::memmove( targetBuffer + srcLength, targetBuffer, ( length - pos ) * sizeof( T ) );
-	memcpy( targetBuffer, srcBuffer, srcLength * sizeof( T ) );
+	::memcpy( targetBuffer, srcBuffer, srcLength * sizeof( T ) );
 	markBufferLength( newLength );
 }
 

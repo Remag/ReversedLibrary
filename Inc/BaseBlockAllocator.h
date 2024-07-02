@@ -171,7 +171,7 @@ void* CBaseBlockAllocator<blockSize, blockAlignment, blockOffset, PageAllocator,
 template <int blockSize, int blockAlignment, int blockOffset, class PageAllocator, class PageSizeStrategy>
 void CBaseBlockAllocator<blockSize, blockAlignment, blockOffset, PageAllocator, PageSizeStrategy>::allocatePage()
 {
-	const int pageSize = getPageStrategy().NextPageSize();
+	const auto pageSize = getPageStrategy().NextPageSize();
 	allocatePage( pageSize );
 }
 

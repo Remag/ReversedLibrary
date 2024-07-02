@@ -134,7 +134,7 @@ namespace RelibInternal {
 	{
 		// Hamming weight problem.
 		// Implementation taken from http://en.wikipedia.org/wiki/Hamming_weight.
-		TBitsetWord totalCount = 0;
+		int totalCount = 0;
 		if constexpr( sizeof( TBitsetWord ) == 4 ) {
 			// 32 bit implementation.
 			const unsigned m1 = 0x55555555;		// binary: 0101...
