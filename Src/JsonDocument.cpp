@@ -164,7 +164,7 @@ double CJsonDocument::parseNumber( CStringView str, CJsonPosition& parsePos ) co
 {
 	const auto startPos = parsePos.Pos;
 	int endPos = startPos;
-	while( CStringView::IsCharDigit( str[endPos] ) || str[endPos] == '.' || str[endPos] == 'e' ) {
+	while( CStringView::IsCharDigit( str[endPos] ) || str[endPos] == '.' || str[endPos] == 'e' || str[endPos] == '-' ) {
 		endPos++;
 	}
 
