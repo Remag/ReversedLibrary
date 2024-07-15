@@ -39,24 +39,37 @@ struct CJsonListNode {
 };
 
 template <class T>
-class CJsonListEnumerator {
+class CJsonListIterator {
 public:
-	explicit CJsonListEnumerator( CJsonListNode<T>* first ) : current( first ) {}
-
-	CJsonListEnumerator begin() const
-		{ return CJsonListEnumerator( current ); }
-	CJsonListEnumerator end() const
-		{ return CJsonListEnumerator( nullptr ); }
+	explicit CJsonListIterator( CJsonListNode<T>* first ) : current( first ) {}
 
 	void operator++()
 		{ current = current->Next; }
 	T operator*() const
 		{ return current->Value; }
-	bool operator!=( CJsonListEnumerator other ) 
+	bool operator!=( CJsonListIterator other ) 
 		{ return current != other.current; }
 
 private:
 	CJsonListNode<T>* current;
+};
+
+template <class T>
+class CJsonList {
+public:
+	explicit CJsonList( CJsonListNode<T>* _first, int _size ) : first( _first ), size( _size ) {}
+
+	int Size() const 
+		{ return size; }
+
+	CJsonListIterator<T> begin() const
+		{ return CJsonListIterator<T>( first ); }
+	CJsonListIterator<T> end() const
+		{ return CJsonListIterator<T>( nullptr ); }
+
+private:
+	CJsonListNode<T>* first;
+	int size;
 };
 
 //////////////////////////////////////////////////////////////////////////
@@ -102,10 +115,10 @@ public:
 	double GetAsNumber() const;
 	CStringPart GetAsString() const;
 	bool GetAsBool() const;
-	CJsonListEnumerator<CJsonValue*> GetAsArray() const;
+	CJsonList<CJsonValue*> GetAsArray() const;
 	CJsonValue& FindObjectValue( CStringPart key ) const;
 	CJsonValue* TryFindObjectValue( CStringPart key ) const;
-	CJsonListEnumerator<CJsonKeyValue> GetObjectKeyValues() const;
+	CJsonList<CJsonKeyValue> GetObjectKeyValues() const;
 
 protected:
 	explicit CJsonValue( TJsonValueType type ) : valueType( type ) {}
@@ -176,8 +189,8 @@ public:
 	int Size() const
 		{ return listSize; }
 
-	CJsonListEnumerator<CJsonValue*> GetValues() const
-		{ return CJsonListEnumerator<CJsonValue*>( listHead ); }
+	CJsonList<CJsonValue*> GetValues() const
+		{ return CJsonList<CJsonValue*>( listHead, listSize ); }
 
 	// Json document needs access to the underlying implementation in order to change values.
 	friend class CJsonDocument;
@@ -205,8 +218,8 @@ public:
 	int Size() const
 		{ return listSize; }
 
-	CJsonListEnumerator<CJsonKeyValue> GetKeyValueList() const
-		{ return CJsonListEnumerator<CJsonKeyValue>( listHead ); }
+	CJsonList<CJsonKeyValue> GetKeyValueList() const
+		{ return CJsonList<CJsonKeyValue>( listHead, listSize ); }
 
 	// Return the value under the specified key or nullptr if no value exists.
 	CJsonValue* TryFindValue( CStringPart keyName ) const;
@@ -270,7 +283,7 @@ inline bool CJsonValue::GetAsBool() const
 	return static_cast<const CJsonBool*>( this )->GetBool();
 }
 
-inline CJsonListEnumerator<CJsonValue*> CJsonValue::GetAsArray() const
+inline CJsonList<CJsonValue*> CJsonValue::GetAsArray() const
 {
 	checkValidConversion( JVT_Array );
 	return static_cast<const CJsonDynamicArray*>( this )->GetValues();
@@ -297,7 +310,7 @@ inline void CJsonValue::checkValidConversion( TJsonValueType expected ) const
 
 //////////////////////////////////////////////////////////////////////////
 
-inline CJsonListEnumerator<CJsonKeyValue> CJsonValue::GetObjectKeyValues() const
+inline CJsonList<CJsonKeyValue> CJsonValue::GetObjectKeyValues() const
 {
 	assert( valueType == JVT_Object );
 	return static_cast<const CJsonObject*>( this )->GetKeyValueList();
