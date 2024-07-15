@@ -76,6 +76,7 @@ void CProcessHeap::Free( CRawBuffer buffer )
 void CProcessHeap::Free( void* ptr )
 {
 	const BOOL freeResult = ::HeapFree( GetProcessHeap(), 0, ptr );
+	freeResult;
 	assert( freeResult != 0 );
 }
 

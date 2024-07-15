@@ -117,6 +117,7 @@ inline void CHeapAllocator::Free( CRawBuffer buffer )
 #else
 	totalSize -= buffer.Size();
 	const BOOL freeResult = ::HeapFree( Handle(), 0, ptr );
+	freeResult;
 	assert( freeResult != 0 );
 #endif
 	allocationCount--;
@@ -153,6 +154,7 @@ inline void CHeapAllocator::Free( void* ptr )
 		totalSize -= numeric_cast<int>( blockSize );
 	}
 	const BOOL freeResult = ::HeapFree( Handle(), 0, ptr );
+	freeResult;
 	assert( freeResult != 0 );
 #endif
 	allocationCount--;

@@ -116,6 +116,7 @@ void CHeapAllocator::destroy( bool forced )
 	assert( heap != 0 );
 	if( allocationCount == 0 || forced ) {
 		const BOOL destroyResult = ::HeapDestroy( heap );
+		destroyResult;
 		assert( destroyResult != 0 );
 		heap = 0;
 		allocationCount = 0;
