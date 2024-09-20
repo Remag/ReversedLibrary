@@ -24,18 +24,13 @@ void GenerateLastErrorException( DWORD errorCode )
 
 //////////////////////////////////////////////////////////////////////////
 
-CException::CException()
+CInternalException::CInternalException( CString _errorText )
+	: errorText( move( _errorText ) )
 {
 }
 
-CException::~CException()
-{
-}
-
-//////////////////////////////////////////////////////////////////////////
-
-CInternalException::CInternalException( CString _errorText ) :
-	errorText( move( _errorText ) )
+CInternalException::CInternalException( const CInternalException& other )
+	: errorText( copy( other.errorText ) )
 {
 }
 
@@ -70,15 +65,23 @@ void checkMemoryError( bool condition )
 
 //////////////////////////////////////////////////////////////////////////
 
+CCheckException::CCheckException( const CCheckException& other )
+	: err( other.err ),
+	  firstParam( copy( other.firstParam ) ),
+	  secondParam( copy( other.secondParam ) ),
+	  thirdParam( copy( other.thirdParam ) )
+{
+}
+
 CString CCheckException::GetMessageText() const
 {
-	return err.GetMessageText().SubstParam( params[0], params[1], params[2] );
+	return err.GetMessageText().SubstParam( firstParam, secondParam, thirdParam );
 }
 
 //////////////////////////////////////////////////////////////////////////
 
-CLastErrorException::CLastErrorException( DWORD _errorCode ) :
-	errorCode( _errorCode )
+CLastErrorException::CLastErrorException( DWORD _errorCode )
+	: errorCode( _errorCode )
 {
 }
 
@@ -98,9 +101,7 @@ CString CLastErrorException::GetErrorText( DWORD errorCode )
 	const DWORD formatResult = ::FormatMessage( FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_ARGUMENT_ARRAY,
 		0, errorCode, LANG_NEUTRAL, reinterpret_cast<wchar_t*>( &text ), 0, 0 );
 
-	auto result = ( text == nullptr || formatResult == 0 )
-		? UnknownLastError.SubstParam( Str( numeric_cast<int>( errorCode ), 16 ) )
-		: Str( text );
+	auto result = ( text == nullptr || formatResult == 0 ) ? UnknownLastError.SubstParam( Str( numeric_cast<int>( errorCode ), 16 ) ) : Str( text );
 
 	if( text != nullptr ) {
 		::LocalFree( static_cast<HLOCAL>( text ) );
@@ -110,17 +111,17 @@ CString CLastErrorException::GetErrorText( DWORD errorCode )
 
 //////////////////////////////////////////////////////////////////////////
 
-CFileException::CFileException( DWORD _errorCode, CStringPart _fileName ) :
-	errorCode( _errorCode ),
-	fileName( _fileName ),
-	type( GetErrorType( _errorCode ) )
+CFileException::CFileException( DWORD _errorCode, CStringPart _fileName )
+	: errorCode( _errorCode ),
+	  fileName( _fileName ),
+	  type( GetErrorType( _errorCode ) )
 {
 }
 
-CFileException::CFileException( TFileExceptionType _type, CStringPart _fileName ) :
-	errorCode( 0 ),
-	fileName( _fileName ),
-	type( _type )
+CFileException::CFileException( TFileExceptionType _type, CStringPart _fileName )
+	: errorCode( 0 ),
+	  fileName( _fileName ),
+	  type( _type )
 {
 }
 
@@ -132,76 +133,76 @@ CString CFileException::GetMessageText() const
 CFileException::TFileExceptionType CFileException::GetErrorType( DWORD errorCode )
 {
 	switch( errorCode ) {
-	case ERROR_FILE_NOT_FOUND:
-	case ERROR_INVALID_HANDLE:
-	case ERROR_NO_MORE_FILES:
-	case ERROR_DISK_CHANGE:
-		return FET_FileNotFound;
-	case ERROR_BAD_FORMAT:
-	case ERROR_NOT_DOS_DISK:
-	case ERROR_BAD_REM_ADAP:
-	case ERROR_BAD_DEV_TYPE:
-	case ERROR_INVALID_TARGET_HANDLE:
-	case ERROR_INVALID_ORDINAL:
-	case ERROR_INVALID_EXE_SIGNATURE:
-	case ERROR_BAD_EXE_FORMAT:
-		return FET_InvalidFile;
-	case ERROR_PATH_NOT_FOUND:
-	case ERROR_INVALID_NAME:
-	case ERROR_INVALID_LEVEL:
-	case ERROR_NO_VOLUME_LABEL:
-	case ERROR_INVALID_DRIVE:
-	case ERROR_WRONG_DISK:
-	case ERROR_NOT_SAME_DEVICE:
-	case ERROR_DUP_NAME:
-	case ERROR_DEV_NOT_EXIST:
-	case ERROR_BAD_NETPATH:
-	case ERROR_BAD_NET_NAME:
-	case ERROR_SHARING_PAUSED:
-	case ERROR_ALREADY_ASSIGNED:
-	case ERROR_BUFFER_OVERFLOW:
-	case ERROR_DIR_NOT_ROOT:
-	case ERROR_LABEL_TOO_LONG:
-	case ERROR_BAD_PATHNAME:
-	case ERROR_FILENAME_EXCED_RANGE:
-	case ERROR_META_EXPANSION_TOO_LONG:
-	case ERROR_DIRECTORY:
-		return FET_BadPath;
-	case ERROR_ALREADY_EXISTS:
-	case ERROR_FILE_EXISTS:
-		return FET_AlreadyExists;
-	case ERROR_ACCESS_DENIED:
-	case ERROR_BUSY:
-	case ERROR_CANNOT_MAKE:
-	case ERROR_INVALID_ACCESS:
-	case ERROR_INVALID_PASSWORD:
-	case ERROR_NETWORK_ACCESS_DENIED:
-	case ERROR_NETWORK_BUSY:
-	case ERROR_NETNAME_DELETED:
-	case ERROR_BAD_NET_RESP:
-	case ERROR_REQ_NOT_ACCEP:
-	case ERROR_SWAPERROR:
-	case ERROR_WRITE_PROTECT:
-		return FET_AccessDenied;
-	case ERROR_SHARING_VIOLATION:
-		return FET_SharingViolation;
-	case ERROR_ADAP_HDW_ERR:
-	case ERROR_BAD_UNIT:
-	case ERROR_BAD_COMMAND:
-	case ERROR_CRC:
-	case ERROR_INVALID_CATEGORY:
-	case ERROR_IO_INCOMPLETE:
-	case ERROR_IO_PENDING:
-	case ERROR_NET_WRITE_FAULT:
-	case ERROR_NOT_READY:
-	case ERROR_OPERATION_ABORTED:
-	case ERROR_UNEXP_NET_ERR:
-		return FET_HardwareError;
-	case NO_ERROR:
-		assert( false );
-		return FET_None;
-	default:
-		return FET_General;
+		case ERROR_FILE_NOT_FOUND:
+		case ERROR_INVALID_HANDLE:
+		case ERROR_NO_MORE_FILES:
+		case ERROR_DISK_CHANGE:
+			return FET_FileNotFound;
+		case ERROR_BAD_FORMAT:
+		case ERROR_NOT_DOS_DISK:
+		case ERROR_BAD_REM_ADAP:
+		case ERROR_BAD_DEV_TYPE:
+		case ERROR_INVALID_TARGET_HANDLE:
+		case ERROR_INVALID_ORDINAL:
+		case ERROR_INVALID_EXE_SIGNATURE:
+		case ERROR_BAD_EXE_FORMAT:
+			return FET_InvalidFile;
+		case ERROR_PATH_NOT_FOUND:
+		case ERROR_INVALID_NAME:
+		case ERROR_INVALID_LEVEL:
+		case ERROR_NO_VOLUME_LABEL:
+		case ERROR_INVALID_DRIVE:
+		case ERROR_WRONG_DISK:
+		case ERROR_NOT_SAME_DEVICE:
+		case ERROR_DUP_NAME:
+		case ERROR_DEV_NOT_EXIST:
+		case ERROR_BAD_NETPATH:
+		case ERROR_BAD_NET_NAME:
+		case ERROR_SHARING_PAUSED:
+		case ERROR_ALREADY_ASSIGNED:
+		case ERROR_BUFFER_OVERFLOW:
+		case ERROR_DIR_NOT_ROOT:
+		case ERROR_LABEL_TOO_LONG:
+		case ERROR_BAD_PATHNAME:
+		case ERROR_FILENAME_EXCED_RANGE:
+		case ERROR_META_EXPANSION_TOO_LONG:
+		case ERROR_DIRECTORY:
+			return FET_BadPath;
+		case ERROR_ALREADY_EXISTS:
+		case ERROR_FILE_EXISTS:
+			return FET_AlreadyExists;
+		case ERROR_ACCESS_DENIED:
+		case ERROR_BUSY:
+		case ERROR_CANNOT_MAKE:
+		case ERROR_INVALID_ACCESS:
+		case ERROR_INVALID_PASSWORD:
+		case ERROR_NETWORK_ACCESS_DENIED:
+		case ERROR_NETWORK_BUSY:
+		case ERROR_NETNAME_DELETED:
+		case ERROR_BAD_NET_RESP:
+		case ERROR_REQ_NOT_ACCEP:
+		case ERROR_SWAPERROR:
+		case ERROR_WRITE_PROTECT:
+			return FET_AccessDenied;
+		case ERROR_SHARING_VIOLATION:
+			return FET_SharingViolation;
+		case ERROR_ADAP_HDW_ERR:
+		case ERROR_BAD_UNIT:
+		case ERROR_BAD_COMMAND:
+		case ERROR_CRC:
+		case ERROR_INVALID_CATEGORY:
+		case ERROR_IO_INCOMPLETE:
+		case ERROR_IO_PENDING:
+		case ERROR_NET_WRITE_FAULT:
+		case ERROR_NOT_READY:
+		case ERROR_OPERATION_ABORTED:
+		case ERROR_UNEXP_NET_ERR:
+			return FET_HardwareError;
+		case NO_ERROR:
+			assert( false );
+			return FET_None;
+		default:
+			return FET_General;
 	}
 }
 
@@ -219,30 +220,30 @@ extern const CStringView HardwareFileError;
 CString CFileException::GetErrorText( CFileException::TFileExceptionType type, CStringView name, int code )
 {
 	switch( type ) {
-	case FET_FileNotFound:
-		return FileNotFoundError.SubstParam( name );
-	case FET_InvalidFile:
-		return InvalidFileError.SubstParam( name );
-	case FET_FileTooBig:
-		return FileTooBigError.SubstParam( name );
-	case FET_BadPath:
-		return BadPathFileError.SubstParam( name );
-	case FET_AlreadyExists:
-		return ObjectAlreadyExistsError.SubstParam( name );
-	case FET_AccessDenied:
-		return AccessDeniedError.SubstParam( name );
-	case FET_SharingViolation:
-		return SharingViolationFileError.SubstParam( name );
-	case FET_DiskFull:
-		return DiskFullError.SubstParam( name );
-	case FET_EarlyEnd:
-		return EarlyEndFileError.SubstParam( name );
-	case FET_HardwareError:
-		return HardwareFileError.SubstParam( name );
-	case FET_None:
-		assert( false );
-	default:
-		return GeneralFileError.SubstParam( name, code );
+		case FET_FileNotFound:
+			return FileNotFoundError.SubstParam( name );
+		case FET_InvalidFile:
+			return InvalidFileError.SubstParam( name );
+		case FET_FileTooBig:
+			return FileTooBigError.SubstParam( name );
+		case FET_BadPath:
+			return BadPathFileError.SubstParam( name );
+		case FET_AlreadyExists:
+			return ObjectAlreadyExistsError.SubstParam( name );
+		case FET_AccessDenied:
+			return AccessDeniedError.SubstParam( name );
+		case FET_SharingViolation:
+			return SharingViolationFileError.SubstParam( name );
+		case FET_DiskFull:
+			return DiskFullError.SubstParam( name );
+		case FET_EarlyEnd:
+			return EarlyEndFileError.SubstParam( name );
+		case FET_HardwareError:
+			return HardwareFileError.SubstParam( name );
+		case FET_None:
+			assert( false );
+		default:
+			return GeneralFileError.SubstParam( name, code );
 	}
 }
 
@@ -258,5 +259,4 @@ void ThrowFileException( CFileException::TFileExceptionType type, CStringPart fi
 
 //////////////////////////////////////////////////////////////////////////
 
-}	// namespace Relib.
-
+}	 // namespace Relib.

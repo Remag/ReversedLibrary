@@ -4,6 +4,12 @@ namespace Relib {
 
 //////////////////////////////////////////////////////////////////////////
 
+CJsonValueException& CJsonValueException::operator=( const CJsonValueException& other )
+{
+	errorText = copy( other.errorText );
+	return *this;
+}
+
 extern const REAPI CStringView JsonConversionError;
 CJsonValueException::CJsonValueException( TJsonValueType expected, TJsonValueType actual )
 {
@@ -45,4 +51,4 @@ CString CJsonValueException::GetMessageText() const
 
 //////////////////////////////////////////////////////////////////////////
 
-} // namespace Relib.
+}	 // namespace Relib.

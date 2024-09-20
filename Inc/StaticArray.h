@@ -117,7 +117,7 @@ Elem& CStaticArray<Elem, Allocator>::Add( AddArgs&&... args )
 	assert( newSize <= maxSize );
 	// Call the needed constructor.
 	Elem* result = ::new( this->Ptr() + this->Size() ) Elem{ forward<AddArgs>( args )... };
-	this->setSizeValue( this->Size() + 1 );
+	this->setSizeValue( newSize );
 	return *result;
 }
 	

@@ -81,8 +81,8 @@ inline Dest check_cast( const CSharedPtr<Src>& src, const CError& err )
 // Base class for all exceptions.
 class REAPI CException {
 public:
-	CException();
-	virtual ~CException();
+	CException() = default;
+	virtual ~CException() = default;
 
 	virtual CString GetMessageText() const = 0;
 };
@@ -93,6 +93,7 @@ public:
 class REAPI CInternalException : public CException {
 public:
 	explicit CInternalException( CString errorText );
+	CInternalException( const CInternalException& other );
 
 	// CException.
 	virtual CString GetMessageText() const override final;
@@ -143,6 +144,7 @@ class REAPI CCheckException : public CException {
 public:
 	template <class... Params>
 	CCheckException( const CError& err, Params&&... params );
+	CCheckException( const CCheckException& other );
 
 	// CException.
 	virtual CString GetMessageText() const; 
@@ -150,47 +152,66 @@ public:
 	const CError& Error() const
 		{ return err; }
 	CStringView FirstParameter() const
-		{ return params[0]; }
+		{ return firstParam; }
 	CStringView SecondParameter() const
-		{ return params[1]; }
+		{ return secondParam; }
 	CStringView ThirdParameter() const
-		{ return params[2]; }
+		{ return thirdParam; }
 
 	void SetFirstParam( CStringPart newValue )
-		{ params[0] = newValue; }
+		{ firstParam = newValue; }
 	void SetSecondParam( CStringPart newValue )
-		{ params[1] = newValue; }
+		{ secondParam = newValue; }
 	void SetThirdParam( CStringPart newValue )
-		{ params[2] = newValue; }
+		{ thirdParam = newValue; }
 
 private:
 	// An error object. It is assumed that all errors are static.
 	const CError& err;
 	// Optional error parameters.
-	CString params[3];
+	CString firstParam;
+	CString secondParam;
+	CString thirdParam;
 
-	static void initParam( CString* params );
-	template <class FirstParam, class...RestParams>
-	static void initParam( CString* params, FirstParam&& first, RestParams&&... rest );
+	template <class Param1, class Param2, class Param3>
+	void initParam( Param1&& firstParam, Param2&& secondParam, Param3&& thirdParam );
+	template <class Param1, class Param2>
+	void initParam( Param1&& firstParam, Param2&& secondParam );
+	template <class Param1>
+	void initParam( Param1&& firstParam );
+	void initParam();
 };
 
 template <class... Params>
 CCheckException::CCheckException( const CError& _err, Params&&... _params ) :
 	err( _err )
 {
-	static_assert( sizeof...( _params ) <= 3, "Too many parameters for a check." );
-	initParam( params, forward<Params>( _params )... );
+	initParam( forward<Params>( _params )... );
 }
 
-inline void CCheckException::initParam( CString* )
+template <class Param1, class Param2, class Param3>
+inline void CCheckException::initParam( Param1&& _firstParam, Param2&& _secondParam, Param3&& _thirdParam )
 {
+	firstParam = Str( forward<Param1>( _firstParam ) );
+	secondParam = Str( forward<Param2>( _secondParam ) );
+	thirdParam = Str( forward<Param3>( _thirdParam ) );
 }
 
-template <class FirstParam, class...RestParams>
-void CCheckException::initParam( CString* params, FirstParam&& first, RestParams&&... rest )
+template <class Param1, class Param2>
+inline void CCheckException::initParam( Param1&& _firstParam, Param2&& _secondParam )
 {
-	*params = Str( forward<FirstParam>( first ) );
-	initParam( params + 1, forward<RestParams>( rest )... );
+	firstParam = Str( forward<Param1>( _firstParam ) );
+	secondParam = Str( forward<Param2>( _secondParam ) );
+}
+
+template <class Param1>
+inline void CCheckException::initParam( Param1&& _firstParam )
+{
+	firstParam = Str( forward<Param1>( _firstParam ) );
+}
+
+inline void CCheckException::initParam()
+{
 }
 
 template <class... Params>

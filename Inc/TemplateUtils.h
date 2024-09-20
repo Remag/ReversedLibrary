@@ -3,6 +3,7 @@
 // These class create a basic traits support.
 
 #include <type_traits>
+#include <initializer_list>
 
 namespace Relib {
 

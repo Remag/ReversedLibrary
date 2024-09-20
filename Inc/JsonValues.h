@@ -77,6 +77,10 @@ private:
 // Exception thrown on value type mismatch or missing values.
 class REAPI CJsonValueException : public CException {
 public:
+	CJsonValueException( const CJsonValueException& other )
+		: errorText( copy( other.errorText ) ) {}
+	CJsonValueException& operator=( const CJsonValueException& other );
+
 	// Initialize a conversion error.
 	CJsonValueException( TJsonValueType expected, TJsonValueType actual );
 	// Initialize a missing object key error.
