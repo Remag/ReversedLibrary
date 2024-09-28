@@ -38,6 +38,7 @@ void CJsonDocument::CreateFromFile( CFileReader& jsonFile )
 	CArrayBuffer<BYTE> jsonArrayBuffer( static_cast<BYTE*>( jsonStrBuffer.Ptr() ), length + 1 );
 	int bufferStartPos;
 	const auto encoding = jsonFile.ReadByteString( jsonArrayBuffer.Left( length ), bufferStartPos );
+	encoding;
 	assert( encoding == FTE_UTF8 || encoding == FTE_Undefined );
 	jsonArrayBuffer[length] = 0;
 	const CStringView jsonStr( reinterpret_cast<const char*>( jsonArrayBuffer.Mid( bufferStartPos ).Ptr() ), length - bufferStartPos );

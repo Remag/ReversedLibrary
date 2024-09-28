@@ -69,14 +69,15 @@ CVirtualAllocDynamicManager::~CVirtualAllocDynamicManager()
 
 void* CVirtualAllocDynamicManager::Allocate( int size )
 {
-	void* result = ::VirtualAlloc( 0, size, MEM_COMMIT, PAGE_READWRITE );
+	const auto result = ::VirtualAlloc( 0, size, MEM_COMMIT, PAGE_READWRITE );
 	checkMemoryError( result != nullptr );
 	return result;
 }
 
 void CVirtualAllocDynamicManager::Free( void* ptr )
 {
-	const BOOL result = ::VirtualFree( ptr, 0, MEM_RELEASE );
+	const auto result = ::VirtualFree( ptr, 0, MEM_RELEASE );
+	result;
 	assert( result != 0 );
 }
 
