@@ -379,40 +379,40 @@ void CJsonDocument::writeToString( const CJsonString& value, CString& result ) c
 	writeStringValue( value.GetString(), result );
 }
 
-void CJsonDocument::writeStringValue( CStringPart str, CString & result ) const
+void CJsonDocument::writeStringValue( CStringPart str, CString& result ) const
 {
-	result.ReserveBuffer( result.Length() + str.Length() + 2 );
-
-	result += '"';
+	auto localResult = Str( '"' );
+	localResult.ReserveBuffer( str.Length() + 2 );
 	for( auto ch : str ) {
 		switch( ch ) {
 			case '"':
-				result += "\\\"";
+				localResult += "\\\"";
 				break;
 			case '\\':
-				result += "\\\\";
+				localResult += "\\\\";
 				break;
 			case '/':
-				result += "\\/";
+				localResult += "\\/";
 				break;
 			case '\b':
-				result += "\\b";
+				localResult += "\\b";
 				break;
 			case '\n':
-				result += "\\n";
+				localResult += "\\n";
 				break;
 			case '\r':
-				result += "\\r";
+				localResult += "\\r";
 				break;
 			case '\t':
-				result += "\\t";
+				localResult += "\\t";
 				break;
 			default:
-				result += ch;
+				localResult += ch;
 				break;
 		}
 	}
-	result += '"';
+	localResult += '"';
+	result += localResult;
 }
 
 void CJsonDocument::writeToString( const CJsonBool& value, CString& result ) const
@@ -425,18 +425,20 @@ void CJsonDocument::writeToString( const CJsonDynamicArray& arr, int indentValue
 	const auto lastPos = arr.Size() - 1;
 	int valuePos = 0;
 
-	result += '[';
-	indentLine( indentValue + 1, result );
+	auto localResult = Str( '[' );
+	const auto nextIndent = indentValue != NotFound ? indentValue + 1 : NotFound;
+	indentLine( nextIndent, localResult );
 	for( const auto& value : arr.GetValues() ) {
-		writeToString( *value, indentValue + 1, result );
+		writeToString( *value, nextIndent, localResult );
 		if( valuePos != lastPos ) {
-			result += ',';
-			indentLine( indentValue + 1, result );
+			localResult += ',';
+			indentLine( nextIndent, localResult );
 		}
 		valuePos++;
 	}
-	indentLine( indentValue, result );
-	result += ']';
+	indentLine( indentValue, localResult );
+	localResult += ']';
+	result += localResult;
 }
 
 void CJsonDocument::writeToString( const CJsonObject& value, int indentValue, CString& result ) const
@@ -444,20 +446,22 @@ void CJsonDocument::writeToString( const CJsonObject& value, int indentValue, CS
 	const auto lastPos = value.Size() - 1;
 	int valuePos = 0;
 
-	result += '{';
-	indentLine( indentValue + 1, result );
+	auto localResult = Str( '{' );
+	const auto nextIndent = indentValue != NotFound ? indentValue + 1 : NotFound;
+	indentLine( nextIndent, localResult );
 	for( const auto& keyValue : value.GetKeyValueList() ) {
-		writeStringValue( keyValue.Key, result );
-		result += ( indentValue != NotFound ) ? ": " : ":";
-		writeToString( *keyValue.Value, indentValue + 1, result );
+		writeStringValue( keyValue.Key, localResult );
+		localResult += ( indentValue != NotFound ) ? ": " : ":";
+		writeToString( *keyValue.Value, nextIndent, localResult );
 		if( valuePos != lastPos ) {
-			result += ',';
-			indentLine( indentValue + 1, result );
+			localResult += ',';
+			indentLine( nextIndent, localResult );
 		}
 		valuePos++;
 	}
-	indentLine( indentValue, result );
-	result += '}';
+	indentLine( indentValue, localResult );
+	localResult += '}';
+	result += localResult;
 }
 
 void CJsonDocument::indentLine( int indentValue, CString& result ) const
@@ -532,4 +536,4 @@ void CJsonDocument::AddObjectValue( CJsonObject& obj, CStringPart key, CJsonValu
 
 //////////////////////////////////////////////////////////////////////////
 
-} // namespace Relib.
+}	 // namespace Relib.

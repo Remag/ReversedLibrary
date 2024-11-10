@@ -626,6 +626,7 @@ public:
 	static CString ToString( unsigned value, int base = 10 );
 	static CString ToString( __int64 value, int base = 10 );
 	static CString ToString( double value, int digitCount = 3 );
+	static CString ToString( char value );
 	static CString ToString( CStringPart value );
 	static CString ToString( const char* value );
 	static CString ToString( const wchar_t* value, unsigned codePage = CP_UTF8 );
@@ -789,6 +790,11 @@ inline CString CStrConversionFunctions<char>::ToString( double value, int digitC
 	return FloatToString( value, digitCount );
 }
 
+inline CString CStrConversionFunctions<char>::ToString( char value )
+{
+	return CString( &value, 1 );
+}
+
 inline CString CStrConversionFunctions<char>::ToString( CStringPart value )
 {
 	return CString( value.begin(), value.Length() );
@@ -909,6 +915,7 @@ public:
 	static CUnicodeString ToString( unsigned value, int base = 10 );
 	static CUnicodeString ToString( __int64 value, int base = 10 );
 	static CUnicodeString ToString( double value, int digitCount = 3 );
+	static CUnicodeString ToString( wchar_t value );
 	static CUnicodeString ToString( CUnicodePart value );
 	static CUnicodeString ToString( const wchar_t* value );
 	static CUnicodeString ToString( const char* value, unsigned codePage = CP_UTF8 );
@@ -1074,6 +1081,11 @@ inline CUnicodeString CStrConversionFunctions<wchar_t>::ToString( __int64 value,
 inline CUnicodeString CStrConversionFunctions<wchar_t>::ToString( double value, int digitCount )
 {
 	return FloatToString( value, digitCount );
+}
+
+inline CUnicodeString CStrConversionFunctions<wchar_t>::ToString( wchar_t value )
+{
+	return CUnicodeString( &value, 1 );
 }
 
 inline CUnicodeString CStrConversionFunctions<wchar_t>::ToString( CUnicodePart value )
