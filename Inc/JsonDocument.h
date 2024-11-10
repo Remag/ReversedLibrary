@@ -52,13 +52,17 @@ public:
 	CString GetDocumentString() const;
 	CString GetFormattedString() const;
 
+	CJsonValue& GetRoot()
+		{ assert( root != nullptr ); return *root; }
 	const CJsonValue& GetRoot() const
 		{ assert( root != nullptr ); return *root; }
+	CJsonValue* TryGetRoot()
+		{ return root; }
 	const CJsonValue* TryGetRoot() const
 		{ return root; }
 	// Set the specified value as document's root.
 	// Value must have been created in this document.
-	void SetRoot( const CJsonValue& newRoot )
+	void SetRoot( CJsonValue& newRoot )
 		{ root = &newRoot; }
 
 	// Value creation functions.
@@ -74,7 +78,7 @@ public:
 
 private:
 	CArena<> jsonData;
-	const CJsonValue* root = nullptr;
+	CJsonValue* root = nullptr;
 
 	struct CJsonPosition {
 		int Pos = 0;
