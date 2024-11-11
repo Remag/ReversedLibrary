@@ -370,7 +370,7 @@ void CJsonDocument::writeToString( const CJsonNull&, CString& result ) const
 void CJsonDocument::writeToString( const CJsonNumber& value, CString& result ) const
 {
 	const auto resultNum = value.GetNumber();
-	const auto digitCount = HasFractionalPart( resultNum ) ? 3 : 0;
+	const auto digitCount = HasFractionalPart( resultNum ) ? 16 : 0;
 	result += Str( resultNum, digitCount );
 }
 
