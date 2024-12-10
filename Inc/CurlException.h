@@ -14,6 +14,7 @@ namespace Relib {
 class CCurlException : public CException {
 public:
 	explicit CCurlException( CString msg ) : errorMsg( move( msg ) ) {}
+	CCurlException( const CCurlException& other ) : errorMsg( copy( other.errorMsg ) ) {}
 
 	virtual CString GetMessageText() const override final;
 

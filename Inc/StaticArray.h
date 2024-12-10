@@ -15,9 +15,10 @@ class CStaticArray : private CAllocationStrategy<Allocator>, public RelibInterna
 public:
 	typedef Elem TElemType;
 
+	CStaticArray() = default;
 	// Create an array and allocate a buffer of the given size.
 	// Empty elements are not created.
-	explicit CStaticArray( int maxSize = 0 );
+	explicit CStaticArray( int maxSize );
 	// Create an array with the custom dynamic allocator.
 	explicit CStaticArray( Allocator& allocator, int maxSize = 0 );
 	// Arrays can be constructed from rvalues implicitly.
@@ -90,9 +91,9 @@ void CStaticArray<Elem, Allocator>::createNewBuffer( int bufferSize )
 	assert( bufferSize >= this->Size() );
 	assert( bufferSize <= INT_MAX / sizeof( Elem ) );
 	
-	Elem* newBuffer = ( bufferSize > 0 )
+	const auto newBuffer = ( bufferSize > 0 )
 		? static_cast<Elem*>( RELIB_STRATEGY_ALLOCATE( bufferSize * sizeof( Elem ) ) )
-		: 0;
+		: nullptr;
 
 	this->setBufferValue( newBuffer );
 	maxSize = bufferSize;
