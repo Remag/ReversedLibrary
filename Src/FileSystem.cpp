@@ -134,7 +134,7 @@ TPathType GetPathType( CStringPart path )
 	const int length = path.Length();
 	if( length >= 2 && isNameSeparator( path[0] ) && path[0] == path[1] ) {
 		return PT_UNC;
-	} else if( length >= 2 && path[1] == L':' ) {
+	} else if( length >= 2 && path[1] == ':' ) {
 		return length >= 3 && isNameSeparator( path[2] ) ? PT_Absolute : PT_RelativeWithDrive;
 	} else if( length > 0 && isNameSeparator( path[0] ) ) {
 		return PT_RelativeFromRoot;
@@ -180,7 +180,7 @@ TPathType SplitName( CStringPart path, CArray<CStringPart>& components )
 	}
 	// Sometimes the first component has a drive name in it, we need to check for this case and split the component if necessary.
 	if( pathType == PT_RelativeWithDrive ) {
-		assert( components[0][1] == L':' );
+		assert( components[0][1] == ':' );
 		if( components[0].Length() > 2 ) {
 			const auto folderName = components[0].Mid( 2 );
 			components[0] = components[0].Left( 2 );
@@ -368,7 +368,7 @@ CStringPart GetDrive( CStringPart name )
 
 	for( int i = 0; i < length; i++ ) {
 		const auto ch = name[i];
-		if( ch == L':' ) {
+		if( ch == ':' ) {
 			return name.Left( i + 1 );
 		} else if( isNameSeparator( ch ) ) {
 			break;
@@ -389,7 +389,7 @@ CStringPart GetPath( CStringPart name )
 
 	for( int i = 0; i < length; i++ ) {
 		const auto ch = name[i];
-		if( ch == L':' ) {
+		if( ch == ':' ) {
 			return name.Mid( i + 1, nameEndPos - i );
 		} else if( isNameSeparator( ch ) ) {
 			return name.Left( nameEndPos + 1 );
@@ -416,7 +416,7 @@ CStringPart GetName( CStringPart name )
 	int nameEndPos = length;
 	for( int i = nameEndPos - 1; i >= 0; i-- ) {
 		const auto ch = name[i];
-		if( ch == L'.' && nameEndPos == length ) {
+		if( ch == '.' && nameEndPos == length ) {
 			// The first dot is an extension separator.
 			nameEndPos = i;
 		} else if( isNameSeparator( ch ) ) {
@@ -433,9 +433,9 @@ CStringPart GetExt( CStringPart name )
 	const int length = name.Length();
 	for( int i = length - 1; i >= 0; i-- ) {
 		const auto ch = name[i];
-		if( ch == L'.' ) {
+		if( ch == '.' ) {
 			// Special tokens "." and ".." have no extension.
-			if( ( length == 1 ) || ( length == 2 && name[0] == L'.' && i == 1 ) ) {
+			if( ( length == 1 ) || ( length == 2 && name[0] == '.' && i == 1 ) ) {
 				return CStringPart();
 			} else {
 				return name.Mid( i );
@@ -484,11 +484,11 @@ void AddPathSeparator( CString& path )
 void NormalizePath( CString& path )
 {
 	const int length = path.Length();
-	if( length == 3 && isLetterLatin( path[0] ) && path[1] == L':' && isNameSeparator( path[2] ) ) {
+	if( length == 3 && isLetterLatin( path[0] ) && path[1] == ':' && isNameSeparator( path[2] ) ) {
 		return;
 	}
-	if( length == 2 && isLetterLatin( path[0] ) && path[1] == L':' ) {
-		path += L'\\';
+	if( length == 2 && isLetterLatin( path[0] ) && path[1] == ':' ) {
+		path += '\\';
 	}
 	if( length < 2 ) {
 		return;
@@ -503,7 +503,7 @@ void ForceBackSlashes( CString& path )
 {
 	for( int i = 0; i < path.Length(); i++ ) {
 		if( isNameSeparator( path[i] ) ) {
-			path.ReplaceAt( i, L'\\' );
+			path.ReplaceAt( i, '\\' );
 		}
 	}
 }

@@ -20,6 +20,7 @@ public:
 	// Initialize with raw data.
 	CBaseStringPart( CStringData<T> data ) : CBaseStringPart( data.begin(), data.Length() ) {}
 	// Initialize with a symbol.
+	// NOTE: this leads to strings being constructible from booleans! Probably not worth it.
 	CBaseStringPart( const T& symbol ) : CBaseStringPart( &symbol, 1 ) {}
 	// Initialize with a null-terminated buffer.
 	CBaseStringPart( const T* buffer ) : CBaseStringPart( buffer, CStringOperations<T>::Length( buffer ) ) {}
